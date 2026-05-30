@@ -1,11 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Ticket, User, Sun, Moon, Menu } from "lucide-react";
-import { Input } from "@/components/atoms/input";
+import { EventsHeader } from "@/components/organisms/events-header/events-header";
+import { FeaturedEvents } from "@/components/organisms/featured-events/featured-events";
+import { CategoryFilter } from "@/components/organisms/category-filter/category-filter";
+import { EventsGrid } from "@/components/organisms/events-grid/events-grid";
+import { MOCK_EVENTS, CATEGORIES } from "./data";
 
 const EventsPage = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [activeFeaturedTab, setActiveFeaturedTab] = useState<
+    "feature" | "wishlist" | "pass"
+  >("feature");
+  const [registeredIds, setRegisteredIds] = useState<string[]>(["1", "3", "5"]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -41,79 +50,55 @@ const EventsPage = () => {
     }
   };
 
+  const filteredEvents = MOCK_EVENTS.filter((event) => {
+    const matchesCategory = selectedCategory
+      ? event.tag.toLowerCase() === selectedCategory.toLowerCase()
+      : true;
+    const matchesSearch = searchQuery
+      ? event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (event.location &&
+          event.location.toLowerCase().includes(searchQuery.toLowerCase()))
+      : true;
+    return matchesCategory && matchesSearch;
+  });
+
+  const featuredEvents = MOCK_EVENTS.slice(0, 5);
+
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
-      {/* Top Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-4">
-          {/* Left Section: Logo */}
-          <div className="flex items-center">
-            <div className="flex items-center gap-2 font-semibold text-xl tracking-tight">
-              <div className="h-8 w-8 rounded-lg bg-indigo-700 flex items-center justify-center text-white">
-                <Ticket className="size-5" />
-              </div>
-              <span>Passvy</span>
-            </div>
-          </div>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
+      <EventsHeader
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
 
-          {/* Center Section: Search Bar with Account Avatar inside on the right */}
-          <div className="flex-1 max-w-xl relative flex items-center">
-            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-muted-foreground">
-              <Search className="size-5" />
-            </div>
-            <Input
-              type="search"
-              placeholder="Search passes, events, or hosts..."
-              className="pl-12 pr-14 h-12 w-full bg-secondary/15 border-border/80 focus-visible:ring-primary/45 focus-visible:border-primary/45 rounded-full text-base"
+      <main className="container mx-auto px-4 py-8 flex-1">
+        <div className="space-y-8">
+          {!selectedCategory && !searchQuery && featuredEvents.length > 0 && (
+            <FeaturedEvents
+              activeFeaturedTab={activeFeaturedTab}
+              setActiveFeaturedTab={setActiveFeaturedTab}
+              featuredEvents={featuredEvents}
+              mockEvents={MOCK_EVENTS}
+              registeredIds={registeredIds}
+              setRegisteredIds={setRegisteredIds}
             />
-            {/* Account Avatar inside search on the right */}
-            <div className="absolute right-2 cursor-pointer">
-              <div className="relative">
-                <div className="h-8 w-8 rounded-full bg-secondary/30 border border-border overflow-hidden flex items-center justify-center hover:border-primary/50 transition-colors">
-                  <User className="size-4.5 text-muted-foreground" />
-                </div>
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-background bg-emerald-500" />
-              </div>
-            </div>
-          </div>
+          )}
 
-          {/* Right Section: Theme Toggle & Menu Icon */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              aria-label="Toggle theme"
-            >
-              {theme === "light" ? (
-                <Moon className="size-5" />
-              ) : (
-                <Sun className="size-5" />
-              )}
-            </button>
+          <CategoryFilter
+            categories={CATEGORIES}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+          />
 
-            {/* Menu & Pass Icon Group */}
-            <button
-              className="flex items-center gap-5 p-1 pl-3 border border-border hover:shadow-sm rounded-full transition-all cursor-pointer bg-secondary/10 hover:bg-secondary/20"
-              aria-label="User menu"
-            >
-              <Menu className="size-5 text-muted-foreground" />
-              <div className="h-7 w-7 rounded-full bg-indigo-700 flex items-center justify-center text-white">
-                <Ticket className="size-4" />
-              </div>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight">Active Events</h2>
-          <p className="text-muted-foreground">
-            Manage your hosts, active digital passes, and event entry
-            validations.
-          </p>
+          <EventsGrid
+            filteredEvents={filteredEvents}
+            setRegisteredIds={setRegisteredIds}
+            setSearchQuery={setSearchQuery}
+            setSelectedCategory={setSelectedCategory}
+          />
         </div>
       </main>
     </div>

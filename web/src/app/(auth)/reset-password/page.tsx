@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/atoms/button";
-import { Input } from "@/components/atoms/input";
-import { Label } from "@/components/atoms/label";
+import { Button } from "@/components/atoms/button/button";
+import { Input } from "@/components/atoms/input/input";
+import { Label } from "@/components/atoms/label/label";
 import Link from "next/link";
 
 enum ResetStep {
@@ -219,3 +219,4 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+

@@ -1,9 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "@/components/atoms/button";
-import { Input } from "@/components/atoms/input";
-import { Label } from "@/components/atoms/label";
-import { Separator } from "@/components/atoms/separator";
+import { Button } from "@/components/atoms/button/button";
+import { Input } from "@/components/atoms/input/input";
+import { Label } from "@/components/atoms/label/label";
+import { Separator } from "@/components/atoms/separator/separator";
 
 export const metadata: Metadata = {
   title: "Sign Up - Passvy Epass",
@@ -127,3 +127,4 @@ export default function SignupPage() {
     </div>
   );
 }
+
