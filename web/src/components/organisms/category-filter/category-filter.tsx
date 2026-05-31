@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { type Category } from "@/app/(main)/events/data";
+import { TypographySpan } from "@/components/atoms/typography/typography";
 
 export interface CategoryFilterProps {
   categories: Category[];
@@ -58,7 +59,7 @@ export const CategoryFilter = ({
                 key={cat.id}
                 onClick={() =>
                   setSelectedCategory(
-                    cat.name === "All Events" ? null : cat.name
+                    cat.name === "All Events" ? null : cat.name,
                   )
                 }
                 className={`flex items-center gap-2.5 p-3 px-4 rounded-xl cursor-pointer select-none shrink-0 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 border ${
@@ -74,9 +75,9 @@ export const CategoryFilter = ({
                       : "text-indigo-600 dark:text-indigo-400"
                   }`}
                 />
-                <span className="text-[13px] font-semibold tracking-wide">
+                <TypographySpan className="text-[13px] font-semibold tracking-wide">
                   {cat.name}
-                </span>
+                </TypographySpan>
               </button>
             );
           })}
@@ -98,7 +99,7 @@ export const CategoryFilter = ({
         className="flex items-center gap-2 p-3 px-4 rounded-xl cursor-pointer select-none shrink-0 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 border bg-secondary/15 border-border/80 text-muted-foreground hover:text-foreground hover:bg-secondary/30 hover:border-indigo-500/20 font-semibold text-[13px]"
       >
         <SlidersHorizontal className="size-4 text-indigo-600 dark:text-indigo-400" />
-        <span>Filters</span>
+        <TypographySpan>Filters</TypographySpan>
       </button>
     </div>
   );

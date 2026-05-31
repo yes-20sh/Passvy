@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Search, Ticket, Sun, Moon, Menu, Calendar } from "lucide-react";
 import { Input } from "@/components/atoms/input/input";
+import { TypographySpan } from "@/components/atoms/typography/typography";
 import avatarImage from "../../../assets/avtar.avif";
 
 export interface EventsHeaderProps {
@@ -27,7 +28,7 @@ export const EventsHeader = ({
             <div className="h-8 w-8 rounded-lg bg-indigo-700 flex items-center justify-center text-white">
               <Ticket className="size-5" />
             </div>
-            <span>Passvy</span>
+            <TypographySpan>Passvy</TypographySpan>
           </div>
         </div>
 
@@ -54,7 +55,7 @@ export const EventsHeader = ({
                   className="object-cover"
                 />
               </div>
-              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-background bg-emerald-500" />
+              <TypographySpan className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-background bg-emerald-500" />
             </div>
           </div>
         </div>
@@ -82,7 +83,7 @@ export const EventsHeader = ({
             <Link href="/host/events">
               <div className="cursor-pointer h-7 px-3 gap-1.5 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors flex items-center justify-center text-white font-semibold shadow-sm">
                 <Calendar className="size-3.5" />
-                <span className="text-[11px] leading-none">Host Event</span>
+                <TypographySpan className="text-[11px] leading-none">Host Event</TypographySpan>
               </div>
             </Link>
           </div>

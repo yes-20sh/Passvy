@@ -4,6 +4,11 @@ import { Button } from "@/components/atoms/button/button";
 import { Input } from "@/components/atoms/input/input";
 import { Label } from "@/components/atoms/label/label";
 import { Separator } from "@/components/atoms/separator/separator";
+import {
+  TypographyH2,
+  TypographyMuted,
+  TypographySpan,
+} from "@/components/atoms/typography/typography";
 
 export const metadata: Metadata = {
   title: "Login - Passvy Epass",
@@ -15,12 +20,12 @@ export default function LoginPage() {
     <div className="relative flex items-center justify-center min-h-svh overflow-y-auto bg-background selection:bg-primary/30 py-6">
       <div className="relative z-10 w-full max-w-sm p-4 sm:p-8">
         <div className="space-y-2 text-center pb-6">
-          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight text-foreground drop-shadow-sm">
+          <TypographyH2 className="border-b-0 pb-0 drop-shadow-sm text-foreground">
             Passvy
-          </h1>
-          <p className="text-sm text-muted-foreground">
+          </TypographyH2>
+          <TypographyMuted>
             Enter your details to sign in to your account
-          </p>
+          </TypographyMuted>
         </div>
 
         <div className="space-y-4">
@@ -64,9 +69,7 @@ export default function LoginPage() {
           </div>
 
           {/* Sign In Button */}
-          <Button className="w-full mt-2">
-            Sign in
-          </Button>
+          <Button className="w-full mt-2">Sign in</Button>
 
           {/* Divider */}
           <div className="relative my-6">
@@ -75,17 +78,14 @@ export default function LoginPage() {
             </div>
 
             <div className="relative flex justify-center text-[10px] uppercase">
-              <span className="bg-background px-3 text-muted-foreground backdrop-blur-md">
+              <TypographySpan className="bg-background px-3 text-muted-foreground backdrop-blur-md">
                 Or continue with
-              </span>
+              </TypographySpan>
             </div>
           </div>
 
           {/* Google Button */}
-          <Button
-            variant="outline"
-            className="w-full"
-          >
+          <Button variant="outline" className="w-full">
             <svg
               className="mr-2 h-4 w-4"
               aria-hidden="true"
@@ -105,7 +105,7 @@ export default function LoginPage() {
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground text-center mt-4">
+        <TypographyMuted className="text-center mt-4">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
@@ -113,9 +113,8 @@ export default function LoginPage() {
           >
             Sign up
           </Link>
-        </p>
+        </TypographyMuted>
       </div>
     </div>
   );
 }
-

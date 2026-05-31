@@ -4,6 +4,10 @@ import {
   EventCard,
   type EventData,
 } from "@/components/molecules/event-card/event-card";
+import {
+  TypographyH3,
+  TypographyMuted,
+} from "@/components/atoms/typography/typography";
 
 export interface EventsGridProps {
   filteredEvents: EventData[];
@@ -28,10 +32,10 @@ export const EventsGrid = ({
               event={event}
               onRegister={(id) => {
                 setRegisteredIds((prev) =>
-                  prev.includes(id) ? prev : [...prev, id]
+                  prev.includes(id) ? prev : [...prev, id],
                 );
                 alert(
-                  `Successfully registered for event: ${event.title} (ID: ${id})!`
+                  `Successfully registered for event: ${event.title} (ID: ${id})!`,
                 );
               }}
             />
@@ -40,11 +44,13 @@ export const EventsGrid = ({
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-border rounded-2xl bg-card/25 backdrop-blur-sm shadow-inner">
           <Search className="size-10 text-muted-foreground/60 mb-3 animate-pulse" />
-          <h3 className="text-lg font-bold text-foreground">No events found</h3>
-          <p className="text-muted-foreground text-sm max-w-xs mt-1">
+          <TypographyH3 className="text-lg font-bold text-foreground border-0">
+            No events found
+          </TypographyH3>
+          <TypographyMuted className="text-sm max-w-xs mt-1">
             We couldn't find any events matching your search or category filter.
             Try checking other categories or keywords!
-          </p>
+          </TypographyMuted>
           <button
             onClick={() => {
               setSearchQuery("");

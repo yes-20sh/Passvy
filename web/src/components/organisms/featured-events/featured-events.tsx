@@ -9,6 +9,12 @@ import {
 } from "@/components/molecules/event-card/event-card";
 import { EventCardHorizontal } from "@/components/molecules/event-card-horizontal/event-card-horizontal";
 import { EventPassCard } from "@/components/molecules/event-pass-card/event-pass-card";
+import {
+  TypographyH3,
+  TypographyH4,
+  TypographyMuted,
+  TypographySpan,
+} from "@/components/atoms/typography/typography";
 
 export interface FeaturedEventsProps {
   activeFeaturedTab: "feature" | "wishlist" | "pass";
@@ -77,9 +83,9 @@ export const FeaturedEvents = ({
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground text-left">
+        <TypographyH3 className="font-bold text-left border-0">
           Featured Events
-        </h2>
+        </TypographyH3>
 
         {/* Right side: Simple Tabs (Pass, Wishlist, Feature) */}
         <div className="flex items-center gap-6 self-start sm:self-auto">
@@ -145,15 +151,19 @@ export const FeaturedEvents = ({
                   </div>
 
                   {/* Event Title */}
-                  <h3 className="text-white text-base md:text-lg font-bold tracking-tight line-clamp-2 leading-snug">
+                  <TypographyH4 className="text-white text-base md:text-lg font-bold tracking-tight line-clamp-2 leading-snug border-0">
                     {event.title}
-                  </h3>
+                  </TypographyH4>
 
                   {/* Date & Location */}
                   <div className="flex items-center gap-3 text-white/70 text-xs font-medium">
-                    <span className="shrink-0">{event.date}</span>
-                    <span className="text-white/30">•</span>
-                    <span className="truncate">{event.location}</span>
+                    <TypographySpan className="shrink-0">
+                      {event.date}
+                    </TypographySpan>
+                    <TypographySpan className="text-white/30">•</TypographySpan>
+                    <TypographySpan className="truncate">
+                      {event.location}
+                    </TypographySpan>
                   </div>
                 </div>
               </Link>
@@ -197,10 +207,10 @@ export const FeaturedEvents = ({
                   event={event}
                   onRegister={(id) => {
                     setRegisteredIds((prev) =>
-                      prev.includes(id) ? prev : [...prev, id]
+                      prev.includes(id) ? prev : [...prev, id],
                     );
                     alert(
-                      `Successfully registered for event: ${event.title} (ID: ${id})!`
+                      `Successfully registered for event: ${event.title} (ID: ${id})!`,
                     );
                   }}
                 />
@@ -262,13 +272,13 @@ export const FeaturedEvents = ({
           ) : (
             <div className="py-12 text-center border border-dashed border-border rounded-2xl bg-card/25 backdrop-blur-sm shadow-inner">
               <Ticket className="size-9 text-muted-foreground/60 mb-2 mx-auto animate-pulse" />
-              <h4 className="text-sm font-bold text-foreground">
+              <TypographyH4 className="text-sm font-bold text-foreground border-0">
                 No active passes
-              </h4>
-              <p className="text-muted-foreground text-xs max-w-xs mx-auto mt-1">
+              </TypographyH4>
+              <TypographyMuted className="text-xs max-w-xs mx-auto mt-1">
                 You haven't registered for any events yet. Click "Register Now"
                 on any card to secure your pass!
-              </p>
+              </TypographyMuted>
             </div>
           )}
         </div>

@@ -5,6 +5,10 @@ import { Button } from "@/components/atoms/button/button";
 import { Input } from "@/components/atoms/input/input";
 import { Label } from "@/components/atoms/label/label";
 import Link from "next/link";
+import {
+  TypographyH2,
+  TypographyMuted,
+} from "@/components/atoms/typography/typography";
 
 enum ResetStep {
   EMAIL = "EMAIL",
@@ -49,10 +53,10 @@ export default function ResetPasswordPage() {
     <div className="relative flex items-center justify-center min-h-svh overflow-y-auto bg-background selection:bg-primary/30 py-6">
       <div className="relative z-10 w-full max-w-sm p-4 sm:p-8">
         <div className="space-y-2 text-center pb-6">
-          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight text-foreground drop-shadow-sm">
+          <TypographyH2 className="border-b-0 pb-0 drop-shadow-sm text-foreground">
             Passvy
-          </h1>
-          <p className="text-sm text-muted-foreground">
+          </TypographyH2>
+          <TypographyMuted>
             {step === ResetStep.EMAIL &&
               "Enter your email to receive a verification code"}
             {step === ResetStep.OTP && `Enter the code sent to ${email}`}
@@ -60,7 +64,7 @@ export default function ResetPasswordPage() {
               "Choose a new strong password for your account"}
             {step === ResetStep.SUCCESS &&
               "Your password has been successfully updated"}
-          </p>
+          </TypographyMuted>
         </div>
 
         {error && (
@@ -193,9 +197,9 @@ export default function ResetPasswordPage() {
                 />
               </svg>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <TypographyMuted>
               You can now log in using your new password.
-            </p>
+            </TypographyMuted>
             <Link
               href="/login"
               className="inline-flex w-full justify-center items-center rounded-lg bg-indigo-700 hover:bg-indigo-600 cursor-pointer text-white h-10 px-4 text-sm font-semibold transition-colors duration-200"

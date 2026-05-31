@@ -39,15 +39,18 @@ export function EventCard({ event, onRegister }: EventCardProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden bg-card/45 backdrop-blur-sm shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md group p-2 rounded-xl gap-2">
+    <Card className="flex flex-col h-full overflow-hidden bg-card/45 backdrop-blur-sm shadow-sm transition-all duration-300 hover:ring-2 hover:ring-indigo-500/30 hover:shadow-md group p-2 rounded-xl gap-2">
       {/* Event Image Container with Zoom effect on hover */}
-      <Link href={`/events/${id}`} className="relative aspect-video w-full overflow-hidden bg-muted rounded-xl block">
+      <Link
+        href={`/events/${id}`}
+        className="relative aspect-video w-full overflow-hidden bg-muted rounded-xl block"
+      >
         <Image
           src={image}
           alt={title}
           fill
           sizes="(max-width: 768px)  100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500"
         />
         {/* Subtle top overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10" />
@@ -57,7 +60,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
         {/* Title & Tag */}
         <div className="flex items-start justify-between gap-6">
           <Link href={`/events/${id}`} className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-bold leading-tight tracking-tight text-foreground line-clamp-2 min-h-[2.75rem] group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
+            <CardTitle className="text-lg font-bold leading-tight tracking-tight text-foreground line-clamp-2 min-h-[2.75rem]">
               {title}
             </CardTitle>
           </Link>
@@ -107,4 +110,3 @@ export function EventCard({ event, onRegister }: EventCardProps) {
     </Card>
   );
 }
-
