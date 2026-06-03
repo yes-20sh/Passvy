@@ -1,0 +1,27 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Load variables from .env if the file exists
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
+fi
+
+# Check if ENABLE_HUSKY is exactly set to "false"
+if [ "$ENABLE_HUSKY" = "false" ]; then
+  echo "⏭️  Husky hooks are disabled (ENABLE_HUSKY=false). Skipping..."
+  exit 0
+fi
+
+
+API_CHANGED=$(git diff --cached --name-only | grep "^api/")
+WEB_CHANGED=$(git diff --cached --name-only | grep "^web/")
+
+if [ -n "$API_CHANGED" ]; then
+  echo "Changes detected in api/ -> Running API linters..."
+  bun run lint:api || exit 1
+fi
+
+if [ -n "$WEB_CHANGED" ]; then
+  echo "Changes detected in web/ -> Running Web linters..."
+  bun run lint:web || exit 1
+fi

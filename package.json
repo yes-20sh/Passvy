@@ -1,0 +1,14 @@
+{
+  "name": "passvy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint:api": "cd api && bun run lint",
+    "lint:web": "cd web && bun run lint",
+    "lint": "bun run lint:api && bun run lint:web",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
