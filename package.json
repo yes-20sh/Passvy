@@ -6,6 +6,9 @@
     "lint:api": "cd api && bun run lint",
     "lint:web": "cd web && bun run lint",
     "lint": "bun run lint:api && bun run lint:web",
+    "format:api": "cd api && bun run format",
+    "format:web": "cd web && bun run format",
+    "format": "bun run format:api && bun run format:web",
     "prepare": "husky"
   },
   "devDependencies": {

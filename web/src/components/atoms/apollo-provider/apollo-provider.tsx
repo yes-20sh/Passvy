@@ -10,7 +10,7 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+    uri: `${process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000'}/graphql`,
   });
 
   return new ApolloClient({

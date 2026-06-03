@@ -11,7 +11,10 @@ export class GraphqlConfigService implements GqlOptionsFactory<ApolloDriverConfi
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      plugins:
+        process.env.GRAPHQL_PLAYGROUND === 'true'
+          ? [ApolloServerPluginLandingPageLocalDefault()]
+          : [],
     };
   }
 }
