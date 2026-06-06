@@ -224,42 +224,33 @@
 
 :root {
   --custom-bg: linear-gradient(
-    135deg,
-    #cbb7f2 0%,
-    #d8c8f4 18%,
-    #e7d9f5 35%,
-    #f4e4dd 55%,
-    #f5d2e3 72%,
-    #d7e7fb 88%,
-    #b9d8f8 100%
+    170deg,
+    #e0e7ff 0%,
+    #f4f4f5 25%,
+    #fafafa 75%,
+    #c7d2fe 100%
   );
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --custom-bg: linear-gradient(
-      135deg,
-      #281845 0%,
-      #312051 18%,
-      #3d2864 35%,
-      #463522 55%,
-      #482335 72%,
-      #23344b 88%,
-      #1c324c 100%
+      170deg,
+      #1e1b4b 0%,
+      #18181b 25%,
+      #09090b 75%,
+      #312e81 100%
     );
   }
 }
 
 .dark {
   --custom-bg: linear-gradient(
-    135deg,
-    #281845 0%,
-    #312051 18%,
-    #3d2864 35%,
-    #463522 55%,
-    #482335 72%,
-    #23344b 88%,
-    #1c324c 100%
+    170deg,
+    #1e1b4b 0%,
+    #18181b 25%,
+    #09090b 75%,
+    #312e81 100%
   );
 }
 
