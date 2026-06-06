@@ -25,3 +25,15 @@ export class SignupInput {
   @IsNotEmpty({ message: 'Confirm password is required' })
   confirmPassword: string;
 }
+
+@InputType()
+export class LoginInput {
+  @Field()
+  @IsEmail({}, { message: 'Invalid email address' })
+  @IsNotEmpty({ message: 'Email is required' })
+  email: string;
+
+  @Field()
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+}

@@ -4,12 +4,16 @@ import {
   InternalServerErrorException,
   Logger,
   HttpException,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { UserBaseEntity } from './entities/auth.base.entity';
-import { SignupInput } from './dto/auth.dto';
+import { SignupInput, LoginInput } from './dto/auth.dto';
+import { LoginResponse } from './entities/auth.response.entity';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +22,7 @@ export class AuthService {
   constructor(
     @InjectRepository(UserBaseEntity)
     private readonly userRepository: Repository<UserBaseEntity>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signup(input: SignupInput): Promise<string> {
@@ -53,6 +58,44 @@ export class AuthService {
       if (error instanceof HttpException) throw error;
       this.logger.error('Signup failed', error);
       throw new InternalServerErrorException('Something went wrong');
+    }
+  }
+
+  async login(input: LoginInput, res: Response): Promise<LoginResponse> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email: input.email },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid email or password.');
+      }
+
+      const isPasswordValid = bcrypt.compareSync(input.password, user.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid email or password.');
+      }
+
+      const payload = { sub: user.id, email: user.email, role: user.role };
+      const accessToken = this.jwtService.sign(payload);
+
+      res.cookie('access_token', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      return { accessToken };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      this.logger.error(
+        'Login failed',
+        error instanceof Error ? error.stack : error,
+      );
+      throw new InternalServerErrorException(
+        'Something went wrong during login',
+      );
     }
   }
 }

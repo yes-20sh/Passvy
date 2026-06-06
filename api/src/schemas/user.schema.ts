@@ -23,6 +23,9 @@ export class UserSchema {
   @Column({ type: 'varchar' })
   password: string;
 
+  @Column({ type: 'varchar', default: 'USER' })
+  role: string;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 

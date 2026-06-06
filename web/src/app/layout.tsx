@@ -3,6 +3,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/atoms/tooltip/tooltip";
 import { ApolloProvider } from "@/components/atoms/apollo-provider/apollo-provider";
 import { Toaster } from "@/components/atoms/sonner/sonner";
+import { Provider as StoreProvider } from "@/store/Provider";
 import "./globals.scss";
 
 const roboto = Roboto({
@@ -33,9 +34,11 @@ export default function RootLayout({
       className={`${roboto.variable} ${robotoMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ApolloProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-        </ApolloProvider>
+        <StoreProvider>
+          <ApolloProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </ApolloProvider>
+        </StoreProvider>
         <Toaster />
       </body>
     </html>
