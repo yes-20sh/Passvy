@@ -17,6 +17,7 @@ type Documents = {
     "mutation ForgotPassword($input: ForgotPasswordInput!) {\n  forgotPassword(input: $input) {\n    message\n    statusCode\n  }\n}": typeof types.ForgotPasswordDocument,
     "mutation GoogleAuth($input: GoogleAuthInput!) {\n  googleAuth(input: $input) {\n    accessToken\n    statusCode\n  }\n}": typeof types.GoogleAuthDocument,
     "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    accessToken\n    statusCode\n  }\n}": typeof types.LoginDocument,
+    "mutation Logout {\n  logout {\n    message\n    statusCode\n  }\n}": typeof types.LogoutDocument,
     "mutation ResetPassword($input: ResetPasswordInput!) {\n  resetPassword(input: $input) {\n    message\n    statusCode\n  }\n}": typeof types.ResetPasswordDocument,
     "mutation Signup($input: SignupInput!) {\n  signup(input: $input) {\n    message\n    statusCode\n  }\n}": typeof types.SignupDocument,
     "mutation VerifyOtp($input: VerifyOtpInput!) {\n  verifyOtp(input: $input) {\n    message\n    statusCode\n  }\n}": typeof types.VerifyOtpDocument,
@@ -26,6 +27,7 @@ const documents: Documents = {
     "mutation ForgotPassword($input: ForgotPasswordInput!) {\n  forgotPassword(input: $input) {\n    message\n    statusCode\n  }\n}": types.ForgotPasswordDocument,
     "mutation GoogleAuth($input: GoogleAuthInput!) {\n  googleAuth(input: $input) {\n    accessToken\n    statusCode\n  }\n}": types.GoogleAuthDocument,
     "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    accessToken\n    statusCode\n  }\n}": types.LoginDocument,
+    "mutation Logout {\n  logout {\n    message\n    statusCode\n  }\n}": types.LogoutDocument,
     "mutation ResetPassword($input: ResetPasswordInput!) {\n  resetPassword(input: $input) {\n    message\n    statusCode\n  }\n}": types.ResetPasswordDocument,
     "mutation Signup($input: SignupInput!) {\n  signup(input: $input) {\n    message\n    statusCode\n  }\n}": types.SignupDocument,
     "mutation VerifyOtp($input: VerifyOtpInput!) {\n  verifyOtp(input: $input) {\n    message\n    statusCode\n  }\n}": types.VerifyOtpDocument,
@@ -58,6 +60,10 @@ export function gql(source: "mutation GoogleAuth($input: GoogleAuthInput!) {\n  
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    accessToken\n    statusCode\n  }\n}"): (typeof documents)["mutation Login($input: LoginInput!) {\n  login(input: $input) {\n    accessToken\n    statusCode\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation Logout {\n  logout {\n    message\n    statusCode\n  }\n}"): (typeof documents)["mutation Logout {\n  logout {\n    message\n    statusCode\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

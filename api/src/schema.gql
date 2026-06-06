@@ -24,6 +24,7 @@ type Mutation {
   forgotPassword(input: ForgotPasswordInput!): SuccessResponse!
   googleAuth(input: GoogleAuthInput!): LoginResponse!
   login(input: LoginInput!): LoginResponse!
+  logout: SuccessResponse!
   resetPassword(input: ResetPasswordInput!): SuccessResponse!
   signup(input: SignupInput!): SuccessResponse!
   verifyOtp(input: VerifyOtpInput!): SuccessResponse!

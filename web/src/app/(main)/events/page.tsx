@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ProtectedRoute } from "@/components/template/protected-route/protected-route";
-import { EventsHeader } from "@/components/organisms/events-header/events-header";
+import { Header } from "@/components/organisms/header/header";
 import { FeaturedEvents } from "@/components/organisms/featured-events/featured-events";
 import { CategoryFilter } from "@/components/organisms/category-filter/category-filter";
 import { EventsGrid } from "@/components/organisms/events-grid/events-grid";
@@ -69,7 +69,7 @@ const EventsPage = () => {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
-        <EventsHeader
+        <Header
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           theme={theme}

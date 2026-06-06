@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { EventsHeader } from "@/components/organisms/events-header/events-header";
+import { Header } from "@/components/organisms/header/header";
 import { HostEventsList } from "@/components/organisms/host-events-list/host-events-list";
 import { MOCK_EVENTS } from "../../events/data"; // Reusing mock events for now
 
@@ -45,7 +45,7 @@ const HostEventsPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
-      <EventsHeader
+      <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         theme={theme}

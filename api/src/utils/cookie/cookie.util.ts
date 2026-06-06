@@ -8,3 +8,11 @@ export const setAuthCookie = (res: Response, accessToken: string): void => {
     maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 };
+
+export const clearAuthCookie = (res: Response): void => {
+  res.clearCookie('access_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+};

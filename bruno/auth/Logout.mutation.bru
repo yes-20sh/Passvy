@@ -1,0 +1,20 @@
+meta {
+  name: Logout
+  type: graphql
+  seq: 7
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  mutation Logout {
+    logout {
+      message
+      statusCode
+    }
+  }
+}

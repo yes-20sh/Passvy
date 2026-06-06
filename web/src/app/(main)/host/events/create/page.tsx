@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { EventsHeader } from "@/components/organisms/events-header/events-header";
+import { Header } from "@/components/organisms/header/header";
 import { CreateEventForm } from "@/components/organisms/create-event-form/create-event-form";
 
 export default function CreateEventPage() {
@@ -44,7 +44,7 @@ export default function CreateEventPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
-      <EventsHeader
+      <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         theme={theme}

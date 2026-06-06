@@ -16,7 +16,7 @@ import {
   hashPassword,
   verifyPassword,
 } from '../../utils/password/password.util';
-import { setAuthCookie } from '../../utils/cookie/cookie.util';
+import { setAuthCookie, clearAuthCookie } from '../../utils/cookie/cookie.util';
 import {
   SignupInput,
   LoginInput,
@@ -163,6 +163,21 @@ export class AuthService {
       );
       throw new InternalServerErrorException(
         'Something went wrong during login',
+      );
+    }
+  }
+
+  async logout(res: Response): Promise<SuccessResponse> {
+    try {
+      clearAuthCookie(res);
+      return { message: 'Logout successful', statusCode: HttpStatus.OK };
+    } catch (error) {
+      this.logger.error(
+        'Logout failed',
+        error instanceof Error ? error.stack : error,
+      );
+      throw new InternalServerErrorException(
+        'Something went wrong during logout',
       );
     }
   }

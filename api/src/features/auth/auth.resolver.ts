@@ -35,6 +35,12 @@ export class AuthResolver {
   }
 
   @Public()
+  @Mutation(() => SuccessResponse)
+  async logout(@Context('res') res: Response): Promise<SuccessResponse> {
+    return this.authService.logout(res);
+  }
+
+  @Public()
   @Mutation(() => LoginResponse)
   async googleAuth(
     @Args('input') input: GoogleAuthInput,
