@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms/button/button";
 import { Input } from "@/components/atoms/input/input";
 import { Label } from "@/components/atoms/label/label";
@@ -20,6 +21,7 @@ import DATA from "@/data";
 import { useMutation } from "@apollo/client/react";
 
 export function SignupForm() {
+  const router = useRouter();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [signup, { loading }] = useMutation(SignupDocument);
   const { loginWithGoogle, loading: googleLoading } = useGoogleLogin();
@@ -64,6 +66,7 @@ export function SignupForm() {
         toast.success("Account created successfully!", {
           description: data.signup.message || "You can now log in with your credentials.",
         });
+        router.push("/login");
       }
       
     } catch (err) {
@@ -84,13 +87,35 @@ export function SignupForm() {
             >
               {field.label}
             </Label>
-            <Input
-              id={field.id}
-              name={field.id}
-              type={field.type}
-              placeholder={field.placeholder}
-              error={errors[field.id]}
-            />
+            {field.id === "mobile" ? (
+              <div className="flex w-full gap-2">
+                <div>
+
+                <Input
+                  className="w-11 text-center px-0 bg-muted text-muted-foreground"
+                  value="+91"
+                  readOnly
+                  tabIndex={-1}
+                  />
+                  </div>
+                <Input
+                  className="flex-1 w-full"
+                  id={field.id}
+                  name={field.id}
+                  type={field.type}
+                  placeholder="98765 43210"
+                  error={errors[field.id]}
+                />
+              </div>
+            ) : (
+              <Input
+                id={field.id}
+                name={field.id}
+                type={field.type}
+                placeholder={field.placeholder}
+                error={errors[field.id]}
+              />
+            )}
           </div>
         ))}
 

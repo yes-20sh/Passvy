@@ -12,7 +12,7 @@ export const signupFields: SignupField[] = [
     id: "mobile",
     label: "Mobile Number",
     type: "tel",
-    placeholder: "+1 (555) 000-0000",
+    placeholder: "+91 98765 43210",
   },
   {
     id: "password",
