@@ -3,12 +3,16 @@ import { UseGuards } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { SettingsResponse } from './entities/settings.response.entity';
 import { UpdateSettingsInput } from './dto/settings.dto';
-import { RolesGuard } from '../../guards/roles.guard';
-import { Roles } from '../../decorator/roles.decorator';
-import { CurrentUser } from '../../decorator/current-user.decorator';
-
-import { UserSchema } from '../../schemas/user.schema';
+import { RolesGuard } from '@/guards/roles.guard';
+import { Roles } from '@/decorator/roles.decorator';
+import { CurrentUser } from '@/decorator/current-user.decorator';
 import { Role } from '@/enum';
+
+export interface JwtUser {
+  sub: string;
+  email: string;
+  role: string;
+}
 
 @Resolver()
 export class SettingsResolver {
@@ -17,19 +21,17 @@ export class SettingsResolver {
   @Query(() => SettingsResponse)
   @UseGuards(RolesGuard)
   @Roles(Role.USER)
-  async getSettings(
-    @CurrentUser() user: UserSchema,
-  ): Promise<SettingsResponse> {
-    return this.settingsService.getSettings(user.id);
+  async getSettings(@CurrentUser() user: JwtUser): Promise<SettingsResponse> {
+    return this.settingsService.getSettings(user.sub);
   }
 
   @Mutation(() => SettingsResponse)
   @UseGuards(RolesGuard)
   @Roles(Role.USER)
   async updateSettings(
-    @CurrentUser() user: UserSchema,
+    @CurrentUser() user: JwtUser,
     @Args('input') input: UpdateSettingsInput,
   ): Promise<SettingsResponse> {
-    return this.settingsService.updateSettings(user.id, input);
+    return this.settingsService.updateSettings(user.sub, input);
   }
 }

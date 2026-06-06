@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/atoms/tooltip/tooltip";
 import { ApolloProvider } from "@/components/atoms/apollo-provider/apollo-provider";
 import { Toaster } from "@/components/atoms/sonner/sonner";
 import { Provider as StoreProvider } from "@/store/Provider";
+import { AppInitializer } from "@/components/atoms/app-initializer/app-initializer";
 import "./globals.scss";
 
 const roboto = Roboto({
@@ -36,7 +37,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <StoreProvider>
           <ApolloProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <TooltipProvider>
+              <AppInitializer />
+              {children}
+            </TooltipProvider>
           </ApolloProvider>
         </StoreProvider>
         <Toaster />

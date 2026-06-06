@@ -1,5 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsOptional, IsString, IsArray } from 'class-validator';
+import { IsOptional, IsString, IsArray, IsEnum } from 'class-validator';
+import { Theme } from '@/enum';
 
 @InputType()
 export class UpdateSettingsInput {
@@ -13,10 +14,10 @@ export class UpdateSettingsInput {
   @IsString()
   mobileNumber?: string;
 
-  @Field({ nullable: true })
+  @Field(() => Theme, { nullable: true })
   @IsOptional()
-  @IsString()
-  theme?: string;
+  @IsEnum(Theme)
+  theme?: Theme;
 
   @Field(() => [String], { nullable: true })
   @IsOptional()

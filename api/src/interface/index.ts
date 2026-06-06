@@ -1,1 +1,2 @@
-export * from './send-email';
+export * from './send-email/send-email.interface';
+export * from './firebase/firebase.interface';

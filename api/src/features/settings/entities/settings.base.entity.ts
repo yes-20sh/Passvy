@@ -1,5 +1,5 @@
 import { ObjectType, OmitType } from '@nestjs/graphql';
-import { UserSchema } from '../../../schemas/user.schema';
+import { UserSchema } from '@/schemas/user.schema';
 
 @ObjectType()
 export class Settings extends OmitType(UserSchema, [
@@ -7,4 +7,8 @@ export class Settings extends OmitType(UserSchema, [
   'googleId',
   'resetPasswordOtp',
   'resetPasswordOtpExpires',
+  'createdAt',
+  'updatedAt',
+  'role',
+  'authProvider',
 ] as const) {}

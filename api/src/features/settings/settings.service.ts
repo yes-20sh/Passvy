@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserSchema } from '../../schemas/user.schema';
+import { UserSchema } from '@/schemas/user.schema';
 import { UpdateSettingsInput } from './dto/settings.dto';
 import { SettingsResponse } from './entities/settings.response.entity';
-import { CloudinaryService } from '../../config/cloudinary/cloudinary.service';
+import { CloudinaryService } from '@/config/cloudinary/cloudinary.service';
 
 @Injectable()
 export class SettingsService {

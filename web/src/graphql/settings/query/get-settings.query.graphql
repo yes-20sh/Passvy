@@ -1,0 +1,15 @@
+query GetSettings {
+  getSettings {
+    success
+    message
+    data {
+      id
+      fullName
+      email
+      mobileNumber
+      avatar
+      theme
+      eventPreferences
+    }
+  }
+}

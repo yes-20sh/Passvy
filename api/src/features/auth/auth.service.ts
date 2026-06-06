@@ -12,11 +12,8 @@ import { Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserBaseEntity } from './entities/auth.base.entity';
-import {
-  hashPassword,
-  verifyPassword,
-} from '../../utils/password/password.util';
-import { setAuthCookie, clearAuthCookie } from '../../utils/cookie/cookie.util';
+import { hashPassword, verifyPassword } from '@/utils/password/password.util';
+import { setAuthCookie, clearAuthCookie } from '@/utils/cookie/cookie.util';
 import {
   SignupInput,
   LoginInput,
@@ -29,9 +26,10 @@ import {
   LoginResponse,
   SuccessResponse,
 } from './entities/auth.response.entity';
-import { MailService } from '../../services/mail/mail.service';
+import { MailService } from '@/services/mail/mail.service';
 import { forgotPasswordTemplate } from '@/services/mail/templates/forgot-password.template';
-import { FirebaseConfigService } from '../../config/firebase/firebase.service';
+import { FirebaseConfigService } from '@/config/firebase/firebase.service';
+import { FirebaseAuthClient } from '@/interface';
 
 @Injectable()
 export class AuthService {
@@ -50,9 +48,9 @@ export class AuthService {
     res: Response,
   ): Promise<LoginResponse> {
     try {
-      const decodedToken = await this.firebaseConfigService
-        .getAuth()
-        .verifyIdToken(input.idToken);
+      const decodedToken = await (
+        this.firebaseConfigService.getAuth() as FirebaseAuthClient
+      ).verifyIdToken(input.idToken);
 
       const { email, name, uid } = decodedToken;
 
@@ -170,7 +168,10 @@ export class AuthService {
   async logout(res: Response): Promise<SuccessResponse> {
     try {
       clearAuthCookie(res);
-      return { message: 'Logout successful', statusCode: HttpStatus.OK };
+      return await Promise.resolve({
+        message: 'Logout successful',
+        statusCode: HttpStatus.OK,
+      });
     } catch (error) {
       this.logger.error(
         'Logout failed',

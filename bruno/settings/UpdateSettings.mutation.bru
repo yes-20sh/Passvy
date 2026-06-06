@@ -1,0 +1,40 @@
+meta {
+  name: UpdateSettings
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation UpdateSettings($input: UpdateSettingsInput!) {
+    updateSettings(input: $input) {
+      success
+      message
+      data {
+        id
+        fullName
+        email
+        mobileNumber
+        avatar
+        theme
+        eventPreferences
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "fullName": "Updated Name",
+      "mobileNumber": "+1234567890",
+      "theme": "dark",
+      "eventPreferences": ["tech", "music"]
+    }
+  }
+}

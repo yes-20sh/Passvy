@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Theme } from '@/enum';
 
 @ObjectType()
 @Entity({ name: 'users' })
@@ -22,7 +23,7 @@ export class UserSchema {
   @Column({ unique: true, type: 'varchar' })
   email: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ unique: true, type: 'varchar', nullable: true })
   mobileNumber: string | null;
 
@@ -46,11 +47,11 @@ export class UserSchema {
   @Column({ type: 'timestamp', nullable: true })
   resetPasswordOtpExpires: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'varchar', nullable: true })
   avatar: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => Theme, { nullable: true })
   @Column({ type: 'varchar', nullable: true })
   theme: string | null;
 

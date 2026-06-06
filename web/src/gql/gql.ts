@@ -22,6 +22,8 @@ type Documents = {
     "mutation Signup($input: SignupInput!) {\n  signup(input: $input) {\n    message\n    statusCode\n  }\n}": typeof types.SignupDocument,
     "mutation VerifyOtp($input: VerifyOtpInput!) {\n  verifyOtp(input: $input) {\n    message\n    statusCode\n  }\n}": typeof types.VerifyOtpDocument,
     "query HealthCheck {\n  healthCheck\n}": typeof types.HealthCheckDocument,
+    "mutation UpdateSettings($input: UpdateSettingsInput!) {\n  updateSettings(input: $input) {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}": typeof types.UpdateSettingsDocument,
+    "query GetSettings {\n  getSettings {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}": typeof types.GetSettingsDocument,
 };
 const documents: Documents = {
     "mutation ForgotPassword($input: ForgotPasswordInput!) {\n  forgotPassword(input: $input) {\n    message\n    statusCode\n  }\n}": types.ForgotPasswordDocument,
@@ -32,6 +34,8 @@ const documents: Documents = {
     "mutation Signup($input: SignupInput!) {\n  signup(input: $input) {\n    message\n    statusCode\n  }\n}": types.SignupDocument,
     "mutation VerifyOtp($input: VerifyOtpInput!) {\n  verifyOtp(input: $input) {\n    message\n    statusCode\n  }\n}": types.VerifyOtpDocument,
     "query HealthCheck {\n  healthCheck\n}": types.HealthCheckDocument,
+    "mutation UpdateSettings($input: UpdateSettingsInput!) {\n  updateSettings(input: $input) {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}": types.UpdateSettingsDocument,
+    "query GetSettings {\n  getSettings {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}": types.GetSettingsDocument,
 };
 
 /**
@@ -80,6 +84,14 @@ export function gql(source: "mutation VerifyOtp($input: VerifyOtpInput!) {\n  ve
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query HealthCheck {\n  healthCheck\n}"): (typeof documents)["query HealthCheck {\n  healthCheck\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation UpdateSettings($input: UpdateSettingsInput!) {\n  updateSettings(input: $input) {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}"): (typeof documents)["mutation UpdateSettings($input: UpdateSettingsInput!) {\n  updateSettings(input: $input) {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query GetSettings {\n  getSettings {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}"): (typeof documents)["query GetSettings {\n  getSettings {\n    success\n    message\n    data {\n      id\n      fullName\n      email\n      mobileNumber\n      avatar\n      theme\n      eventPreferences\n    }\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

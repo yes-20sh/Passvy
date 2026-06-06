@@ -1,0 +1,29 @@
+meta {
+  name: GetSettings
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetSettings {
+    getSettings {
+      success
+      message
+      data {
+        id
+        fullName
+        email
+        mobileNumber
+        avatar
+        theme
+        eventPreferences
+      }
+    }
+  }
+}

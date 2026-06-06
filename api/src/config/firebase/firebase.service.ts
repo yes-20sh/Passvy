@@ -1,11 +1,13 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import admin from 'firebase-admin';
+import * as admin from 'firebase-admin';
+import { App } from 'firebase-admin/app';
+import { Auth } from 'firebase-admin/auth';
 import serviceAccount from './passvy-4ca45-b64d04571479.json';
 
 @Injectable()
 export class FirebaseConfigService implements OnModuleInit {
   private readonly logger = new Logger(FirebaseConfigService.name);
-  public app!: admin.app.App;
+  public app!: App;
 
   onModuleInit() {
     const existingApp = admin.apps[0];
@@ -31,7 +33,7 @@ export class FirebaseConfigService implements OnModuleInit {
     }
   }
 
-  getAuth(): admin.auth.Auth {
+  getAuth(): Auth {
     if (!this.app) {
       throw new Error('Firebase app not initialized');
     }

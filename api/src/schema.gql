@@ -27,10 +27,12 @@ type Mutation {
   logout: SuccessResponse!
   resetPassword(input: ResetPasswordInput!): SuccessResponse!
   signup(input: SignupInput!): SuccessResponse!
+  updateSettings(input: UpdateSettingsInput!): SettingsResponse!
   verifyOtp(input: VerifyOtpInput!): SuccessResponse!
 }
 
 type Query {
+  getSettings: SettingsResponse!
   healthCheck: String!
 }
 
@@ -39,6 +41,22 @@ input ResetPasswordInput {
   email: String!
   newPassword: String!
   otp: String!
+}
+
+type Settings {
+  avatar: String
+  email: String!
+  eventPreferences: [String!]
+  fullName: String!
+  id: ID!
+  mobileNumber: String
+  theme: Theme
+}
+
+type SettingsResponse {
+  data: Settings
+  message: String!
+  success: Boolean!
 }
 
 input SignupInput {
@@ -52,6 +70,19 @@ input SignupInput {
 type SuccessResponse {
   message: String!
   statusCode: Int!
+}
+
+enum Theme {
+  DARK
+  LIGHT
+}
+
+input UpdateSettingsInput {
+  avatar: String
+  eventPreferences: [String!]
+  fullName: String
+  mobileNumber: String
+  theme: Theme
 }
 
 input VerifyOtpInput {

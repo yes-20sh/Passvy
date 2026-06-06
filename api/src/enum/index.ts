@@ -1,1 +1,2 @@
-export * from './role';
+export * from './role/role.enum';
+export * from './theme/theme.enum';
