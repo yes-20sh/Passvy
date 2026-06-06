@@ -221,3 +221,48 @@
     display: none;
   }
 }
+
+:root {
+  --custom-bg: linear-gradient(
+    135deg,
+    #cbb7f2 0%,
+    #d8c8f4 18%,
+    #e7d9f5 35%,
+    #f4e4dd 55%,
+    #f5d2e3 72%,
+    #d7e7fb 88%,
+    #b9d8f8 100%
+  );
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --custom-bg: linear-gradient(
+      135deg,
+      #281845 0%,
+      #312051 18%,
+      #3d2864 35%,
+      #463522 55%,
+      #482335 72%,
+      #23344b 88%,
+      #1c324c 100%
+    );
+  }
+}
+
+.dark {
+  --custom-bg: linear-gradient(
+    135deg,
+    #281845 0%,
+    #312051 18%,
+    #3d2864 35%,
+    #463522 55%,
+    #482335 72%,
+    #23344b 88%,
+    #1c324c 100%
+  );
+}
+
+.bg-custom-gradient {
+  background: var(--custom-bg) !important;
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/atoms/tooltip/tooltip";
 import { ApolloProvider } from "@/components/atoms/apollo-provider/apollo-provider";
+import { Toaster } from "@/components/atoms/sonner/sonner";
 import "./globals.scss";
 
 const roboto = Roboto({
@@ -35,6 +36,7 @@ export default function RootLayout({
         <ApolloProvider>
           <TooltipProvider>{children}</TooltipProvider>
         </ApolloProvider>
+        <Toaster />
       </body>
     </html>
   );

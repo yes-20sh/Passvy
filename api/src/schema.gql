@@ -2,13 +2,8 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type Mutation {
-  signup(input: SignupInput!): SignupResponse!
+  signup(input: SignupInput!): String!
 }
 
 type Query {
@@ -21,18 +16,4 @@ input SignupInput {
   fullName: String!
   mobileNumber: String!
   password: String!
-}
-
-type SignupResponse {
-  message: String!
-  user: UserResponse!
-}
-
-type UserResponse {
-  createdAt: DateTime!
-  email: String!
-  fullName: String!
-  id: ID!
-  mobileNumber: String!
-  updatedAt: DateTime!
 }

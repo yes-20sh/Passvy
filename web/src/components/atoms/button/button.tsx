@@ -10,7 +10,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-indigo-700 text-white hover:bg-indigo-600 cursor-pointer",
         outline:
-          "border-border bg-secondary/10 text-foreground hover:bg-secondary/20 hover:text-foreground backdrop-blur-sm transition-all aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-border bg-background/50 text-foreground hover:bg-background/60 hover:text-foreground backdrop-blur-sm transition-all cursor-pointer aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
@@ -40,18 +40,36 @@ const buttonVariants = cva(
   }
 )
 
+export interface ButtonProps extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {
+  loading?: boolean;
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
+  loading,
+  children,
+  disabled,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={loading || disabled}
       {...props}
-    />
+    >
+      {loading ? (
+        <span className="flex items-center gap-1 h-5 justify-center">
+          <span className="size-1.5 rounded-full bg-current animate-bounce [animation-delay:-0.3s]" />
+          <span className="size-1.5 rounded-full bg-current animate-bounce [animation-delay:-0.15s]" />
+          <span className="size-1.5 rounded-full bg-current animate-bounce" />
+        </span>
+      ) : (
+        children
+      )}
+    </ButtonPrimitive>
   )
 }
 
