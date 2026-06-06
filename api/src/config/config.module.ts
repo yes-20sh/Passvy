@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphqlConfigService } from './graphql/graphql.service';
 import { DatabaseModule } from './database/database.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DatabaseModule } from './database/database.module';
       useClass: GraphqlConfigService,
     }),
     DatabaseModule,
+    FirebaseModule,
   ],
 })
 export class ConfigModule {}

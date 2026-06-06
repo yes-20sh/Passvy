@@ -1,0 +1,26 @@
+meta {
+  name: VerifyOtp
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  mutation VerifyOtp($input: VerifyOtpInput!) {
+    verifyOtp(input: $input)
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "email": "test@example.com",
+      "otp": "123456"
+    }
+  }
+}

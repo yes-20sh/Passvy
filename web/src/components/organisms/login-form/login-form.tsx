@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { LoginDocument } from "@/gql/graphql";
+import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import VALIDATION from "@/validation";
 import DATA from "@/data";
 import { useMutation } from "@apollo/client/react";
@@ -26,6 +27,7 @@ export function LoginForm() {
   const dispatch = useAppDispatch();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [login, { loading }] = useMutation(LoginDocument);
+  const { loginWithGoogle, loading: googleLoading } = useGoogleLogin();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ export function LoginForm() {
     setErrors({});
 
     try {
-      await login({
+      const { data } = await login({
         variables: {
           input: {
             email: result.data.email,
@@ -60,14 +62,15 @@ export function LoginForm() {
         },
       });
       
-      dispatch(setLoginState({ email: result.data.email }));
-      
-      toast.success("Login successful!", {
-        description: "Welcome back to Passvy.",
-      });
-      
-  
-      router.push("/events");
+      if (data?.login?.statusCode === 200) {
+        dispatch(setLoginState({ email: result.data.email }));
+        
+        toast.success("Login successful!", {
+          description: "Welcome back to Passvy.",
+        });
+        
+        router.push("/events");
+      }
       
     } catch (err) {
       toast.error("Login failed", {
@@ -90,10 +93,10 @@ export function LoginForm() {
               </Label>
               {field.id === "password" && (
                 <Link
-                  href="/forgot-password"
+                  href="/reset-password"
                   className="text-xs font-medium text-primary underline-offset-4 hover:underline transition-all"
                 >
-                  Forgot password?
+                  Reset password?
                 </Link>
               )}
             </div>
@@ -112,20 +115,22 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="w-full bg-transparent border-t border-dashed border-border" />
-        </div>
-
-        <div className="relative flex justify-center text-[10px] uppercase">
-          <TypographySpan className="px-3 text-muted-foreground">
-            Or continue with
-          </TypographySpan>
-        </div>
+      <div className="flex items-center my-6">
+        <Separator className="flex-1 bg-transparent border-t border-dashed border-border" />
+        <TypographySpan className="px-3 text-[10px] uppercase text-muted-foreground shrink-0">
+          Or continue with
+        </TypographySpan>
+        <Separator className="flex-1 bg-transparent border-t border-dashed border-border" />
       </div>
 
       <div className="space-y-4">
-        <Button variant="outline" className="w-full">
+        <Button 
+          variant="outline" 
+          className="w-full" 
+          onClick={loginWithGoogle} 
+          loading={googleLoading}
+          type="button"
+        >
           <svg
             className="mr-2 h-4 w-4"
             aria-hidden="true"
@@ -147,7 +152,7 @@ export function LoginForm() {
         <TypographyMuted className="text-center mt-4">
           Don&apos;t have an account?{" "}
           <Link
-            href="/register"
+            href="/signup"
             className="font-medium text-primary underline-offset-4 hover:underline transition-all"
           >
             Sign up

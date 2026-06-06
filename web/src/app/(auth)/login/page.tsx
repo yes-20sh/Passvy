@@ -3,7 +3,7 @@ import { AuthTemplate } from "@/components/template/auth-template/auth-template"
 import { LoginForm } from "@/components/organisms/login-form/login-form";
 
 export const metadata: Metadata = {
-  title: "Login - Passvy Epass",
+  title: "Login - Passvy",
   description: "Log in to Passvy, your digital epass manager.",
 };
 

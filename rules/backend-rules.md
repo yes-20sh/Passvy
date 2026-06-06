@@ -24,48 +24,7 @@ This document outlines the structural and coding guidelines for the backend of t
 ## 2. File & Naming Conventions
 
 - **Files and Folders:** Always use `kebab-case` for files and folders (e.g., `user-profile.service.ts`, `auth-guards/`).
-- **Classes:** Use `PascalCase` for classes, decorators, and interfaces (e.g., `export class UsersResolver {}`).
-- **Standard Suffixes:** Follow the NestJS naming conventions strictly: `.resolver.ts`, `.service.ts`, `.module.ts`, `.dto.ts`, `.entity.ts`, `.guard.ts`, `.decorator.ts`, `.spec.ts`.
-
-## 3. Types, Enums & Interfaces
-
-- **Strict TypeScript:** Always explicitly create and use `interface` and `enum` for data models, request payloads, and service responses.
-- **No `any`:** Never use the `any` type. Always ensure strict typing to prevent runtime errors.
-- **Validation:** Use Data Transfer Objects (DTOs) with `class-validator` and `class-transformer` to validate and transform all incoming request payloads.
-
-## 4. Code Quality & Linting
-
-- **ESLint Compliance:** Code quality must be strictly managed using ESLint. The code must pass all linter checks before committing.
-- **Clean Code:** **Always remove unused imports, functions, variables, and dead code.** Ensure your files are clean and focused.
-- **Dependency Injection:** Rely exclusively on NestJS's Dependency Injection (DI) system. Do not manually instantiate services.
-
-## 5. General Backend Conventions
-# Backend Rules & Guidelines (NestJS GraphQL)
-
-This document outlines the structural and coding guidelines for the backend of the project. The backend is built using **NestJS, GraphQL, and TypeScript**, strictly adhering to a **Feature-First Architecture** to ensure modularity and maintainability.
-
-## 1. Feature-First Architecture
-
-- **Organize by Domain/Feature:** Group files by their functional feature rather than their technical type. Each feature must have its own directory containing its module, resolver, service, tests, DTOs, and entities.
-  - _Example Structure:_
-    ```
-    src/features/users/
-    ├── users.module.ts
-    ├── users.resolver.ts
-    ├── users.resolver.spec.ts
-    ├── users.service.ts
-    ├── users.service.spec.ts
-    ├── dto/
-    │   └── user.dto.ts
-    └── entities/
-        ├── user.base.entity.ts
-        └── user.response.entity.ts
-    ```
-- **Encapsulation:** Features must be self-contained. Any cross-feature interaction should be done by importing the required module and injecting its exported services.
-
-## 2. File & Naming Conventions
-
-- **Files and Folders:** Always use `kebab-case` for files and folders (e.g., `user-profile.service.ts`, `auth-guards/`).
+- **Same Name Rule:** Whenever creating a new file or component, **always create the folder and file with the exact same name** (e.g., `users/users.module.ts`).
 - **Classes:** Use `PascalCase` for classes, decorators, and interfaces (e.g., `export class UsersResolver {}`).
 - **Standard Suffixes:** Follow the NestJS naming conventions strictly: `.resolver.ts`, `.service.ts`, `.module.ts`, `.dto.ts`, `.entity.ts`, `.guard.ts`, `.decorator.ts`, `.spec.ts`.
 

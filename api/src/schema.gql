@@ -2,6 +2,14 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input ForgotPasswordInput {
+  email: String!
+}
+
+input GoogleAuthInput {
+  idToken: String!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -9,15 +17,27 @@ input LoginInput {
 
 type LoginResponse {
   accessToken: String!
+  statusCode: Int!
 }
 
 type Mutation {
+  forgotPassword(input: ForgotPasswordInput!): SuccessResponse!
+  googleAuth(input: GoogleAuthInput!): LoginResponse!
   login(input: LoginInput!): LoginResponse!
-  signup(input: SignupInput!): String!
+  resetPassword(input: ResetPasswordInput!): SuccessResponse!
+  signup(input: SignupInput!): SuccessResponse!
+  verifyOtp(input: VerifyOtpInput!): SuccessResponse!
 }
 
 type Query {
   healthCheck: String!
+}
+
+input ResetPasswordInput {
+  confirmPassword: String!
+  email: String!
+  newPassword: String!
+  otp: String!
 }
 
 input SignupInput {
@@ -26,4 +46,14 @@ input SignupInput {
   fullName: String!
   mobileNumber: String!
   password: String!
+}
+
+type SuccessResponse {
+  message: String!
+  statusCode: Int!
+}
+
+input VerifyOtpInput {
+  email: String!
+  otp: String!
 }

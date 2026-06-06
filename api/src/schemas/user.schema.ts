@@ -17,14 +17,26 @@ export class UserSchema {
   @Column({ unique: true, type: 'varchar' })
   email: string;
 
-  @Column({ unique: true, type: 'varchar' })
-  mobileNumber: string;
+  @Column({ unique: true, type: 'varchar', nullable: true })
+  mobileNumber: string | null;
 
-  @Column({ type: 'varchar' })
-  password: string;
+  @Column({ type: 'varchar', nullable: true })
+  password: string | null;
+
+  @Column({ type: 'varchar', default: 'LOCAL' })
+  authProvider: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  googleId: string | null;
 
   @Column({ type: 'varchar', default: 'USER' })
   role: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  resetPasswordOtp: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetPasswordOtpExpires: Date | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

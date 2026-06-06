@@ -14,6 +14,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { SignupDocument } from "@/gql/graphql";
+import { useGoogleLogin } from "@/hooks/useGoogleLogin";
 import VALIDATION from "@/validation";
 import DATA from "@/data";
 import { useMutation } from "@apollo/client/react";
@@ -21,6 +22,7 @@ import { useMutation } from "@apollo/client/react";
 export function SignupForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [signup, { loading }] = useMutation(SignupDocument);
+  const { loginWithGoogle, loading: googleLoading } = useGoogleLogin();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,7 +48,7 @@ export function SignupForm() {
     setErrors({});
 
     try {
-      await signup({
+      const { data } = await signup({
         variables: {
           input: {
             fullName: result.data.name,
@@ -58,9 +60,11 @@ export function SignupForm() {
         },
       });
       
-      toast.success("Account created successfully!", {
-        description: "You can now log in with your credentials.",
-      });
+      if (data?.signup?.statusCode === 201) {
+        toast.success("Account created successfully!", {
+          description: data.signup.message || "You can now log in with your credentials.",
+        });
+      }
       
     } catch (err) {
       toast.error("Signup failed", {
@@ -95,20 +99,22 @@ export function SignupForm() {
         </Button>
       </form>
 
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="w-full bg-transparent border-t border-dashed border-border" />
-        </div>
-
-        <div className="relative flex justify-center text-[10px] uppercase">
-          <TypographySpan className="px-3 text-muted-foreground">
-            Or continue with
-          </TypographySpan>
-        </div>
+      <div className="flex items-center my-6">
+        <Separator className="flex-1 bg-transparent border-t border-dashed border-border" />
+        <TypographySpan className="px-3 text-[10px] uppercase text-muted-foreground shrink-0">
+          Or continue with
+        </TypographySpan>
+        <Separator className="flex-1 bg-transparent border-t border-dashed border-border" />
       </div>
 
       <div className="space-y-4">
-        <Button variant="outline" className="w-full">
+        <Button 
+          variant="outline" 
+          className="w-full"
+          onClick={loginWithGoogle}
+          loading={googleLoading}
+          type="button"
+        >
           <svg
             className="mr-2 h-4 w-4"
             aria-hidden="true"
