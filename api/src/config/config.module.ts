@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule as NestConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { GraphqlConfigService } from './graphql/graphql.service';
+import { GraphqlModule } from './graphql/graphql.module';
 import { DatabaseModule } from './database/database.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -12,12 +11,10 @@ import { FirebaseModule } from './firebase/firebase.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    GraphQLModule.forRootAsync<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      useClass: GraphqlConfigService,
-    }),
+    GraphqlModule,
     DatabaseModule,
     FirebaseModule,
+    CloudinaryModule,
   ],
 })
 export class ConfigModule {}
