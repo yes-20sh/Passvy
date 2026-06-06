@@ -1,101 +1,55 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  Logger,
-  OnModuleInit,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { UserBaseEntity } from './entities/user.base.entity';
-import { LoginInput, RegisterInput } from './dto/auth.dto';
-import { LoginResponse } from './entities/login-response.entity';
-import { UserResponse } from './entities/user.response.entity';
+import { UserBaseEntity } from './entities/auth.base.entity';
+import { SignupInput } from './dto/auth.dto';
+import { SignupResponse } from './entities/auth.response.entity';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
-  private readonly logger = new Logger(AuthService.name);
-
+export class AuthService {
   constructor(
     @InjectRepository(UserBaseEntity)
     private readonly userRepository: Repository<UserBaseEntity>,
-    private readonly jwtService: JwtService,
   ) {}
 
-  async onModuleInit(): Promise<void> {
-    try {
-      const userCount = await this.userRepository.count();
-      if (userCount === 0) {
-        this.logger.log(
-          'No users found in database. Seeding a default user...',
-        );
-        const hashedPassword = bcrypt.hashSync('Solanki@2001', 10);
-        const defaultUser = this.userRepository.create({
-          email: 'admin@passvy.com',
-          password: hashedPassword,
-        });
-        await this.userRepository.save(defaultUser);
-        this.logger.log(
-          'Default user created: admin@passvy.com / Solanki@2001',
-        );
-      }
-    } catch (error) {
-      this.logger.error('Failed to seed default user', error);
-    }
-  }
-
-  async login(input: LoginInput): Promise<LoginResponse> {
-    const user = await this.userRepository.findOne({
-      where: { email: input.email },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password.');
+  async signup(input: SignupInput): Promise<SignupResponse> {
+    if (input.password !== input.confirmPassword) {
+      throw new ConflictException('Passwords do not match.');
     }
 
-    const isPasswordValid = bcrypt.compareSync(input.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password.');
-    }
-
-    const payload = { sub: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-    };
-  }
-
-  async register(input: RegisterInput): Promise<UserResponse> {
     const existingUser = await this.userRepository.findOne({
-      where: { email: input.email },
+      where: [{ email: input.email }, { mobileNumber: input.mobileNumber }],
     });
 
     if (existingUser) {
-      throw new ConflictException('Email is already registered.');
+      throw new ConflictException(
+        existingUser.email === input.email
+          ? 'Email is already registered.'
+          : 'Mobile number is already registered.',
+      );
     }
 
     const hashedPassword = bcrypt.hashSync(input.password, 10);
-    const newUser = this.userRepository.create({
-      email: input.email,
-      password: hashedPassword,
-    });
-
-    const savedUser = await this.userRepository.save(newUser);
+    const savedUser = await this.userRepository.save(
+      this.userRepository.create({
+        fullName: input.fullName,
+        email: input.email,
+        mobileNumber: input.mobileNumber,
+        password: hashedPassword,
+      }),
+    );
 
     return {
-      id: savedUser.id,
-      email: savedUser.email,
-      createdAt: savedUser.createdAt,
-      updatedAt: savedUser.updatedAt,
+      message: 'Signup successful',
+      user: {
+        id: savedUser.id,
+        fullName: savedUser.fullName,
+        email: savedUser.email,
+        mobileNumber: savedUser.mobileNumber,
+        createdAt: savedUser.createdAt,
+        updatedAt: savedUser.updatedAt,
+      },
     };
   }
 }

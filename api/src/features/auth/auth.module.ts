@@ -1,18 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import SCHEMAS from '../../schemas/schemas';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature(SCHEMAS),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'fallback-secret-key-12345',
-      signOptions: { expiresIn: '1d' },
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature(SCHEMAS)],
   providers: [AuthService, AuthResolver],
   exports: [AuthService],
 })
