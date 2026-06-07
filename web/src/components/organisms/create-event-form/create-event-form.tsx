@@ -359,7 +359,6 @@ export const CreateEventForm = () => {
           onlineLink={formState.onlineLink}
           offlineAddress={formState.offlineAddress}
           capacity={formState.capacity}
-          stepper={formState.stepper}
           currentStep={formState.step}
         />
       </div>

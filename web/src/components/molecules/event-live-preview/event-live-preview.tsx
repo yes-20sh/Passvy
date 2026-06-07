@@ -6,7 +6,6 @@ import { Badge, BadgeVariant } from "@/components/atoms/badge/badge";
 import { Image as ImageIcon, Percent, CalendarIcon, MapPin, Globe, Users, IndianRupee } from "lucide-react";
 import { format } from "date-fns";
 import { DescriptionBlock, EventPass, EventCoupon } from "@/interfaces/events/event.interface";
-import { EventStep } from "@/gql/graphql";
 
 interface EventLivePreviewProps {
   title: string;
@@ -23,20 +22,12 @@ interface EventLivePreviewProps {
   onlineLink?: string;
   offlineAddress?: string;
   capacity?: string;
-  stepper?: EventStep | null;
   currentStep?: number;
 }
 
 export const EventLivePreview = ({
-  title, headerImage, blocks, passes, coupons, startDate, startTime, endDate, endTime, category, eventMode, onlineLink, offlineAddress, capacity, stepper, currentStep = 1
+  title, headerImage, blocks, passes, coupons, startDate, startTime, endDate, endTime, category, eventMode, onlineLink, offlineAddress, capacity, currentStep = 1
 }: EventLivePreviewProps) => {
-  const isStepSaved = (step: EventStep) => {
-    if (!stepper) return false;
-    const stepsOrder: EventStep[] = ["ESSENTIALS", "DESCRIPTION", "MODE", "PASSES", "PAYOUTS"];
-    const currentIdx = stepsOrder.indexOf(stepper);
-    const targetIdx = stepsOrder.indexOf(step);
-    return currentIdx >= targetIdx;
-  };
   const hasEssentials = !!(title || startDate || endDate || category);
   const hasDescription = !!(headerImage || blocks.some(b => b.content?.trim()));
   const hasMode = !!(onlineLink || offlineAddress || capacity);
