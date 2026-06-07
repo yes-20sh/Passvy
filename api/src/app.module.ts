@@ -5,7 +5,7 @@ import { HealthModule } from './features/health/health.module';
 import { AuthModule } from './features/auth/auth.module';
 import { SettingsModule } from './features/settings/settings.module';
 import { EventsModule } from './features/events/events.module';
-import { MailModule } from './services/mail/mail.module';
+import { MailModule } from './config/mail/mail.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';

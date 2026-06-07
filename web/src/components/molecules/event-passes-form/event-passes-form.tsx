@@ -3,7 +3,7 @@ import { Label } from "@/components/atoms/label/label";
 import { Input } from "@/components/atoms/input/input";
 import { Button } from "@/components/atoms/button/button";
 import { Plus, Trash2, Ticket, Star, Crown, Settings, User, Users, Percent, IndianRupee } from "lucide-react";
-import { EventPass, EventCoupon } from "../../organisms/create-event-form/types";
+import { EventPass, EventCoupon } from "@/interfaces/events/event.interface";
 
 interface EventPassesFormProps {
   passes: EventPass[];
@@ -12,10 +12,13 @@ interface EventPassesFormProps {
   setCoupons: React.Dispatch<React.SetStateAction<EventCoupon[]>>;
   onBack: () => void;
   onNext: (e: React.FormEvent | React.MouseEvent) => void;
+  hasChanges?: boolean;
+  onSave?: () => void;
+  isSaving?: boolean;
 }
 
 export const EventPassesForm = ({
-  passes, setPasses, coupons, setCoupons, onBack, onNext
+  passes, setPasses, coupons, setCoupons, onBack, onNext, hasChanges = false, onSave, isSaving = false
 }: EventPassesFormProps) => {
 
   const addPass = () => {
@@ -357,13 +360,24 @@ export const EventPassesForm = ({
           >
             Back
           </Button>
-          <Button
-            type="button"
-            onClick={onNext}
-            className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
-          >
-            Next
-          </Button>
+          {hasChanges ? (
+            <Button
+              type="button"
+              onClick={onSave}
+              disabled={isSaving}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={onNext}
+              className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
+            >
+              Next
+            </Button>
+          )}
         </div>
       </form>
     </div>

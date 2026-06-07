@@ -1,0 +1,47 @@
+meta {
+  name: GetEvent
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetEvent($eventId: String!) {
+    getEvent(eventId: $eventId) {
+      message
+      statusCode
+      event {
+        id
+        title
+        headerImage
+        startDate
+        startTime
+        endDate
+        endTime
+        category
+        status
+        stepper
+        mode {
+          id
+          eventMode
+          onlineLink
+          offlineAddress
+          offlineMapLink
+          offlineLandmark
+          capacity
+        }
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "eventId": "REPLACE_WITH_EVENT_ID"
+  }
+}

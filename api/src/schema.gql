@@ -2,6 +2,171 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+enum BlockType {
+  HEADING
+  IMAGE
+  LIST
+  PARAGRAPH
+}
+
+input CreateDescriptionBlockInput {
+  blockType: BlockType!
+  content: String
+  headingLevel: String
+  listStyle: String
+  sortOrder: Int!
+  textSize: String
+}
+
+input CreateEventCouponInput {
+  code: String!
+  discountType: DiscountType!
+  discountValue: Float!
+  usageLimit: Int
+}
+
+input CreateEventInput {
+  capacity: Int
+  category: String
+  coupons: [CreateEventCouponInput!]
+  descriptionBlocks: [CreateDescriptionBlockInput!]
+  endDate: DateTime
+  endTime: String
+  eventId: String
+  eventMode: EventMode!
+  headerImage: String
+  offlineAddress: String
+  offlineLandmark: String
+  offlineMapLink: String
+  onlineLink: String
+  passes: [CreateEventPassInput!]
+  paymentSetting: CreateEventPaymentSettingInput
+  startDate: DateTime
+  startTime: String
+  status: EventStatus
+  stepper: EventStep
+  title: String!
+}
+
+input CreateEventPassInput {
+  customName: String
+  passCategory: String
+  price: Float!
+  pricing: PassPricing!
+  quantity: Int
+  tier: PassTier!
+}
+
+input CreateEventPaymentSettingInput {
+  acceptedMethods: [String!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum DiscountType {
+  AMOUNT
+  PERCENTAGE
+}
+
+type EventCouponSchema {
+  code: String!
+  createdAt: DateTime!
+  discountType: DiscountType!
+  discountValue: Float!
+  id: ID!
+  usageLimit: Int
+}
+
+type EventDescriptionBlockSchema {
+  blockType: BlockType!
+  content: String
+  createdAt: DateTime!
+  headingLevel: String
+  id: ID!
+  listStyle: String
+  sortOrder: Int!
+  textSize: String
+}
+
+enum EventMode {
+  OFFLINE
+  ONLINE
+}
+
+type EventModeSchema {
+  capacity: Int
+  createdAt: DateTime!
+  eventMode: EventMode!
+  id: ID!
+  offlineAddress: String
+  offlineLandmark: String
+  offlineMapLink: String
+  onlineLink: String
+  updatedAt: DateTime!
+}
+
+type EventPassSchema {
+  createdAt: DateTime!
+  customName: String
+  id: ID!
+  passCategory: String
+  price: Float!
+  pricing: PassPricing!
+  quantity: Int
+  tier: PassTier!
+}
+
+type EventPaymentSettingSchema {
+  acceptedMethods: [String!]!
+  createdAt: DateTime!
+  id: ID!
+  updatedAt: DateTime!
+}
+
+type EventResponse {
+  event: EventSchema
+  message: String!
+  statusCode: Int!
+}
+
+type EventSchema {
+  category: String
+  coupons: [EventCouponSchema!]
+  createdAt: DateTime!
+  creatorId: String!
+  descriptionBlocks: [EventDescriptionBlockSchema!]
+  endDate: DateTime
+  endTime: String
+  headerImage: String
+  id: ID!
+  mode: EventModeSchema
+  passes: [EventPassSchema!]
+  paymentSetting: EventPaymentSettingSchema
+  slug: String
+  startDate: DateTime
+  startTime: String
+  status: EventStatus!
+  stepper: EventStep
+  title: String!
+  updatedAt: DateTime!
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum EventStep {
+  DESCRIPTION
+  ESSENTIALS
+  MODE
+  PASSES
+  PAYOUTS
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -21,6 +186,7 @@ type LoginResponse {
 }
 
 type Mutation {
+  createEvent(input: CreateEventInput!): EventResponse!
   forgotPassword(input: ForgotPasswordInput!): SuccessResponse!
   googleAuth(input: GoogleAuthInput!): LoginResponse!
   login(input: LoginInput!): LoginResponse!
@@ -31,7 +197,20 @@ type Mutation {
   verifyOtp(input: VerifyOtpInput!): SuccessResponse!
 }
 
+enum PassPricing {
+  FREE
+  PAID
+}
+
+enum PassTier {
+  CUSTOM
+  GA
+  VIP
+  VVIP
+}
+
 type Query {
+  getEvent(eventId: String!): EventResponse!
   getSettings: SettingsResponse!
   healthCheck: String!
 }

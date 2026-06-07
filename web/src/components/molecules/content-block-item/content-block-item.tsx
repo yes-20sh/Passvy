@@ -2,7 +2,7 @@ import React from "react";
 import { Badge } from "@/components/atoms/badge/badge";
 import { GripVertical, Trash2, ChevronDown } from "lucide-react";
 import Image from "next/image";
-import { DescriptionBlock } from "../../organisms/create-event-form/types";
+import { DescriptionBlock } from "@/interfaces/events/event.interface";
 import { Textarea } from "@/components/atoms/textarea/textarea";
 import {
   DropdownMenu,
@@ -55,7 +55,7 @@ export const ContentBlockItem = ({
               {block.type}
             </Badge>
 
-            {block.type === "heading" && (
+            {block.type === "HEADING" && (
               <DropdownMenu>
                 <DropdownMenuTrigger className="h-7 px-2 flex items-center gap-1 text-xs border border-input rounded-md bg-transparent hover:bg-secondary/20 focus-visible:ring-1 focus-visible:ring-ring outline-none font-bold">
                   {block.level ? block.level.toUpperCase() : "H2"}
@@ -75,7 +75,7 @@ export const ContentBlockItem = ({
               </DropdownMenu>
             )}
 
-            {block.type === "paragraph" && (
+            {block.type === "PARAGRAPH" && (
               <DropdownMenu>
                 <DropdownMenuTrigger className="h-7 px-2 flex items-center gap-1 text-xs border border-input rounded-md bg-transparent hover:bg-secondary/20 focus-visible:ring-1 focus-visible:ring-ring outline-none">
                   {block.textSize === "sm" ? "Small Text" : block.textSize === "lg" ? "Large Text" : "Normal Text"}
@@ -89,7 +89,7 @@ export const ContentBlockItem = ({
               </DropdownMenu>
             )}
 
-            {block.type === "list" && (
+            {block.type === "LIST" && (
               <DropdownMenu>
                 <DropdownMenuTrigger className="h-7 px-2 flex items-center gap-1 text-xs border border-input rounded-md bg-transparent hover:bg-secondary/20 focus-visible:ring-1 focus-visible:ring-ring outline-none">
                   {block.listStyle === "decimal" ? "Numbered List" : "Bullet List"}
@@ -113,7 +113,7 @@ export const ContentBlockItem = ({
           </button>
         </div>
 
-        {block.type === "heading" && (
+        {block.type === "HEADING" && (
           <Textarea
             placeholder="Section Heading"
             value={block.content}
@@ -123,7 +123,7 @@ export const ContentBlockItem = ({
           />
         )}
 
-        {block.type === "paragraph" && (
+        {block.type === "PARAGRAPH" && (
           <Textarea
             placeholder="Write your description here..."
             value={block.content}
@@ -133,7 +133,7 @@ export const ContentBlockItem = ({
           />
         )}
 
-        {block.type === "list" && (
+        {block.type === "LIST" && (
           <div className="relative flex w-full rounded-md border border-input bg-background overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
             <div className="flex flex-col items-end pt-2 pb-2 pl-3 pr-2 bg-secondary/10 border-r border-input text-muted-foreground select-none font-mono text-xs">
               {block.content.split('\n').map((_, i) => (
@@ -153,7 +153,7 @@ export const ContentBlockItem = ({
           </div>
         )}
 
-        {block.type === "image" && (
+        {block.type === "IMAGE" && (
           <div className="space-y-2">
             {block.content ? (
               <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-border shadow-sm group">

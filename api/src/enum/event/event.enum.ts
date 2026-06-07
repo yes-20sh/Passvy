@@ -10,6 +10,22 @@ export enum EventStatus {
   PUBLISHED = 'PUBLISHED',
 }
 
+export enum EventStep {
+  ESSENTIALS = 'ESSENTIALS',
+  DESCRIPTION = 'DESCRIPTION',
+  MODE = 'MODE',
+  PASSES = 'PASSES',
+  PAYOUTS = 'PAYOUTS',
+}
+
+export enum EventRelation {
+  MODE = 'mode',
+  DESCRIPTION_BLOCKS = 'descriptionBlocks',
+  PASSES = 'passes',
+  COUPONS = 'coupons',
+  PAYMENT_SETTING = 'paymentSetting',
+}
+
 export enum BlockType {
   HEADING = 'heading',
   PARAGRAPH = 'paragraph',
@@ -34,15 +50,10 @@ export enum DiscountType {
   AMOUNT = 'AMOUNT',
 }
 
-export enum PayoutMethod {
-  BANK = 'BANK',
-  UPI = 'UPI',
-}
-
 registerEnumType(EventMode, { name: 'EventMode' });
 registerEnumType(EventStatus, { name: 'EventStatus' });
 registerEnumType(BlockType, { name: 'BlockType' });
 registerEnumType(PassPricing, { name: 'PassPricing' });
 registerEnumType(PassTier, { name: 'PassTier' });
 registerEnumType(DiscountType, { name: 'DiscountType' });
-registerEnumType(PayoutMethod, { name: 'PayoutMethod' });
+registerEnumType(EventStep, { name: 'EventStep' });

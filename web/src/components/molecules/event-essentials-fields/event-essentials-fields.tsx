@@ -26,6 +26,7 @@ interface EventEssentialsFieldsProps {
   setEndTime: (val: string) => void;
   category: string;
   setCategory: (val: string) => void;
+  errors?: { [key: string]: string };
 }
 
 export const EventEssentialsFields = ({
@@ -42,7 +43,8 @@ export const EventEssentialsFields = ({
   endTime,
   setEndTime,
   category,
-  setCategory
+  setCategory,
+  errors
 }: EventEssentialsFieldsProps) => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -61,8 +63,8 @@ export const EventEssentialsFields = ({
           placeholder="Enter event title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="resize-none"
-        />
+          />
+        {errors?.title && <p className="text-xs text-destructive font-medium">{errors.title}</p>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,6 +104,9 @@ export const EventEssentialsFields = ({
               />
             </div>
           </div>
+          {(errors?.startDate || errors?.startTime) && (
+            <p className="text-xs text-destructive font-medium">{errors.startDate || errors.startTime}</p>
+          )}
         </div>
 
         <div className="space-y-3">
@@ -140,6 +145,9 @@ export const EventEssentialsFields = ({
               />
             </div>
           </div>
+          {(errors?.endDate || errors?.endTime) && (
+            <p className="text-xs text-destructive font-medium">{errors.endDate || errors.endTime}</p>
+          )}
         </div>
       </div>
 
@@ -162,6 +170,7 @@ export const EventEssentialsFields = ({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+        {errors?.category && <p className="text-xs text-destructive font-medium">{errors.category}</p>}
       </div>
 
       <div className="space-y-3">

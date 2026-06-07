@@ -16,7 +16,7 @@ import {
   PassPricing,
   PassTier,
   DiscountType,
-  PayoutMethod,
+  EventStep,
 } from '@/enum';
 
 @InputType()
@@ -106,40 +106,52 @@ export class CreateEventPaymentSettingInput {
   @IsArray()
   @IsString({ each: true })
   acceptedMethods: string[];
+}
 
-  @Field(() => PayoutMethod, { nullable: true })
-  @IsEnum(PayoutMethod)
-  @IsOptional()
-  payoutMethod?: PayoutMethod;
-
-  @Field(() => String, { nullable: true })
-  @IsString()
-  @IsOptional()
-  payoutUpiId?: string;
+@InputType()
+export class CreateEventModeInput {
+  @Field(() => EventMode)
+  @IsEnum(EventMode)
+  eventMode: EventMode;
 
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
-  payoutBankName?: string;
+  onlineLink?: string;
 
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
-  payoutAccountName?: string;
+  offlineAddress?: string;
 
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
-  payoutAccountNumber?: string;
+  offlineMapLink?: string;
 
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
-  payoutIfsc?: string;
+  offlineLandmark?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  capacity?: number;
 }
 
 @InputType()
 export class CreateEventInput {
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  eventId?: string;
+
+  @Field(() => EventStep, { nullable: true })
+  @IsEnum(EventStep)
+  @IsOptional()
+  stepper?: EventStep;
+
   @Field()
   @IsString()
   title: string;
@@ -185,6 +197,16 @@ export class CreateEventInput {
   @IsString()
   @IsOptional()
   offlineAddress?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineMapLink?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineLandmark?: string;
 
   @Field(() => Int, { nullable: true })
   @IsInt()

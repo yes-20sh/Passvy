@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import SCHEMAS from '../../schemas/schemas';
-import { MailModule } from '../../services/mail/mail.module';
+import { MailModule } from '../../config/mail/mail.module';
 import { FirebaseModule } from '../../config/firebase/firebase.module';
 
 @Module({

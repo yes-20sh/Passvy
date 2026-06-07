@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,8 +10,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { EventMode, EventStatus } from '@/enum';
+import { EventStatus, EventStep } from '@/enum';
 import { EventDescriptionBlockSchema } from './event-description-block.schema';
+import { EventModeSchema } from './event-mode.schema';
 import { EventPassSchema } from './event-pass.schema';
 import { EventCouponSchema } from './event-coupon.schema';
 import { EventPaymentSettingSchema } from './event-payment-setting.schema';
@@ -27,6 +28,10 @@ export class EventSchema {
   @Field()
   @Column({ type: 'varchar', length: 255 })
   title: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  slug: string | null;
 
   @Field(() => String)
   @Column({ name: 'creator_id', type: 'uuid' })
@@ -60,30 +65,13 @@ export class EventSchema {
   @Column({ type: 'varchar', length: 100, nullable: true })
   category: string | null;
 
-  @Field(() => EventMode)
-  @Column({
-    name: 'event_mode',
-    type: 'enum',
-    enum: EventMode,
-    default: EventMode.ONLINE,
-  })
-  eventMode: EventMode;
-
-  @Field(() => String, { nullable: true })
-  @Column({ name: 'online_link', type: 'text', nullable: true })
-  onlineLink: string | null;
-
-  @Field(() => String, { nullable: true })
-  @Column({ name: 'offline_address', type: 'text', nullable: true })
-  offlineAddress: string | null;
-
-  @Field(() => Int, { nullable: true })
-  @Column({ type: 'int', nullable: true })
-  capacity: number | null;
-
   @Field(() => EventStatus)
   @Column({ type: 'enum', enum: EventStatus, default: EventStatus.DRAFT })
   status: EventStatus;
+
+  @Field(() => EventStep, { nullable: true })
+  @Column({ type: 'enum', enum: EventStep, nullable: true })
+  stepper: EventStep | null;
 
   // Relations
   @Field(() => [EventDescriptionBlockSchema], { nullable: true })
@@ -107,6 +95,12 @@ export class EventSchema {
     cascade: true,
   })
   paymentSetting: EventPaymentSettingSchema;
+
+  @Field(() => EventModeSchema, { nullable: true })
+  @OneToOne(() => EventModeSchema, (mode) => mode.event, {
+    cascade: true,
+  })
+  mode: EventModeSchema;
 
   @Field()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

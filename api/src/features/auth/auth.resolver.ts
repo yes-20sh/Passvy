@@ -9,10 +9,8 @@ import {
   VerifyOtpInput,
   GoogleAuthInput,
 } from './dto/auth.dto';
-import {
-  LoginResponse,
-  SuccessResponse,
-} from './entities/auth.response.entity';
+import { LoginResponse } from './entities/auth.response.entity';
+import { SuccessResponse } from '@/shared/entities/success.response.entity';
 import { Public } from '../../decorator/public.decorator';
 
 @Resolver()

@@ -1,0 +1,59 @@
+mutation CreateEvent($input: CreateEventInput!) {
+  createEvent(input: $input) {
+    message
+    statusCode
+    event {
+      id
+      title
+      slug
+      headerImage
+      startDate
+      startTime
+      endDate
+      endTime
+      category
+      status
+      stepper
+      mode {
+        id
+        eventMode
+        onlineLink
+        offlineAddress
+        offlineMapLink
+        offlineLandmark
+        capacity
+      }
+      descriptionBlocks {
+        id
+        blockType
+        content
+        headingLevel
+        textSize
+        listStyle
+        sortOrder
+      }
+      passes {
+        id
+        pricing
+        tier
+        customName
+        passCategory
+        quantity
+        price
+      }
+      coupons {
+        id
+        code
+        discountType
+        discountValue
+        usageLimit
+      }
+      paymentSetting {
+        id
+        acceptedMethods
+      }
+      createdAt
+      updatedAt
+    }
+  }
+}

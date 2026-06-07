@@ -1,9 +1,8 @@
-export type BlockType = "heading" | "paragraph" | "image" | "list";
-export type PassPricing = "FREE" | "PAID";
-export type PassTier = "GA" | "VIP" | "VVIP" | "CUSTOM";
-export type PassCategory = "SINGLE" | "FRIEND" | "GROUP" | "CUSTOM";
-export type HeadingSize = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-export type ParagraphSize = "sm" | "base" | "lg";
+import { BlockType, PassPricing, PassTier } from '@/gql/graphql';
+
+export type PassCategory = 'SINGLE' | 'FRIEND' | 'GROUP' | 'CUSTOM';
+export type HeadingSize = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+export type ParagraphSize = 'sm' | 'base' | 'lg';
 
 export interface DescriptionBlock {
   id: string;
@@ -11,7 +10,7 @@ export interface DescriptionBlock {
   content: string;
   level?: HeadingSize;
   textSize?: ParagraphSize;
-  listStyle?: "disc" | "decimal";
+  listStyle?: 'disc' | 'decimal';
 }
 
 export interface EventPass {
@@ -27,6 +26,6 @@ export interface EventPass {
 export interface EventCoupon {
   id: string;
   code: string;
-  discountType: "PERCENTAGE" | "AMOUNT";
+  discountType: 'PERCENTAGE' | 'AMOUNT';
   discountValue: string;
 }

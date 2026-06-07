@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Button } from "@/components/atoms/button/button";
-import { DescriptionBlock, BlockType } from "../../organisms/create-event-form/types";
+import { DescriptionBlock } from "@/interfaces/events/event.interface";
+import { BlockType } from "@/gql/graphql";
 
 import { ContentBlockItem } from "../content-block-item/content-block-item";
 import { AddBlockToolbar } from "../add-block-toolbar/add-block-toolbar";
@@ -10,10 +11,13 @@ interface EventDescriptionFormProps {
   setBlocks: React.Dispatch<React.SetStateAction<DescriptionBlock[]>>;
   onNext: (e: React.FormEvent | React.MouseEvent) => void;
   onBack: () => void;
+  hasChanges?: boolean;
+  onSave?: () => void;
+  isSaving?: boolean;
 }
 
 export const EventDescriptionForm = ({
-  blocks, setBlocks, onNext, onBack
+  blocks, setBlocks, onNext, onBack, hasChanges = false, onSave, isSaving = false
 }: EventDescriptionFormProps) => {
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
@@ -46,9 +50,9 @@ export const EventDescriptionForm = ({
         id: Math.random().toString(), 
         type, 
         content: "",
-        level: type === "heading" ? "h2" : undefined,
-        textSize: type === "paragraph" ? "base" : undefined,
-        listStyle: type === "list" ? "disc" : undefined
+        level: type === "HEADING" ? "h2" : undefined,
+        textSize: type === "PARAGRAPH" ? "base" : undefined,
+        listStyle: type === "LIST" ? "disc" : undefined
       },
     ]);
   };
@@ -121,13 +125,24 @@ export const EventDescriptionForm = ({
         >
           Back
         </Button>
-        <Button
-          type="button"
-          onClick={onNext}
-          className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
-        >
-          Next
-        </Button>
+        {hasChanges ? (
+          <Button
+            type="button"
+            onClick={onSave}
+            disabled={isSaving}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
+          >
+            {isSaving ? "Saving..." : "Save"}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            onClick={onNext}
+            className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
+          >
+            Next
+          </Button>
+        )}
       </div>
     </div>
   );

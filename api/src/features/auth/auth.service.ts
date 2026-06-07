@@ -22,12 +22,10 @@ import {
   VerifyOtpInput,
   GoogleAuthInput,
 } from './dto/auth.dto';
-import {
-  LoginResponse,
-  SuccessResponse,
-} from './entities/auth.response.entity';
-import { MailService } from '@/services/mail/mail.service';
-import { forgotPasswordTemplate } from '@/services/mail/templates/forgot-password.template';
+import { LoginResponse } from './entities/auth.response.entity';
+import { SuccessResponse } from '@/shared/entities/success.response.entity';
+import { MailService } from '@/config/mail/mail.service';
+import { forgotPasswordTemplate } from '@/config/mail/templates/forgot-password.template';
 import { FirebaseConfigService } from '@/config/firebase/firebase.service';
 import { FirebaseAuthClient } from '@/interface';
 

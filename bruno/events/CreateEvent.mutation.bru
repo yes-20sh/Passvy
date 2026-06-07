@@ -1,0 +1,54 @@
+meta {
+  name: CreateEvent
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  mutation CreateEvent($input: CreateEventInput!) {
+    createEvent(input: $input) {
+      message
+      statusCode
+      event {
+        id
+        title
+        headerImage
+        startDate
+        startTime
+        endDate
+        endTime
+        category
+        status
+        stepper
+        mode {
+          id
+          eventMode
+          onlineLink
+          offlineAddress
+          offlineMapLink
+          offlineLandmark
+          capacity
+        }
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "title": "My Awesome Event",
+      "stepper": "MODE",
+      "mode": {
+        "eventMode": "ONLINE",
+        "capacity": 100
+      }
+    }
+  }
+}

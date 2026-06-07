@@ -10,6 +10,20 @@ import { EventPaymentsForm } from "../../molecules/event-payments-form/event-pay
 import { EventLivePreview } from "../../molecules/event-live-preview/event-live-preview";
 import { Button } from "@/components/atoms/button/button";
 
+// GraphQL/Apollo
+import { useMutation } from "@apollo/client/react";
+import {
+  CreateEventDocument,
+  CreateEventInput,
+  EventStep,
+  EventMode, 
+  PassPricing,
+  PassTier,
+  DiscountType,
+} from "@/gql/graphql";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 // Redux hooks and actions
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -20,14 +34,146 @@ import {
   setPasses,
   setCoupons,
   setAcceptedMethods,
+  updateEventFromSaved,
+  CreateEventState
 } from "@/store/slices/create-event.slice";
-import { DescriptionBlock, EventPass, EventCoupon } from "./types";
+
+
+const isSameDate = (d1: string | Date | null | undefined, d2: string | Date | null | undefined) => {
+  if (!d1 && !d2) return true;
+  if (!d1 || !d2) return false;
+  return new Date(d1).getTime() === new Date(d2).getTime();
+};
+
+const hasStepChanges = (
+  step: number,
+  current: CreateEventState,
+  saved: CreateEventState['lastSavedValues']
+) => {
+  if (!saved) return true;
+
+  switch (step) {
+    case 1:
+      return (
+        current.title !== (saved.title ?? "") ||
+        current.headerImage !== (saved.headerImage ?? "") ||
+        !isSameDate(current.startDate, saved.startDate) ||
+        current.startTime !== (saved.startTime ?? "") ||
+        !isSameDate(current.endDate, saved.endDate) ||
+        current.endTime !== (saved.endTime ?? "") ||
+        current.category !== (saved.category ?? "")
+      );
+    case 2:
+      return JSON.stringify(current.blocks) !== JSON.stringify(saved.blocks);
+    case 3:
+      return (
+        current.eventMode !== saved.eventMode ||
+        current.generateMeetLink !== saved.generateMeetLink ||
+        current.onlineLink !== (saved.onlineLink ?? "") ||
+        current.offlineAddress !== (saved.offlineAddress ?? "") ||
+        current.offlineMapLink !== (saved.offlineMapLink ?? "") ||
+        current.offlineLandmark !== (saved.offlineLandmark ?? "") ||
+        current.capacity !== (saved.capacity ?? "")
+      );
+    case 4:
+      return (
+        JSON.stringify(current.passes) !== JSON.stringify(saved.passes) ||
+        JSON.stringify(current.coupons) !== JSON.stringify(saved.coupons)
+      );
+    case 5:
+      return (
+        JSON.stringify(current.acceptedMethods) !== JSON.stringify(saved.acceptedMethods)
+      );
+    default:
+      return false;
+  }
+};
 
 export const CreateEventForm = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const formState = useAppSelector((state) => state.createEvent);
 
+  const [createEventMutation, { loading }] = useMutation(CreateEventDocument);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleSave = async (stepNum: number, isPublishing = false) => {
+    try {
+      const stepperMap: Record<number, EventStep> = {
+        1: "ESSENTIALS",
+        2: "DESCRIPTION",
+        3: "MODE",
+        4: "PASSES",
+        5: "PAYOUTS",
+      };
+
+      const input: CreateEventInput = {
+        eventId: formState.eventId || undefined,
+        title: formState.title,
+        category: formState.category || undefined,
+        startDate: formState.startDate || undefined,
+        startTime: formState.startTime || undefined,
+        endDate: formState.endDate || undefined,
+        endTime: formState.endTime || undefined,
+        headerImage: formState.headerImage || undefined,
+        
+        descriptionBlocks: formState.blocks.map((block, idx) => ({
+          blockType: block.type,
+          content: block.content,
+          headingLevel: block.level || undefined,
+          textSize: block.textSize || undefined,
+          listStyle: block.listStyle || undefined,
+          sortOrder: idx + 1,
+        })),
+
+        eventMode: formState.eventMode as EventMode,
+        onlineLink: formState.onlineLink || undefined,
+        offlineAddress: formState.offlineAddress || undefined,
+        offlineMapLink: formState.offlineMapLink || undefined,
+        offlineLandmark: formState.offlineLandmark || undefined,
+        capacity: formState.capacity ? parseInt(formState.capacity, 10) : undefined,
+
+        passes: formState.passes.map(p => ({
+          pricing: p.pricing as PassPricing,
+          tier: p.tier as PassTier,
+          customName: p.customName || undefined,
+          passCategory: p.category || undefined,
+          quantity: p.quantity ? parseInt(p.quantity, 10) : undefined,
+          price: p.pricing === "FREE" ? 0 : (p.price ? parseFloat(p.price) : 0),
+        })),
+        coupons: formState.coupons.map(c => ({
+          code: c.code,
+          discountType: c.discountType as DiscountType,
+          discountValue: parseFloat(c.discountValue) || 0,
+        })),
+
+        paymentSetting: {
+          acceptedMethods: formState.acceptedMethods,
+        },
+
+        stepper: stepperMap[stepNum],
+        status: isPublishing ? "PUBLISHED" : "DRAFT",
+      };
+
+      const { data } = await createEventMutation({
+        variables: { input },
+      });
+
+      if (data?.createEvent?.event) {
+        dispatch(updateEventFromSaved(data.createEvent.event));
+        toast.success(data.createEvent.message || "Event saved successfully!");
+        if (isPublishing) {
+          router.push("/host/events");
+        }
+      } else {
+        toast.error("Failed to save event");
+      }
+    } catch (err) {
+      console.error(err);
+      const error = err as Error;
+      toast.error(error.message || "An error occurred while saving the event.");
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +182,7 @@ export const CreateEventForm = () => {
 
   const confirmPublish = () => {
     setShowConfirm(false);
-    console.log("Creating Event:", formState);
-    alert("Event Published Successfully!");
+    handleSave(5, true);
   };
 
   // Wrapper handlers to convert values and dispatch cleanly
@@ -48,6 +193,8 @@ export const CreateEventForm = () => {
   // Convert Date strings to Date objects for the DatePicker
   const parsedStartDate = formState.startDate ? new Date(formState.startDate) : undefined;
   const parsedEndDate = formState.endDate ? new Date(formState.endDate) : undefined;
+
+  const stepChanges = hasStepChanges(formState.step, formState, formState.lastSavedValues);
 
   return (
     <div className="flex flex-col gap-10 w-full">
@@ -72,15 +219,27 @@ export const CreateEventForm = () => {
               category={formState.category}
               setCategory={(v) => handleUpdate("category", v)}
               onNext={() => dispatch(setStep(2))}
+              hasChanges={stepChanges}
+              onSave={() => handleSave(1)}
+              isSaving={loading}
             />
           )}
 
           {formState.step === 2 && (
             <EventDescriptionForm
               blocks={formState.blocks}
-              setBlocks={(b) => dispatch(setBlocks(b as DescriptionBlock[]))}
+              setBlocks={(b) => {
+                if (typeof b === "function") {
+                  dispatch(setBlocks(b(formState.blocks)));
+                } else {
+                  dispatch(setBlocks(b));
+                }
+              }}
               onBack={() => dispatch(setStep(1))}
               onNext={() => dispatch(setStep(3))}
+              hasChanges={stepChanges}
+              onSave={() => handleSave(2)}
+              isSaving={loading}
             />
           )}
 
@@ -88,8 +247,14 @@ export const CreateEventForm = () => {
             <EventModeForm
               eventMode={formState.eventMode}
               setEventMode={(v) => handleUpdate("eventMode", v)}
-              onlineLink={formState.onlineLink}
-              setOnlineLink={(v) => handleUpdate("onlineLink", v)}
+              startDate={parsedStartDate}
+              setStartDate={(v) => handleUpdate("startDate", v?.toISOString())}
+              startTime={formState.startTime}
+              setStartTime={(v) => handleUpdate("startTime", v)}
+              endDate={parsedEndDate}
+              setEndDate={(v) => handleUpdate("endDate", v?.toISOString())}
+              endTime={formState.endTime}
+              setEndTime={(v) => handleUpdate("endTime", v)}
               offlineAddress={formState.offlineAddress}
               setOfflineAddress={(v) => handleUpdate("offlineAddress", v)}
               offlineMapLink={formState.offlineMapLink}
@@ -100,38 +265,53 @@ export const CreateEventForm = () => {
               setCapacity={(v) => handleUpdate("capacity", v)}
               onBack={() => dispatch(setStep(2))}
               onNext={() => dispatch(setStep(4))}
+              hasChanges={stepChanges}
+              onSave={() => handleSave(3)}
+              isSaving={loading}
             />
           )}
 
           {formState.step === 4 && (
             <EventPassesForm
               passes={formState.passes}
-              setPasses={(p) => dispatch(setPasses(p as EventPass[]))}
+              setPasses={(p) => {
+                if (typeof p === "function") {
+                  dispatch(setPasses(p(formState.passes)));
+                } else {
+                  dispatch(setPasses(p));
+                }
+              }}
               coupons={formState.coupons}
-              setCoupons={(c) => dispatch(setCoupons(c as EventCoupon[]))}
+              setCoupons={(c) => {
+                if (typeof c === "function") {
+                  dispatch(setCoupons(c(formState.coupons)));
+                } else {
+                  dispatch(setCoupons(c));
+                }
+              }}
               onBack={() => dispatch(setStep(3))}
               onNext={() => dispatch(setStep(5))}
+              hasChanges={stepChanges}
+              onSave={() => handleSave(4)}
+              isSaving={loading}
             />
           )}
 
           {formState.step === 5 && (
             <EventPaymentsForm
               acceptedMethods={formState.acceptedMethods}
-              setAcceptedMethods={(m) => dispatch(setAcceptedMethods(m as string[]))}
-              payoutMethod={formState.payoutMethod}
-              setPayoutMethod={(v) => handleUpdate("payoutMethod", v)}
-              payoutUpiId={formState.payoutUpiId}
-              setPayoutUpiId={(v) => handleUpdate("payoutUpiId", v)}
-              payoutBankName={formState.payoutBankName}
-              setPayoutBankName={(v) => handleUpdate("payoutBankName", v)}
-              payoutAccountName={formState.payoutAccountName}
-              setPayoutAccountName={(v) => handleUpdate("payoutAccountName", v)}
-              payoutAccountNumber={formState.payoutAccountNumber}
-              setPayoutAccountNumber={(v) => handleUpdate("payoutAccountNumber", v)}
-              payoutIfsc={formState.payoutIfsc}
-              setPayoutIfsc={(v) => handleUpdate("payoutIfsc", v)}
+              setAcceptedMethods={(m) => {
+                if (typeof m === "function") {
+                  dispatch(setAcceptedMethods(m(formState.acceptedMethods)));
+                } else {
+                  dispatch(setAcceptedMethods(m));
+                }
+              }}
               onBack={() => dispatch(setStep(4))}
               onSubmit={handleSubmit}
+              hasChanges={stepChanges}
+              onSave={() => handleSave(5)}
+              isSaving={loading}
             />
           )}
 
@@ -179,6 +359,8 @@ export const CreateEventForm = () => {
           onlineLink={formState.onlineLink}
           offlineAddress={formState.offlineAddress}
           capacity={formState.capacity}
+          stepper={formState.stepper}
+          currentStep={formState.step}
         />
       </div>
     </div>

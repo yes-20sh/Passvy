@@ -30,7 +30,6 @@ export class GoogleService {
     description?: string;
     startTime: Date;
     endTime: Date;
-    hostEmail?: string;
   }): Promise<string> {
     try {
       const calendar = google.calendar({
@@ -49,9 +48,6 @@ export class GoogleService {
           dateTime: eventDetails.endTime.toISOString(),
           timeZone: 'UTC',
         },
-        attendees: eventDetails.hostEmail
-          ? [{ email: eventDetails.hostEmail }]
-          : undefined,
         conferenceData: {
           createRequest: {
             requestId: crypto.randomUUID(),

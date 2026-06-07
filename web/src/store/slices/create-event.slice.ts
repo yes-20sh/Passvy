@@ -1,16 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { DescriptionBlock, EventPass, EventCoupon } from "@/components/organisms/create-event-form/types";
+import {
+  DescriptionBlock,
+  EventPass,
+  EventCoupon,
+} from '@/interfaces/events/event.interface';
+import { PassCategory } from '@/types/events/event.type';
+import { EventStep, CreateEventMutation } from '@/gql/graphql';
 
 export interface CreateEventState {
   step: number;
+  eventId: string | null;
+  stepper: EventStep | null;
+  lastSavedValues: Omit<CreateEventState, 'lastSavedValues' | 'step'> | null;
+
   title: string;
   headerImage: string;
-  startDate: string | undefined; // Store dates as ISO strings in Redux
+  startDate: string | undefined;
   startTime: string;
   endDate: string | undefined;
   endTime: string;
   category: string;
-  eventMode: "ONLINE" | "OFFLINE";
+  eventMode: 'ONLINE' | 'OFFLINE';
+  generateMeetLink: boolean;
   onlineLink: string;
   offlineAddress: string;
   offlineMapLink: string;
@@ -20,62 +31,55 @@ export interface CreateEventState {
   passes: EventPass[];
   coupons: EventCoupon[];
   acceptedMethods: string[];
-  payoutMethod: "BANK" | "UPI";
-  payoutUpiId: string;
-  payoutBankName: string;
-  payoutAccountName: string;
-  payoutAccountNumber: string;
-  payoutIfsc: string;
 }
 
 const initialState: CreateEventState = {
   step: 1,
-  title: "",
-  headerImage: "",
+  eventId: null,
+  stepper: null,
+  lastSavedValues: null,
+
+  title: '',
+  headerImage: '',
   startDate: undefined,
-  startTime: "",
+  startTime: '',
   endDate: undefined,
-  endTime: "",
-  category: "",
-  eventMode: "ONLINE",
-  onlineLink: "",
-  offlineAddress: "",
-  offlineMapLink: "",
-  offlineLandmark: "",
-  capacity: "",
+  endTime: '',
+  category: '',
+  eventMode: 'ONLINE',
+  generateMeetLink: false,
+  onlineLink: '',
+  offlineAddress: '',
+  offlineMapLink: '',
+  offlineLandmark: '',
+  capacity: '',
   blocks: [
     {
-      id: "1",
-      type: "heading",
-      content: "About This Event",
-      level: "h2"
+      id: '1',
+      type: 'HEADING',
+      content: 'About This Event',
+      level: 'h2',
     },
     {
-      id: "2",
-      type: "paragraph",
-      content: "Join us for an unforgettable experience...",
-      textSize: "base"
-    }
+      id: '2',
+      type: 'PARAGRAPH',
+      content: 'Join us for an unforgettable experience...',
+      textSize: 'base',
+    },
   ],
   passes: [
     {
-      id: "1",
-      pricing: "FREE",
-      tier: "GA",
-      customName: "",
-      category: "SINGLE",
-      quantity: "100",
-      price: ""
-    }
+      id: '1',
+      pricing: 'FREE',
+      tier: 'GA',
+      customName: '',
+      category: 'SINGLE',
+      quantity: '100',
+      price: '',
+    },
   ],
   coupons: [],
-  acceptedMethods: ["RAZORPAY", "CHECKIN"],
-  payoutMethod: "BANK",
-  payoutUpiId: "",
-  payoutBankName: "",
-  payoutAccountName: "",
-  payoutAccountNumber: "",
-  payoutIfsc: "",
+  acceptedMethods: ['RAZORPAY', 'CHECKIN'],
 };
 
 export const createEventSlice = createSlice({
@@ -87,7 +91,7 @@ export const createEventSlice = createSlice({
     },
     updateField: <K extends keyof CreateEventState>(
       state: CreateEventState,
-      action: PayloadAction<{ field: K; value: CreateEventState[K] }>
+      action: PayloadAction<{ field: K; value: CreateEventState[K] }>,
     ) => {
       state[action.payload.field] = action.payload.value;
     },
@@ -103,6 +107,99 @@ export const createEventSlice = createSlice({
     setAcceptedMethods: (state, action: PayloadAction<string[]>) => {
       state.acceptedMethods = action.payload;
     },
+    updateEventFromSaved: (
+      state,
+      action: PayloadAction<
+        NonNullable<CreateEventMutation['createEvent']['event']>
+      >,
+    ) => {
+      const event = action.payload;
+      if (!event) return;
+
+      state.eventId = event.id || null;
+      state.stepper = event.stepper || null;
+
+      state.title = event.title || '';
+      state.headerImage = event.headerImage || '';
+      state.startDate = event.startDate
+        ? new Date(event.startDate as string).toISOString()
+        : undefined;
+      state.startTime = event.startTime || '';
+      state.endDate = event.endDate
+        ? new Date(event.endDate as string).toISOString()
+        : undefined;
+      state.endTime = event.endTime || '';
+      state.category = event.category || '';
+
+      if (event.mode) {
+        state.eventMode = event.mode.eventMode as 'ONLINE' | 'OFFLINE';
+        state.onlineLink = event.mode.onlineLink || '';
+        state.offlineAddress = event.mode.offlineAddress || '';
+        state.offlineMapLink = event.mode.offlineMapLink || '';
+        state.offlineLandmark = event.mode.offlineLandmark || '';
+        state.capacity = event.mode.capacity ? String(event.mode.capacity) : '';
+      }
+
+      if (event.descriptionBlocks) {
+        state.blocks = event.descriptionBlocks.map((b) => ({
+          id: b.id || Math.random().toString(),
+          type: b.blockType,
+          content: b.content || '',
+          level: b.headingLevel as DescriptionBlock['level'] | undefined,
+          textSize: b.textSize as DescriptionBlock['textSize'] | undefined,
+          listStyle: b.listStyle as DescriptionBlock['listStyle'] | undefined,
+        }));
+      }
+
+      if (event.passes) {
+        state.passes = event.passes.map((p) => ({
+          id: p.id || Math.random().toString(),
+          pricing: p.pricing as 'FREE' | 'PAID',
+          tier: p.tier as 'GA' | 'VIP' | 'VVIP' | 'CUSTOM',
+          customName: p.customName || '',
+          category: (p.passCategory || 'SINGLE') as PassCategory,
+          quantity: p.quantity ? String(p.quantity) : '',
+          price: p.price ? String(p.price) : '',
+        }));
+      }
+
+      if (event.coupons) {
+        state.coupons = event.coupons.map((c) => ({
+          id: c.id || Math.random().toString(),
+          code: c.code,
+          discountType: c.discountType as 'PERCENTAGE' | 'AMOUNT',
+          discountValue: c.discountValue ? String(c.discountValue) : '',
+        }));
+      }
+
+      if (event.paymentSetting) {
+        state.acceptedMethods = event.paymentSetting.acceptedMethods || ['RAZORPAY', 'CHECKIN'];
+      }
+
+      // Create a copy for lastSavedValues
+      state.lastSavedValues = {
+        eventId: state.eventId,
+        stepper: state.stepper,
+        title: state.title,
+        headerImage: state.headerImage,
+        startDate: state.startDate,
+        startTime: state.startTime,
+        endDate: state.endDate,
+        endTime: state.endTime,
+        category: state.category,
+        eventMode: state.eventMode,
+        generateMeetLink: state.generateMeetLink,
+        onlineLink: state.onlineLink,
+        offlineAddress: state.offlineAddress,
+        offlineMapLink: state.offlineMapLink,
+        offlineLandmark: state.offlineLandmark,
+        capacity: state.capacity,
+        blocks: state.blocks,
+        passes: state.passes,
+        coupons: state.coupons,
+        acceptedMethods: state.acceptedMethods,
+      };
+    },
     resetForm: () => initialState,
   },
 });
@@ -114,6 +211,7 @@ export const {
   setPasses,
   setCoupons,
   setAcceptedMethods,
+  updateEventFromSaved,
   resetForm,
 } = createEventSlice.actions;
 

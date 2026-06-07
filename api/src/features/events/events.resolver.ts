@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Mutation, Query, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { EventSchema } from '@/schemas/event.schema';
@@ -21,11 +21,16 @@ export class EventsResolver {
     @CurrentUser() user: JwtUser,
     @Args('input') input: CreateEventInput,
   ): Promise<EventResponse> {
-    const event = await this.eventsService.createEvent(user.sub, input);
-    return {
-      message: 'Event created successfully',
-      statusCode: 201,
-      event,
-    };
+    return this.eventsService.createEvent(user.sub, input);
+  }
+
+  @Query(() => EventResponse)
+  @UseGuards(RolesGuard)
+  @Roles(Role.USER)
+  async getEvent(
+    @CurrentUser() user: JwtUser,
+    @Args('eventId') eventId: string,
+  ): Promise<EventResponse> {
+    return this.eventsService.getEvent(user.sub, eventId);
   }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/atoms/button/button";
 import { Type, AlignLeft, Image as ImageIcon, List as ListIcon } from "lucide-react";
-import { BlockType } from "../../organisms/create-event-form/types";
+import { BlockType } from "@/gql/graphql";
 
 interface AddBlockToolbarProps {
   onAddBlock: (type: BlockType) => void;
@@ -17,7 +17,7 @@ export const AddBlockToolbar = ({ onAddBlock }: AddBlockToolbarProps) => {
         <Button
           type="button"
           size="sm"
-          onClick={() => onAddBlock("heading")}
+          onClick={() => onAddBlock("HEADING")}
           className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-xs"
         >
           <Type className="size-3.5 mr-1.5" />
@@ -26,7 +26,7 @@ export const AddBlockToolbar = ({ onAddBlock }: AddBlockToolbarProps) => {
         <Button
           type="button"
           size="sm"
-          onClick={() => onAddBlock("paragraph")}
+          onClick={() => onAddBlock("PARAGRAPH")}
           className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-xs"
         >
           <AlignLeft className="size-3.5 mr-1.5" />
@@ -35,7 +35,7 @@ export const AddBlockToolbar = ({ onAddBlock }: AddBlockToolbarProps) => {
         <Button
           type="button"
           size="sm"
-          onClick={() => onAddBlock("image")}
+          onClick={() => onAddBlock("IMAGE")}
           className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-xs"
         >
           <ImageIcon className="size-3.5 mr-1.5" />
@@ -44,7 +44,7 @@ export const AddBlockToolbar = ({ onAddBlock }: AddBlockToolbarProps) => {
         <Button
           type="button"
           size="sm"
-          onClick={() => onAddBlock("list")}
+          onClick={() => onAddBlock("LIST")}
           className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg text-xs"
         >
           <ListIcon className="size-3.5 mr-1.5" />

@@ -8,12 +8,3 @@ export class LoginResponse {
   @Field(() => Int)
   statusCode: number;
 }
-
-@ObjectType()
-export class SuccessResponse {
-  @Field()
-  message: string;
-
-  @Field(() => Int)
-  statusCode: number;
-}
