@@ -4,6 +4,7 @@ import { GraphqlModule } from './graphql/graphql.module';
 import { DatabaseModule } from './database/database.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { GoogleModule } from './google/google.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     DatabaseModule,
     FirebaseModule,
     CloudinaryModule,
+    GoogleModule,
   ],
 })
 export class ConfigModule {}

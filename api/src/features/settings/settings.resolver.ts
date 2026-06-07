@@ -7,12 +7,7 @@ import { RolesGuard } from '@/guards/roles.guard';
 import { Roles } from '@/decorator/roles.decorator';
 import { CurrentUser } from '@/decorator/current-user.decorator';
 import { Role } from '@/enum';
-
-export interface JwtUser {
-  sub: string;
-  email: string;
-  role: string;
-}
+import type { JwtUser } from '@/interface';
 
 @Resolver()
 export class SettingsResolver {

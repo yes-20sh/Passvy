@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useApolloClient } from "@apollo/client/react";
-import { GetSettingsDocument } from "@/gql/graphql";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { login, logout } from "@/store/slices/authSlice";
+import { useEffect } from 'react';
+import { useApolloClient } from '@apollo/client/react';
+import { GetSettingsDocument } from '@/gql/graphql';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
+import { login, logout } from '@/store/slices/authSlice';
 
 export const useAuthInit = () => {
   const client = useApolloClient();
@@ -19,15 +19,15 @@ export const useAuthInit = () => {
       try {
         const { data } = await client.query({
           query: GetSettingsDocument,
-          fetchPolicy: "network-only",
-          errorPolicy: "none",
+          fetchPolicy: 'network-only',
+          errorPolicy: 'none',
         });
 
         if (data?.getSettings?.data) {
           dispatch(
             login({
-              email: data.getSettings.data.email ?? "",
-            })
+              email: data.getSettings.data.email ?? '',
+            }),
           );
         } else {
           dispatch(logout());

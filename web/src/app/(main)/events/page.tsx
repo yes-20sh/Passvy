@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ProtectedRoute } from "@/components/template/protected-route/protected-route";
+
 import { Header } from "@/components/organisms/header/header";
 import { FeaturedEvents } from "@/components/organisms/featured-events/featured-events";
 import { CategoryFilter } from "@/components/organisms/category-filter/category-filter";
 import { EventsGrid } from "@/components/organisms/events-grid/events-grid";
+import { EventsTemplate } from "@/components/template/events-template/events-template";
 import { MOCK_EVENTS, CATEGORIES } from "./data";
 
 const EventsPage = () => {
@@ -67,44 +68,43 @@ const EventsPage = () => {
   const featuredEvents = MOCK_EVENTS.slice(0, 5);
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
+    <EventsTemplate
+      header={
         <Header
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           theme={theme}
           toggleTheme={toggleTheme}
         />
-
-        <main className="container mx-auto px-4 py-8 flex-1">
-          <div className="space-y-8">
-            {!selectedCategory && !searchQuery && featuredEvents.length > 0 && (
-              <FeaturedEvents
-                activeFeaturedTab={activeFeaturedTab}
-                setActiveFeaturedTab={setActiveFeaturedTab}
-                featuredEvents={featuredEvents}
-                mockEvents={MOCK_EVENTS}
-                registeredIds={registeredIds}
-                setRegisteredIds={setRegisteredIds}
-              />
-            )}
-
-            <CategoryFilter
-              categories={CATEGORIES}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-
-            <EventsGrid
-              filteredEvents={filteredEvents}
-              setRegisteredIds={setRegisteredIds}
-              setSearchQuery={setSearchQuery}
-              setSelectedCategory={setSelectedCategory}
-            />
-          </div>
-        </main>
-      </div>
-    </ProtectedRoute>
+      }
+      featuredEvents={
+        (!selectedCategory && !searchQuery && featuredEvents.length > 0) ? (
+          <FeaturedEvents
+            activeFeaturedTab={activeFeaturedTab}
+            setActiveFeaturedTab={setActiveFeaturedTab}
+            featuredEvents={featuredEvents}
+            mockEvents={MOCK_EVENTS}
+            registeredIds={registeredIds}
+            setRegisteredIds={setRegisteredIds}
+          />
+        ) : undefined
+      }
+      categoryFilter={
+        <CategoryFilter
+          categories={CATEGORIES}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
+      }
+      eventsGrid={
+        <EventsGrid
+          filteredEvents={filteredEvents}
+          setRegisteredIds={setRegisteredIds}
+          setSearchQuery={setSearchQuery}
+          setSelectedCategory={setSelectedCategory}
+        />
+      }
+    />
   );
 };
 

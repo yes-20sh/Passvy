@@ -4,6 +4,7 @@ import { ConfigModule } from './config/config.module';
 import { HealthModule } from './features/health/health.module';
 import { AuthModule } from './features/auth/auth.module';
 import { SettingsModule } from './features/settings/settings.module';
+import { EventsModule } from './features/events/events.module';
 import { MailModule } from './services/mail/mail.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { AuthGuard } from './guards/auth.guard';
@@ -16,6 +17,7 @@ import { JwtModule } from '@nestjs/jwt';
     HealthModule,
     AuthModule,
     SettingsModule,
+    EventsModule,
     MailModule,
     JwtModule.register({ secret: process.env.JWT_SECRET || 'fallback' }),
   ],

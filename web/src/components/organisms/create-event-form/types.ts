@@ -1,7 +1,7 @@
 export type BlockType = "heading" | "paragraph" | "image" | "list";
 export type PassPricing = "FREE" | "PAID";
 export type PassTier = "GA" | "VIP" | "VVIP" | "CUSTOM";
-export type PassCategory = "SINGLE" | "FRIEND" | "GROUP";
+export type PassCategory = "SINGLE" | "FRIEND" | "GROUP" | "CUSTOM";
 export type HeadingSize = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 export type ParagraphSize = "sm" | "base" | "lg";
 
@@ -27,5 +27,6 @@ export interface EventPass {
 export interface EventCoupon {
   id: string;
   code: string;
-  discountPercentage: string;
+  discountType: "PERCENTAGE" | "AMOUNT";
+  discountValue: string;
 }

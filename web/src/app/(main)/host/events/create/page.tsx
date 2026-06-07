@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "@/components/organisms/header/header";
 import { CreateEventForm } from "@/components/organisms/create-event-form/create-event-form";
+import { EventsTemplate } from "@/components/template/events-template/events-template";
 
 export default function CreateEventPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -43,19 +44,16 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
-      <Header
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        theme={theme}
-        toggleTheme={toggleTheme}
-      />
-
-      <main className="container mx-auto px-4 py-12 flex-1">
-        <div className="flex flex-col gap-8 max-w-6xl mx-auto w-full">
-          <CreateEventForm />
-        </div>
-      </main>
-    </div>
+    <EventsTemplate
+      header={
+        <Header
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+      }
+      content={<CreateEventForm />}
+    />
   );
 }

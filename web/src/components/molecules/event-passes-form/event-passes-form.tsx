@@ -2,8 +2,8 @@ import React from "react";
 import { Label } from "@/components/atoms/label/label";
 import { Input } from "@/components/atoms/input/input";
 import { Button } from "@/components/atoms/button/button";
-import { ArrowLeft, Plus, Trash2, Ticket, Star, Crown, Settings, User, Users, DollarSign, Percent } from "lucide-react";
-import { EventPass, EventCoupon, PassTier, PassCategory, PassPricing } from "../../organisms/create-event-form/types";
+import { Plus, Trash2, Ticket, Star, Crown, Settings, User, Users, Percent, IndianRupee } from "lucide-react";
+import { EventPass, EventCoupon } from "../../organisms/create-event-form/types";
 
 interface EventPassesFormProps {
   passes: EventPass[];
@@ -49,7 +49,8 @@ export const EventPassesForm = ({
       {
         id: Math.random().toString(),
         code: "",
-        discountPercentage: ""
+        discountType: "PERCENTAGE",
+        discountValue: ""
       }
     ]);
   };
@@ -66,16 +67,6 @@ export const EventPassesForm = ({
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-right-4 duration-300">
-      <div>
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
-        >
-          <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
-          <span>Back to Event Details</span>
-        </button>
-      </div>
 
       <div className="space-y-1">
         <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
@@ -180,7 +171,7 @@ export const EventPassesForm = ({
                 {/* Category */}
                 <div className="space-y-3">
                   <Label className="text-[10px] font-extrabold uppercase tracking-wider block text-muted-foreground">Pass Category</Label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <div
                       onClick={() => updatePass(pass.id, "category", "SINGLE")}
                       className={`p-3 border rounded-lg cursor-pointer select-none transition-all flex flex-col items-center justify-center gap-1.5 text-center ${
@@ -207,6 +198,15 @@ export const EventPassesForm = ({
                     >
                       <Users className={`size-4 ${pass.category === "GROUP" ? "text-emerald-600" : "text-muted-foreground"}`} />
                       <span className="font-extrabold text-[10px] text-foreground">Group (5)</span>
+                    </div>
+                    <div
+                      onClick={() => updatePass(pass.id, "category", "CUSTOM")}
+                      className={`p-3 border rounded-lg cursor-pointer select-none transition-all flex flex-col items-center justify-center gap-1.5 text-center ${
+                        pass.category === "CUSTOM" ? "ring-2 ring-emerald-600 border-emerald-600 bg-emerald-600/5" : "border-border hover:border-emerald-600 bg-secondary/10"
+                      }`}
+                    >
+                      <Settings className={`size-4 ${pass.category === "CUSTOM" ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`} />
+                      <span className="font-extrabold text-[10px] text-foreground">Custom</span>
                     </div>
                   </div>
                 </div>
@@ -246,19 +246,19 @@ export const EventPassesForm = ({
                     </div>
                     {pass.pricing === "PAID" && (
                       <div className="space-y-1.5 text-left animate-in zoom-in-95 duration-200">
-                        <Label htmlFor={`price-${pass.id}`} className="text-xs">Price (USD)</Label>
+                        <Label htmlFor={`price-${pass.id}`} className="text-xs">Price (INR)</Label>
                         <div className="relative">
                           <Input
                             id={`price-${pass.id}`}
                             type="number"
                             placeholder="0.00"
-                            min="0.5"
+                            min="1"
                             step="0.01"
                             value={pass.price}
                             onChange={(e) => updatePass(pass.id, "price", e.target.value)}
                             className="pl-8 h-9 text-xs"
                           />
-                          <DollarSign className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                          <IndianRupee className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         </div>
                       </div>
                     )}
@@ -305,17 +305,36 @@ export const EventPassesForm = ({
                     className="h-10 text-xs font-bold uppercase tracking-widest"
                   />
                 </div>
+                <div className="flex bg-secondary/20 p-1 rounded-lg h-10 items-stretch">
+                  <button
+                    type="button"
+                    onClick={() => updateCoupon(coupon.id, "discountType", "PERCENTAGE")}
+                    className={`px-3 flex-1 justify-center text-xs font-bold rounded flex items-center gap-1 transition-all ${coupon.discountType === "PERCENTAGE" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"}`}
+                  >
+                    <Percent className="size-3" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateCoupon(coupon.id, "discountType", "AMOUNT")}
+                    className={`px-3 flex-1 justify-center text-xs font-bold rounded flex items-center gap-1 transition-all ${coupon.discountType === "AMOUNT" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"}`}
+                  >
+                    <IndianRupee className="size-3" />
+                  </button>
+                </div>
                 <div className="w-24 relative">
                   <Input
                     type="number"
                     placeholder="0"
                     min="1"
-                    max="100"
-                    value={coupon.discountPercentage}
-                    onChange={(e) => updateCoupon(coupon.id, "discountPercentage", e.target.value)}
+                    value={coupon.discountValue || ""}
+                    onChange={(e) => updateCoupon(coupon.id, "discountValue", e.target.value)}
                     className="h-10 text-xs pr-8"
                   />
-                  <Percent className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  {coupon.discountType === "AMOUNT" ? (
+                    <IndianRupee className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  ) : (
+                    <Percent className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  )}
                 </div>
                 <button
                   type="button"
@@ -329,15 +348,23 @@ export const EventPassesForm = ({
           </div>
         </div>
 
-        <hr className="border-border/40" />
-
-        <Button
-          type="button"
-          onClick={onNext}
-          className="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg py-3 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
-        >
-          Next
-        </Button>
+        <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+          <Button
+            type="button"
+            onClick={onBack}
+            variant="outline"
+            className="font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
+          >
+            Back
+          </Button>
+          <Button
+            type="button"
+            onClick={onNext}
+            className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
+          >
+            Next
+          </Button>
+        </div>
       </form>
     </div>
   );
