@@ -175,7 +175,12 @@ export const ContentBlockItem = ({
                   className="hidden"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
-                      onUpdateContent(block.id, URL.createObjectURL(e.target.files[0]));
+                      const file = e.target.files[0];
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        onUpdateContent(block.id, reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
                     }
                   }}
                 />
@@ -199,7 +204,12 @@ export const ContentBlockItem = ({
                   className="hidden"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
-                      onUpdateContent(block.id, URL.createObjectURL(e.target.files[0]));
+                      const file = e.target.files[0];
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        onUpdateContent(block.id, reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
                     }
                   }}
                 />

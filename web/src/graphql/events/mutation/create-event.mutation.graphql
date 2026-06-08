@@ -15,9 +15,12 @@ mutation CreateEvent($input: CreateEventInput!) {
       status
       stepper
       mode {
-        id
         eventMode
         onlineLink
+        meetingStartDate
+        meetingStartTime
+        meetingEndDate
+        meetingEndTime
         offlineAddress
         offlineMapLink
         offlineLandmark

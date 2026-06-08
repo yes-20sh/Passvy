@@ -116,10 +116,10 @@ export const EventEssentialsForm = ({
           <Button
             type="button"
             onClick={handleAction}
-            disabled={isSaving}
+            loading={isSaving}
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
           >
-            {isSaving ? "Saving..." : "Save"}
+            Save
           </Button>
         ) : (
           <Button

@@ -12,6 +12,7 @@ interface EventPaymentsFormProps {
   hasChanges?: boolean;
   onSave?: () => void;
   isSaving?: boolean;
+  hasPaidPasses?: boolean;
 }
 
 export const EventPaymentsForm = ({
@@ -19,13 +20,44 @@ export const EventPaymentsForm = ({
   onBack, onSubmit,
   hasChanges = false,
   onSave,
-  isSaving = false
+  isSaving = false,
+  hasPaidPasses = false
 }: EventPaymentsFormProps) => {
 
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!hasPaidPasses && acceptedMethods.includes("CHECKIN")) {
+      setAcceptedMethods((prev) => prev.filter((m) => m !== "CHECKIN"));
+    }
+    // If only free passes exist and FREE isn't selected, auto-select it
+    if (!hasPaidPasses && !acceptedMethods.includes("FREE")) {
+       setAcceptedMethods((prev) => [...prev, "FREE"]);
+    }
+  }, [hasPaidPasses, acceptedMethods, setAcceptedMethods]);
+
   const toggleMethod = (method: string) => {
+    if (error) setError(null);
     setAcceptedMethods((prev) =>
       prev.includes(method) ? prev.filter((m) => m !== method) : [...prev, method]
     );
+  };
+
+  const handleNext = (e: React.FormEvent | React.MouseEvent) => {
+    e.preventDefault();
+    if (acceptedMethods.length === 0) {
+      setError("Please select at least one payment method.");
+      return;
+    }
+    onSubmit(e);
+  };
+
+  const handleSaveAction = () => {
+    if (acceptedMethods.length === 0) {
+      setError("Please select at least one payment method.");
+      return;
+    }
+    if (onSave) onSave();
   };
 
   return (
@@ -46,7 +78,7 @@ export const EventPaymentsForm = ({
         </p>
       </div>
 
-      <form id="publish-event-form" onSubmit={onSubmit} className="space-y-8">
+      <form id="publish-event-form" onSubmit={handleNext} className="space-y-8">
         
         <div className="space-y-3">
           <Label className="text-xs font-extrabold uppercase tracking-wider block">Accepted Payment Methods</Label>
@@ -71,11 +103,14 @@ export const EventPaymentsForm = ({
             {/* CHECKIN */}
             <button
               type="button"
+              disabled={!hasPaidPasses}
               onClick={() => toggleMethod("CHECKIN")}
-              className={`flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-2xl border-2 transition-all duration-200 cursor-pointer text-center relative ${
-                acceptedMethods.includes("CHECKIN")
-                  ? "ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5 text-indigo-700 dark:text-indigo-400"
-                  : "border-border hover:border-indigo-600 bg-secondary/10 text-muted-foreground opacity-70 grayscale"
+              className={`flex flex-col items-center justify-center gap-2 w-24 h-24 rounded-2xl border-2 transition-all duration-200 text-center relative ${
+                !hasPaidPasses 
+                  ? "border-border/60 bg-secondary/20 text-muted-foreground cursor-not-allowed opacity-50 grayscale"
+                  : acceptedMethods.includes("CHECKIN")
+                    ? "cursor-pointer ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5 text-indigo-700 dark:text-indigo-400"
+                    : "cursor-pointer border-border hover:border-indigo-600 bg-secondary/10 text-muted-foreground opacity-70 grayscale"
               }`}
             >
               {acceptedMethods.includes("CHECKIN") && (
@@ -96,6 +131,7 @@ export const EventPaymentsForm = ({
               <div className="absolute top-0 inset-x-0 bg-secondary text-[9px] font-bold py-0.5 text-center">Coming Soon</div>
             </button>
           </div>
+          {error && <p className="text-xs text-destructive font-bold">{error}</p>}
         </div>
 
         <div className="space-y-4 pt-4 border-t border-border/40">
@@ -136,11 +172,11 @@ export const EventPaymentsForm = ({
           {hasChanges ? (
             <Button
               type="button"
-              onClick={onSave}
-              disabled={isSaving}
+              onClick={handleSaveAction}
+              loading={isSaving}
               className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
             >
-              {isSaving ? "Saving..." : "Save"}
+              Save
             </Button>
           ) : (
             <Button

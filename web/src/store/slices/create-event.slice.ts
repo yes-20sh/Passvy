@@ -20,9 +20,15 @@ export interface CreateEventState {
   endDate: string | undefined;
   endTime: string;
   category: string;
+
+  // Step 3: Event Mode
   eventMode: 'ONLINE' | 'OFFLINE';
   generateMeetLink: boolean;
   onlineLink: string;
+  meetingStartDate?: string;
+  meetingStartTime: string;
+  meetingEndDate?: string;
+  meetingEndTime: string;
   offlineAddress: string;
   offlineMapLink: string;
   offlineLandmark: string;
@@ -46,9 +52,15 @@ const initialState: CreateEventState = {
   endDate: undefined,
   endTime: '',
   category: '',
+
+  // Step 3: Event Mode
   eventMode: 'ONLINE',
   generateMeetLink: false,
   onlineLink: '',
+  meetingStartDate: undefined,
+  meetingStartTime: '',
+  meetingEndDate: undefined,
+  meetingEndTime: '',
   offlineAddress: '',
   offlineMapLink: '',
   offlineLandmark: '',
@@ -74,12 +86,12 @@ const initialState: CreateEventState = {
       tier: 'GA',
       customName: '',
       category: 'SINGLE',
-      quantity: '100',
+      quantity: '',
       price: '',
     },
   ],
   coupons: [],
-  acceptedMethods: ['RAZORPAY', 'CHECKIN'],
+  acceptedMethods: [],
 };
 
 export const createEventSlice = createSlice({
@@ -134,6 +146,14 @@ export const createEventSlice = createSlice({
       if (event.mode) {
         state.eventMode = event.mode.eventMode as 'ONLINE' | 'OFFLINE';
         state.onlineLink = event.mode.onlineLink || '';
+        state.meetingStartDate = event.mode.meetingStartDate
+          ? new Date(event.mode.meetingStartDate as string).toISOString()
+          : undefined;
+        state.meetingStartTime = event.mode.meetingStartTime || '';
+        state.meetingEndDate = event.mode.meetingEndDate
+          ? new Date(event.mode.meetingEndDate as string).toISOString()
+          : undefined;
+        state.meetingEndTime = event.mode.meetingEndTime || '';
         state.offlineAddress = event.mode.offlineAddress || '';
         state.offlineMapLink = event.mode.offlineMapLink || '';
         state.offlineLandmark = event.mode.offlineLandmark || '';
@@ -190,6 +210,10 @@ export const createEventSlice = createSlice({
         eventMode: state.eventMode,
         generateMeetLink: state.generateMeetLink,
         onlineLink: state.onlineLink,
+        meetingStartDate: state.meetingStartDate,
+        meetingStartTime: state.meetingStartTime,
+        meetingEndDate: state.meetingEndDate,
+        meetingEndTime: state.meetingEndTime,
         offlineAddress: state.offlineAddress,
         offlineMapLink: state.offlineMapLink,
         offlineLandmark: state.offlineLandmark,

@@ -40,6 +40,22 @@ export class EventModeSchema {
   @Column({ name: 'online_link', type: 'text', nullable: true })
   onlineLink: string | null;
 
+  @Field(() => Date, { nullable: true })
+  @Column({ name: 'meeting_start_date', type: 'date', nullable: true })
+  meetingStartDate: Date | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ name: 'meeting_start_time', type: 'time', nullable: true })
+  meetingStartTime: string | null;
+
+  @Field(() => Date, { nullable: true })
+  @Column({ name: 'meeting_end_date', type: 'date', nullable: true })
+  meetingEndDate: Date | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ name: 'meeting_end_time', type: 'time', nullable: true })
+  meetingEndTime: string | null;
+
   @Field(() => String, { nullable: true })
   @Column({ name: 'offline_address', type: 'text', nullable: true })
   offlineAddress: string | null;

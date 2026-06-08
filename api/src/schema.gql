@@ -35,6 +35,10 @@ input CreateEventInput {
   eventId: String
   eventMode: EventMode!
   headerImage: String
+  meetingEndDate: DateTime
+  meetingEndTime: String
+  meetingStartDate: DateTime
+  meetingStartTime: String
   offlineAddress: String
   offlineLandmark: String
   offlineMapLink: String
@@ -101,6 +105,10 @@ type EventModeSchema {
   createdAt: DateTime!
   eventMode: EventMode!
   id: ID!
+  meetingEndDate: DateTime
+  meetingEndTime: String
+  meetingStartDate: DateTime
+  meetingStartTime: String
   offlineAddress: String
   offlineLandmark: String
   offlineMapLink: String
@@ -210,7 +218,7 @@ enum PassTier {
 }
 
 type Query {
-  getEvent(eventId: String!): EventResponse!
+  getEvent(slug: String!): EventResponse!
   getSettings: SettingsResponse!
   healthCheck: String!
 }

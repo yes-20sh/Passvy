@@ -14,6 +14,7 @@ import { EventStep, EventMode, EventRelation, BlockType } from '@/enum';
 import { generateEventMeetLinkHelper } from '@/helper/generate-meet-link/generate-meet-link.helper';
 import { CloudinaryService } from '@/config/cloudinary/cloudinary.service';
 import { uploadEventImageHelper } from '@/helper/cloudinary/cloudinary.helper';
+import { generateSlugHelper } from '@/helper/generate-slug/generate-slug.helper';
 
 @Injectable()
 export class EventsService {
@@ -141,6 +142,7 @@ export class EventsService {
         event = this.eventRepository.create({
           ...input,
           creatorId: userId,
+          slug: generateSlugHelper(input.title),
         });
       }
 
@@ -207,10 +209,10 @@ export class EventsService {
     }
   }
 
-  async getEvent(userId: string, eventId: string): Promise<EventResponse> {
+  async getEvent(userId: string, slug: string): Promise<EventResponse> {
     try {
       const event = await this.eventRepository.findOne({
-        where: { id: eventId, creatorId: userId },
+        where: { slug, creatorId: userId },
         relations: {
           [EventRelation.MODE]: true,
           [EventRelation.DESCRIPTION_BLOCKS]: true,
@@ -222,6 +224,28 @@ export class EventsService {
 
       if (!event) {
         throw new NotFoundException('Event not found or unauthorized');
+      }
+
+      // Convert string dates from Postgres back to Date objects for GraphQL serialization
+      if (event.startDate && typeof event.startDate === 'string') {
+        event.startDate = new Date(event.startDate);
+      }
+      if (event.endDate && typeof event.endDate === 'string') {
+        event.endDate = new Date(event.endDate);
+      }
+      if (event.mode) {
+        if (
+          event.mode.meetingStartDate &&
+          typeof event.mode.meetingStartDate === 'string'
+        ) {
+          event.mode.meetingStartDate = new Date(event.mode.meetingStartDate);
+        }
+        if (
+          event.mode.meetingEndDate &&
+          typeof event.mode.meetingEndDate === 'string'
+        ) {
+          event.mode.meetingEndDate = new Date(event.mode.meetingEndDate);
+        }
       }
 
       return {

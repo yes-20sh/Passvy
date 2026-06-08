@@ -1,5 +1,5 @@
-query GetEvent($eventId: String!) {
-  getEvent(eventId: $eventId) {
+query GetEvent($slug: String!) {
+  getEvent(slug: $slug) {
     message
     statusCode
     event {
@@ -15,9 +15,12 @@ query GetEvent($eventId: String!) {
       status
       stepper
       mode {
-        id
         eventMode
         onlineLink
+        meetingStartDate
+        meetingStartTime
+        meetingEndDate
+        meetingEndTime
         offlineAddress
         offlineMapLink
         offlineLandmark

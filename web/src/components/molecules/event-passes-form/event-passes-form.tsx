@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { z } from "zod";
+import { eventPassesFormSchema } from "@/validation/event-passes.validation";
 import { Label } from "@/components/atoms/label/label";
 import { Input } from "@/components/atoms/input/input";
 import { Button } from "@/components/atoms/button/button";
@@ -15,13 +17,59 @@ interface EventPassesFormProps {
   hasChanges?: boolean;
   onSave?: () => void;
   isSaving?: boolean;
+  capacity?: string;
 }
 
 export const EventPassesForm = ({
-  passes, setPasses, coupons, setCoupons, onBack, onNext, hasChanges = false, onSave, isSaving = false
+  passes, setPasses, coupons, setCoupons, onBack, onNext, hasChanges = false, onSave, isSaving = false, capacity
 }: EventPassesFormProps) => {
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = () => {
+    try {
+      eventPassesFormSchema.parse({ passes, coupons });
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: { [key: string]: string } = {};
+        error.errors.forEach((err) => {
+          const path = err.path.join(".");
+          newErrors[path] = err.message;
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
+  const handleNext = (e: React.FormEvent | React.MouseEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onNext(e);
+    }
+  };
+
+  const handleSaveAction = () => {
+    if (validateForm()) {
+      if (onSave) onSave();
+    }
+  };
+
+  React.useEffect(() => {
+    if (passes.length === 1 && passes[0].quantity === "" && capacity) {
+      setPasses((prev) => 
+        prev.map((p) => p.id === passes[0].id ? { ...p, quantity: capacity } : p)
+      );
+    }
+  }, [capacity, passes, setPasses]);
+
   const addPass = () => {
+    const totalQuantity = passes.reduce((acc, pass) => acc + (parseInt(pass.quantity) || 0), 0);
+    const totalCapacity = capacity ? parseInt(capacity) : 0;
+    const remainingSeats = totalCapacity > 0 ? Math.max(0, totalCapacity - totalQuantity) : "";
+    
     setPasses((prev) => [
       ...prev,
       {
@@ -30,16 +78,34 @@ export const EventPassesForm = ({
         tier: "GA",
         customName: "",
         category: "SINGLE",
-        quantity: "",
+        quantity: remainingSeats.toString(),
         price: ""
       }
     ]);
   };
 
   const updatePass = (id: string, field: keyof EventPass, value: string) => {
-    setPasses((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, [field]: value } : p))
-    );
+    setPasses((prev) => {
+      let val = value;
+      if (field === "quantity" && capacity) {
+        const totalCapacity = parseInt(capacity);
+        const otherPassesSum = prev.filter(p => p.id !== id).reduce((acc, p) => acc + (parseInt(p.quantity) || 0), 0);
+        const maxAllowed = Math.max(0, totalCapacity - otherPassesSum);
+        if (parseInt(val) > maxAllowed) {
+          val = maxAllowed.toString();
+        }
+      }
+      return prev.map((p) => {
+        if (p.id === id) {
+          const newPass = { ...p, [field]: val };
+          if (field === "pricing" && val === "FREE") {
+            newPass.price = "";
+          }
+          return newPass;
+        }
+        return p;
+      });
+    });
   };
 
   const removePass = (id: string) => {
@@ -85,7 +151,7 @@ export const EventPassesForm = ({
         </p>
       </div>
 
-      <form id="configure-passes-form" onSubmit={(e) => { e.preventDefault(); onNext(e); }} className="space-y-8">
+      <form id="configure-passes-form" onSubmit={handleNext} className="space-y-8">
         
         {/* Passes List */}
         <div className="space-y-4">
@@ -246,6 +312,9 @@ export const EventPassesForm = ({
                         onChange={(e) => updatePass(pass.id, "quantity", e.target.value)}
                         className="h-9 text-xs"
                       />
+                      {errors[`passes.${passes.findIndex(p => p.id === pass.id)}.quantity`] && (
+                        <p className="text-[10px] text-destructive font-medium mt-1">{errors[`passes.${passes.findIndex(p => p.id === pass.id)}.quantity`]}</p>
+                      )}
                     </div>
                     {pass.pricing === "PAID" && (
                       <div className="space-y-1.5 text-left animate-in zoom-in-95 duration-200">
@@ -263,6 +332,9 @@ export const EventPassesForm = ({
                           />
                           <IndianRupee className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         </div>
+                        {errors[`passes.${passes.findIndex(p => p.id === pass.id)}.price`] && (
+                          <p className="text-[10px] text-destructive font-medium mt-1">{errors[`passes.${passes.findIndex(p => p.id === pass.id)}.price`]}</p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -297,55 +369,63 @@ export const EventPassesForm = ({
                 <span className="text-xs font-semibold text-muted-foreground">No promo codes added.</span>
               </div>
             )}
-            {coupons.map((coupon) => (
-              <div key={coupon.id} className="flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex-1">
-                  <Input
-                    type="text"
-                    placeholder="e.g. EARLYBIRD50"
-                    value={coupon.code}
-                    onChange={(e) => updateCoupon(coupon.id, "code", e.target.value.toUpperCase())}
-                    className="h-10 text-xs font-bold uppercase tracking-widest"
-                  />
-                </div>
-                <div className="flex bg-secondary/20 p-1 rounded-lg h-10 items-stretch">
+            {coupons.map((coupon, idx) => (
+              <div key={coupon.id} className="flex flex-col gap-1 animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <Input
+                      type="text"
+                      placeholder="e.g. EARLYBIRD50"
+                      value={coupon.code}
+                      onChange={(e) => updateCoupon(coupon.id, "code", e.target.value.toUpperCase())}
+                      className="h-10 text-xs font-bold uppercase tracking-widest"
+                    />
+                  </div>
+                  <div className="flex bg-secondary/20 p-1 rounded-lg h-10 items-stretch">
+                    <button
+                      type="button"
+                      onClick={() => updateCoupon(coupon.id, "discountType", "PERCENTAGE")}
+                      className={`px-3 flex-1 justify-center text-xs font-bold rounded flex items-center gap-1 transition-all ${coupon.discountType === "PERCENTAGE" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"}`}
+                    >
+                      <Percent className="size-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateCoupon(coupon.id, "discountType", "AMOUNT")}
+                      className={`px-3 flex-1 justify-center text-xs font-bold rounded flex items-center gap-1 transition-all ${coupon.discountType === "AMOUNT" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"}`}
+                    >
+                      <IndianRupee className="size-3" />
+                    </button>
+                  </div>
+                  <div className="w-24 relative">
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      min="1"
+                      value={coupon.discountValue || ""}
+                      onChange={(e) => updateCoupon(coupon.id, "discountValue", e.target.value)}
+                      className="h-10 text-xs pr-8"
+                    />
+                    {coupon.discountType === "AMOUNT" ? (
+                      <IndianRupee className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    ) : (
+                      <Percent className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    )}
+                  </div>
                   <button
                     type="button"
-                    onClick={() => updateCoupon(coupon.id, "discountType", "PERCENTAGE")}
-                    className={`px-3 flex-1 justify-center text-xs font-bold rounded flex items-center gap-1 transition-all ${coupon.discountType === "PERCENTAGE" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"}`}
+                    onClick={() => removeCoupon(coupon.id)}
+                    className="h-10 w-10 flex items-center justify-center rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
                   >
-                    <Percent className="size-3" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => updateCoupon(coupon.id, "discountType", "AMOUNT")}
-                    className={`px-3 flex-1 justify-center text-xs font-bold rounded flex items-center gap-1 transition-all ${coupon.discountType === "AMOUNT" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5"}`}
-                  >
-                    <IndianRupee className="size-3" />
+                    <Trash2 className="size-4" />
                   </button>
                 </div>
-                <div className="w-24 relative">
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    min="1"
-                    value={coupon.discountValue || ""}
-                    onChange={(e) => updateCoupon(coupon.id, "discountValue", e.target.value)}
-                    className="h-10 text-xs pr-8"
-                  />
-                  {coupon.discountType === "AMOUNT" ? (
-                    <IndianRupee className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  ) : (
-                    <Percent className="size-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeCoupon(coupon.id)}
-                  className="h-10 w-10 flex items-center justify-center rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition-colors cursor-pointer"
-                >
-                  <Trash2 className="size-4" />
-                </button>
+                {(errors[`coupons.${idx}.code`] || errors[`coupons.${idx}.discountValue`]) && (
+                  <div className="flex gap-4">
+                    {errors[`coupons.${idx}.code`] && <span className="text-[10px] text-destructive font-medium flex-1">{errors[`coupons.${idx}.code`]}</span>}
+                    {errors[`coupons.${idx}.discountValue`] && <span className="text-[10px] text-destructive font-medium w-24 ml-auto mr-12 text-center">{errors[`coupons.${idx}.discountValue`]}</span>}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -363,16 +443,16 @@ export const EventPassesForm = ({
           {hasChanges ? (
             <Button
               type="button"
-              onClick={onSave}
-              disabled={isSaving}
+              onClick={handleSaveAction}
+              loading={isSaving}
               className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
             >
-              {isSaving ? "Saving..." : "Save"}
+              Save
             </Button>
           ) : (
             <Button
               type="button"
-              onClick={onNext}
+              onClick={handleNext}
               className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
             >
               Next

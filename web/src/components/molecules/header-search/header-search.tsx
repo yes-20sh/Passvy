@@ -2,7 +2,6 @@ import React from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { Input } from "@/components/atoms/input/input";
-import { TypographySpan } from "@/components/atoms/typography/typography";
 import AVTAR from "@/assets/image/avtar";
 
 export interface HeaderSearchProps {
@@ -26,15 +25,15 @@ export const HeaderSearch = ({ searchQuery, setSearchQuery }: HeaderSearchProps)
       {/* Account Avatar inside search on the right */}
       <div className="absolute right-2 cursor-pointer">
         <div className="relative">
-          <div className="h-8 w-8 rounded-full bg-secondary/30 border border-border overflow-hidden flex items-center justify-center hover:border-primary/50 transition-colors relative">
+          <div className="h-8 w-8 rounded-full bg-secondary/30 ring-2 ring-border ring-offset-1 ring-offset-background hover:ring-primary/50 overflow-hidden flex items-center justify-center transition-colors relative">
             <Image
               src={AVTAR.avtar}
               alt="Account Avatar"
               fill
+              sizes="32px"
               className="object-cover"
             />
           </div>
-          <TypographySpan className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-background bg-emerald-500" />
         </div>
       </div>
     </div>

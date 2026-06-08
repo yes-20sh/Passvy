@@ -11,9 +11,10 @@ import { EventLivePreview } from "../../molecules/event-live-preview/event-live-
 import { Button } from "@/components/atoms/button/button";
 
 // GraphQL/Apollo
-import { useMutation } from "@apollo/client/react";
+import { useMutation, useQuery } from "@apollo/client/react";
 import {
   CreateEventDocument,
+  GetEventDocument,
   CreateEventInput,
   EventStep,
   EventMode, 
@@ -22,7 +23,7 @@ import {
   DiscountType,
 } from "@/gql/graphql";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // Redux hooks and actions
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -45,6 +46,11 @@ const isSameDate = (d1: string | Date | null | undefined, d2: string | Date | nu
   return new Date(d1).getTime() === new Date(d2).getTime();
 };
 
+const normalizeTime = (t: string | null | undefined) => {
+  if (!t) return "";
+  return t.length === 5 ? t + ":00" : t;
+};
+
 const hasStepChanges = (
   step: number,
   current: CreateEventState,
@@ -53,16 +59,23 @@ const hasStepChanges = (
   if (!saved) return true;
 
   switch (step) {
-    case 1:
+    case 1: {
+      const isTitleDiff = current.title !== (saved.title ?? "");
+      const isHeaderDiff = current.headerImage !== (saved.headerImage ?? "");
+      const isStartDiff = !isSameDate(current.startDate, saved.startDate);
+      const isStartTimeDiff = normalizeTime(current.startTime) !== normalizeTime(saved.startTime);
+      const isEndDiff = !isSameDate(current.endDate, saved.endDate);
+      const isEndTimeDiff = normalizeTime(current.endTime) !== normalizeTime(saved.endTime);
+      const isCategoryDiff = current.category !== (saved.category ?? "");
+      
+      console.log("hasStepChanges 1:", {
+        isTitleDiff, isHeaderDiff, isStartDiff, isStartTimeDiff, isEndDiff, isEndTimeDiff, isCategoryDiff
+      });
+      
       return (
-        current.title !== (saved.title ?? "") ||
-        current.headerImage !== (saved.headerImage ?? "") ||
-        !isSameDate(current.startDate, saved.startDate) ||
-        current.startTime !== (saved.startTime ?? "") ||
-        !isSameDate(current.endDate, saved.endDate) ||
-        current.endTime !== (saved.endTime ?? "") ||
-        current.category !== (saved.category ?? "")
+        isTitleDiff || isHeaderDiff || isStartDiff || isStartTimeDiff || isEndDiff || isEndTimeDiff || isCategoryDiff
       );
+    }
     case 2:
       return JSON.stringify(current.blocks) !== JSON.stringify(saved.blocks);
     case 3:
@@ -70,6 +83,10 @@ const hasStepChanges = (
         current.eventMode !== saved.eventMode ||
         current.generateMeetLink !== saved.generateMeetLink ||
         current.onlineLink !== (saved.onlineLink ?? "") ||
+        !isSameDate(current.meetingStartDate, saved.meetingStartDate) ||
+        normalizeTime(current.meetingStartTime) !== normalizeTime(saved.meetingStartTime) ||
+        !isSameDate(current.meetingEndDate, saved.meetingEndDate) ||
+        normalizeTime(current.meetingEndTime) !== normalizeTime(saved.meetingEndTime) ||
         current.offlineAddress !== (saved.offlineAddress ?? "") ||
         current.offlineMapLink !== (saved.offlineMapLink ?? "") ||
         current.offlineLandmark !== (saved.offlineLandmark ?? "") ||
@@ -91,11 +108,47 @@ const hasStepChanges = (
 
 export const CreateEventForm = () => {
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const formState = useAppSelector((state) => state.createEvent);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const slugParam = searchParams.get("slug");
+
+  const { data: eventData, error: queryError } = useQuery(GetEventDocument, {
+    variables: { slug: slugParam || "" },
+    skip: !slugParam,
+    fetchPolicy: "network-only",
+  });
+
+  if (queryError) {
+    console.error("GraphQL Query Error:", queryError);
+  }
+
+  React.useEffect(() => {
+    if (eventData?.getEvent?.event) {
+      dispatch(updateEventFromSaved(eventData.getEvent.event));
+      const stepMap: Record<string, number> = {
+        "ESSENTIALS": 1,
+        "DESCRIPTION": 2,
+        "MODE": 3,
+        "PASSES": 4,
+        "PAYOUTS": 5,
+      };
+      const savedStep = eventData.getEvent.event.stepper;
+      if (savedStep && stepMap[savedStep]) {
+        // savedStep represents the last COMPLETED step, so jump to the NEXT step
+        const nextStep = Math.min(5, stepMap[savedStep] + 1);
+        dispatch(setStep(nextStep));
+      }
+    }
+  }, [eventData, dispatch]);
 
   const [createEventMutation, { loading }] = useMutation(CreateEventDocument);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [highestStep, setHighestStep] = useState(formState.step);
+
+  if (formState.step > highestStep) {
+    setHighestStep(formState.step);
+  }
 
   const handleSave = async (stepNum: number, isPublishing = false) => {
     try {
@@ -162,8 +215,15 @@ export const CreateEventForm = () => {
       if (data?.createEvent?.event) {
         dispatch(updateEventFromSaved(data.createEvent.event));
         toast.success(data.createEvent.message || "Event saved successfully!");
+        
+        if (!slugParam && data.createEvent.event.slug) {
+          router.replace(`/host/events/create?slug=${data.createEvent.event.slug}`);
+        }
+
         if (isPublishing) {
           router.push("/host/events");
+        } else {
+          if (stepNum < 5) dispatch(setStep(stepNum + 1));
         }
       } else {
         toast.error("Failed to save event");
@@ -194,7 +254,7 @@ export const CreateEventForm = () => {
   const parsedStartDate = formState.startDate ? new Date(formState.startDate) : undefined;
   const parsedEndDate = formState.endDate ? new Date(formState.endDate) : undefined;
 
-  const stepChanges = hasStepChanges(formState.step, formState, formState.lastSavedValues);
+  const stepChanges = hasStepChanges(formState.step, formState, formState.lastSavedValues) || formState.step >= highestStep;
 
   return (
     <div className="flex flex-col gap-10 w-full">
@@ -247,14 +307,18 @@ export const CreateEventForm = () => {
             <EventModeForm
               eventMode={formState.eventMode}
               setEventMode={(v) => handleUpdate("eventMode", v)}
-              startDate={parsedStartDate}
-              setStartDate={(v) => handleUpdate("startDate", v?.toISOString())}
-              startTime={formState.startTime}
-              setStartTime={(v) => handleUpdate("startTime", v)}
-              endDate={parsedEndDate}
-              setEndDate={(v) => handleUpdate("endDate", v?.toISOString())}
-              endTime={formState.endTime}
-              setEndTime={(v) => handleUpdate("endTime", v)}
+              meetingStartDate={formState.meetingStartDate ? new Date(formState.meetingStartDate) : undefined}
+              setMeetingStartDate={(v) => handleUpdate("meetingStartDate", v?.toISOString())}
+              meetingStartTime={formState.meetingStartTime}
+              setMeetingStartTime={(v) => handleUpdate("meetingStartTime", v)}
+              meetingEndDate={formState.meetingEndDate ? new Date(formState.meetingEndDate) : undefined}
+              setMeetingEndDate={(v) => handleUpdate("meetingEndDate", v?.toISOString())}
+              meetingEndTime={formState.meetingEndTime}
+              setMeetingEndTime={(v) => handleUpdate("meetingEndTime", v)}
+              mainStartDate={parsedStartDate}
+              mainStartTime={formState.startTime}
+              mainEndDate={parsedEndDate}
+              mainEndTime={formState.endTime}
               offlineAddress={formState.offlineAddress}
               setOfflineAddress={(v) => handleUpdate("offlineAddress", v)}
               offlineMapLink={formState.offlineMapLink}
@@ -289,6 +353,7 @@ export const CreateEventForm = () => {
                   dispatch(setCoupons(c));
                 }
               }}
+              capacity={formState.capacity}
               onBack={() => dispatch(setStep(3))}
               onNext={() => dispatch(setStep(5))}
               hasChanges={stepChanges}
@@ -310,8 +375,10 @@ export const CreateEventForm = () => {
               onBack={() => dispatch(setStep(4))}
               onSubmit={handleSubmit}
               hasChanges={stepChanges}
+           
               onSave={() => handleSave(5)}
               isSaving={loading}
+              hasPaidPasses={formState.passes.some(p => p.pricing === "PAID")}
             />
           )}
 

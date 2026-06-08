@@ -65,6 +65,7 @@ export const EventsHeader = ({
                   src={AVTAR.avtar}
                   alt="Account Avatar"
                   fill
+                  sizes="32px"
                   className="object-cover"
                 />
               </div>

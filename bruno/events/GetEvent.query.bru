@@ -11,8 +11,8 @@ post {
 }
 
 body:graphql {
-  query GetEvent($eventId: String!) {
-    getEvent(eventId: $eventId) {
+  query GetEvent($slug: String!) {
+    getEvent(slug: $slug) {
       message
       statusCode
       event {
@@ -42,6 +42,6 @@ body:graphql {
 
 body:graphql:vars {
   {
-    "eventId": "REPLACE_WITH_EVENT_ID"
+    "slug": "REPLACE_WITH_EVENT_SLUG"
   }
 }

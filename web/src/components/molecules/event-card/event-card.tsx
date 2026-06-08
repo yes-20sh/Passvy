@@ -39,7 +39,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
   };
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden bg-card/45 backdrop-blur-sm shadow-sm transition-all duration-300 hover:ring-2 hover:ring-indigo-500/30 hover:shadow-md group p-2 rounded-xl gap-2">
+    <Card className="flex flex-col h-full overflow-hidden bg-card/45 backdrop-blur-sm shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group p-2 rounded-xl gap-2">
       {/* Event Image Container with Zoom effect on hover */}
       <Link
         href={`/events/${id}`}
@@ -50,7 +50,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
           alt={title}
           fill
           sizes="(max-width: 768px)  100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {/* Subtle top overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10" />

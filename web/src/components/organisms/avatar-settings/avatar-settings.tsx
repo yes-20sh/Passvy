@@ -97,6 +97,7 @@ export function AvatarSettings({ avatarUrl, onSuccess }: AvatarSettingsProps) {
             src={displayAvatar}
             alt="User Avatar"
             fill
+            sizes="128px"
             className="object-cover"
             unoptimized
           />

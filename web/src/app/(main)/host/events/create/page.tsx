@@ -53,7 +53,11 @@ export default function CreateEventPage() {
           toggleTheme={toggleTheme}
         />
       }
-      content={<CreateEventForm />}
+      content={
+        <React.Suspense fallback={<div className="p-8 text-center text-muted-foreground animate-pulse">Loading Event Form...</div>}>
+          <CreateEventForm />
+        </React.Suspense>
+      }
     />
   );
 }

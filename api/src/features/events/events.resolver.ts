@@ -29,8 +29,8 @@ export class EventsResolver {
   @Roles(Role.USER)
   async getEvent(
     @CurrentUser() user: JwtUser,
-    @Args('eventId') eventId: string,
+    @Args('slug') slug: string,
   ): Promise<EventResponse> {
-    return this.eventsService.getEvent(user.sub, eventId);
+    return this.eventsService.getEvent(user.sub, slug);
   }
 }

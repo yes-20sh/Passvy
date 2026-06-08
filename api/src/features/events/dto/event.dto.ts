@@ -119,6 +119,24 @@ export class CreateEventModeInput {
   @IsOptional()
   onlineLink?: string;
 
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingStartDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingStartTime?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingEndDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingEndTime?: string;
+
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
@@ -192,6 +210,24 @@ export class CreateEventInput {
   @IsString()
   @IsOptional()
   onlineLink?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingStartDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingStartTime?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingEndDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingEndTime?: string;
 
   @Field(() => String, { nullable: true })
   @IsString()

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { z } from "zod";
+import { eventModeSchema } from "@/validation/event-mode.validation";
 import { Button } from "@/components/atoms/button/button";
 import { Input } from "@/components/atoms/input/input";
 import { Label } from "@/components/atoms/label/label";
@@ -12,14 +14,18 @@ interface EventModeFormProps {
   eventMode: "ONLINE" | "OFFLINE";
   setEventMode: (mode: "ONLINE" | "OFFLINE") => void;
 
-  startDate?: Date;
-  setStartDate?: (val: Date | undefined) => void;
-  startTime?: string;
-  setStartTime?: (val: string) => void;
-  endDate?: Date;
-  setEndDate?: (val: Date | undefined) => void;
-  endTime?: string;
-  setEndTime?: (val: string) => void;
+  meetingStartDate?: Date;
+  setMeetingStartDate?: (val: Date | undefined) => void;
+  meetingStartTime?: string;
+  setMeetingStartTime?: (val: string) => void;
+  meetingEndDate?: Date;
+  setMeetingEndDate?: (val: Date | undefined) => void;
+  meetingEndTime?: string;
+  setMeetingEndTime?: (val: string) => void;
+  mainStartDate?: Date;
+  mainStartTime?: string;
+  mainEndDate?: Date;
+  mainEndTime?: string;
 
   offlineAddress: string;
   setOfflineAddress: (address: string) => void;
@@ -39,14 +45,18 @@ interface EventModeFormProps {
 export const EventModeForm = ({
   eventMode,
   setEventMode,
-  startDate,
-  setStartDate,
-  startTime,
-  setStartTime,
-  endDate,
-  setEndDate,
-  endTime,
-  setEndTime,
+  meetingStartDate,
+  setMeetingStartDate,
+  meetingStartTime,
+  setMeetingStartTime,
+  meetingEndDate,
+  setMeetingEndDate,
+  meetingEndTime,
+  setMeetingEndTime,
+  mainStartDate,
+  mainStartTime,
+  mainEndDate,
+  mainEndTime,
   offlineAddress,
   setOfflineAddress,
   offlineMapLink,
@@ -61,6 +71,72 @@ export const EventModeForm = ({
   onSave,
   isSaving = false
 }: EventModeFormProps) => {
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (eventMode === "OFFLINE") {
+      if (!offlineAddress?.trim()) newErrors.offlineAddress = "Venue address is required for offline events";
+    }
+
+    if (eventMode === "ONLINE") {
+      if (!meetingStartDate) newErrors.meetingStartDate = "Meeting date is required";
+      if (!meetingStartTime) newErrors.meetingStartTime = "Meeting start time is required";
+      if (!meetingEndDate) newErrors.meetingEndDate = "Meeting end date is required";
+      if (!meetingEndTime) newErrors.meetingEndTime = "Meeting end time is required";
+
+      if (meetingStartDate && meetingStartTime && meetingEndDate && meetingEndTime) {
+        const start = new Date(meetingStartDate);
+        const [startHours, startMinutes] = meetingStartTime.split(':').map(Number);
+        start.setHours(startHours, startMinutes, 0, 0);
+
+        const end = new Date(meetingEndDate);
+        const [endHours, endMinutes] = meetingEndTime.split(':').map(Number);
+        end.setHours(endHours, endMinutes, 0, 0);
+
+        if (end <= start) {
+          newErrors.meetingEndDate = "End time must be after start time";
+        } else {
+          const diffMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
+          if (diffMinutes > 60) {
+            newErrors.meetingEndDate = "Online meetings cannot exceed 60 minutes";
+          }
+        }
+
+        // Validate against main event boundaries
+        if (mainStartDate && mainStartTime && mainEndDate && mainEndTime) {
+          const mainStart = new Date(mainStartDate);
+          const [mStartH, mStartM] = mainStartTime.split(':').map(Number);
+          mainStart.setHours(mStartH, mStartM, 0, 0);
+
+          const mainEnd = new Date(mainEndDate);
+          const [mEndH, mEndM] = mainEndTime.split(':').map(Number);
+          mainEnd.setHours(mEndH, mEndM, 0, 0);
+
+          if (start < mainStart || end > mainEnd) {
+            newErrors.meetingStartDate = "Meeting must be within the main event date/time";
+          }
+        }
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      onNext();
+    }
+  };
+
+  const handleSaveAction = () => {
+    if (validateForm()) {
+      if (onSave) onSave();
+    }
+  };
+
   const handleCapacityChange = (val: string) => {
     if (eventMode === "ONLINE") {
       const num = parseInt(val, 10);
@@ -91,7 +167,12 @@ export const EventModeForm = ({
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
-            onClick={() => setEventMode("ONLINE")}
+            onClick={() => {
+              setEventMode("ONLINE");
+              setOfflineAddress("");
+              setOfflineMapLink("");
+              setOfflineLandmark("");
+            }}
             className={cn(
               "flex flex-row items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer",
               eventMode === "ONLINE"
@@ -143,10 +224,10 @@ export const EventModeForm = ({
                 </div>
               </div>
 
-              {setStartDate && setStartTime && setEndDate && setEndTime && (
+              {setMeetingStartDate && setMeetingStartTime && setMeetingEndDate && setMeetingEndTime && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <Label>Start</Label>
+                    <Label>Meeting Start</Label>
                     <div className="flex gap-2">
                       <div className="flex-1">
                         <Popover>
@@ -155,18 +236,18 @@ export const EventModeForm = ({
                               variant={"outline"}
                               className={cn(
                                 "w-full justify-start text-left font-normal border-input shadow-sm h-10",
-                                !startDate && "text-muted-foreground"
+                                !meetingStartDate && "text-muted-foreground"
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                              {meetingStartDate ? format(meetingStartDate, "PPP") : <span>Pick a date</span>}
                             </Button>
                           } />
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
-                              selected={startDate}
-                              onSelect={setStartDate}
+                              selected={meetingStartDate}
+                              onSelect={setMeetingStartDate}
                             />
                           </PopoverContent>
                         </Popover>
@@ -175,16 +256,19 @@ export const EventModeForm = ({
                         <Clock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <Input 
                           type="time" 
-                          value={startTime}
-                          onChange={(e) => setStartTime(e.target.value)}
+                          value={meetingStartTime || ""}
+                          onChange={(e) => setMeetingStartTime(e.target.value)}
                           className="shadow-sm pl-9 [&::-webkit-calendar-picker-indicator]:hidden"
                         />
                       </div>
                     </div>
+                    {(errors?.meetingStartDate || errors?.meetingStartTime) && (
+                      <p className="text-xs text-destructive font-medium">{errors.meetingStartDate || errors.meetingStartTime}</p>
+                    )}
                   </div>
 
                   <div className="space-y-3">
-                    <Label>End</Label>
+                    <Label>Meeting End</Label>
                     <div className="flex gap-2">
                       <div className="flex-1">
                         <Popover>
@@ -193,18 +277,18 @@ export const EventModeForm = ({
                               variant={"outline"}
                               className={cn(
                                 "w-full justify-start text-left font-normal border-input shadow-sm h-10",
-                                !endDate && "text-muted-foreground"
+                                !meetingEndDate && "text-muted-foreground"
                               )}
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
-                              {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                              {meetingEndDate ? format(meetingEndDate, "PPP") : <span>Pick a date</span>}
                             </Button>
                           } />
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
-                              selected={endDate}
-                              onSelect={setEndDate}
+                              selected={meetingEndDate}
+                              onSelect={setMeetingEndDate}
                             />
                           </PopoverContent>
                         </Popover>
@@ -213,12 +297,15 @@ export const EventModeForm = ({
                         <Clock className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <Input 
                           type="time" 
-                          value={endTime}
-                          onChange={(e) => setEndTime(e.target.value)}
+                          value={meetingEndTime || ""}
+                          onChange={(e) => setMeetingEndTime(e.target.value)}
                           className="shadow-sm pl-9 [&::-webkit-calendar-picker-indicator]:hidden"
                         />
                       </div>
                     </div>
+                    {(errors?.meetingEndDate || errors?.meetingEndTime) && (
+                      <p className="text-xs text-destructive font-medium">{errors.meetingEndDate || errors.meetingEndTime}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -245,6 +332,7 @@ export const EventModeForm = ({
                     className="pl-10"
                   />
                 </div>
+                {errors?.offlineAddress && <p className="text-xs text-destructive font-medium">{errors.offlineAddress}</p>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
@@ -259,6 +347,7 @@ export const EventModeForm = ({
                       className="pl-10"
                     />
                   </div>
+                  {errors?.offlineMapLink && <p className="text-xs text-destructive font-medium">{errors.offlineMapLink}</p>}
                 </div>
                 <div className="space-y-3">
                   <Label htmlFor="offlineLandmark">Landmark (Optional)</Label>
@@ -292,11 +381,11 @@ export const EventModeForm = ({
                 className="pl-10 w-[200px]"
               />
             </div>
-            {eventMode === "ONLINE" ? (
+            {errors?.capacity ? (
+              <p className="text-[10px] text-destructive font-medium">{errors.capacity}</p>
+            ) : eventMode === "ONLINE" ? (
               <p className="text-[10px] text-amber-500 font-medium">Max capacity for online events is 100.</p>
-            ) : (
-              <p className="text-[10px] text-muted-foreground">Leave empty for unlimited capacity.</p>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -314,16 +403,16 @@ export const EventModeForm = ({
         {hasChanges ? (
           <Button
             type="button"
-            onClick={onSave}
-            disabled={isSaving}
+            onClick={handleSaveAction}
+            loading={isSaving}
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
           >
-            {isSaving ? "Saving..." : "Save"}
+            Save
           </Button>
         ) : (
           <Button
             type="button"
-            onClick={onNext}
+            onClick={handleNext}
             className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg h-9 px-8 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-xs uppercase tracking-wider"
           >
             Next

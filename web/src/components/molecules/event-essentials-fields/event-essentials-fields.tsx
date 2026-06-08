@@ -49,8 +49,11 @@ export const EventEssentialsFields = ({
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const imageUrl = URL.createObjectURL(file);
-      setHeaderImage(imageUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setHeaderImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -90,6 +93,11 @@ export const EventEssentialsFields = ({
                     mode="single"
                     selected={startDate}
                     onSelect={setStartDate}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
                   />
                 </PopoverContent>
               </Popover>
@@ -131,6 +139,11 @@ export const EventEssentialsFields = ({
                     mode="single"
                     selected={endDate}
                     onSelect={setEndDate}
+                    disabled={(date) => {
+                      const minDate = startDate ? new Date(startDate) : new Date();
+                      minDate.setHours(0, 0, 0, 0);
+                      return date < minDate;
+                    }}
                   />
                 </PopoverContent>
               </Popover>
