@@ -24,6 +24,9 @@ query GetEvent($slug: String!) {
         offlineAddress
         offlineMapLink
         offlineLandmark
+        city
+        state
+        country
         capacity
       }
       descriptionBlocks {

@@ -33,6 +33,12 @@ interface EventModeFormProps {
   setOfflineMapLink: (link: string) => void;
   offlineLandmark: string;
   setOfflineLandmark: (landmark: string) => void;
+  city: string;
+  setCity: (city: string) => void;
+  state: string;
+  setState: (state: string) => void;
+  country: string;
+  setCountry: (country: string) => void;
   capacity: string;
   setCapacity: (capacity: string) => void;
   onNext: () => void;
@@ -63,6 +69,12 @@ export const EventModeForm = ({
   setOfflineMapLink,
   offlineLandmark,
   setOfflineLandmark,
+  city,
+  setCity,
+  state,
+  setState,
+  country,
+  setCountry,
   capacity,
   setCapacity,
   onNext,
@@ -78,6 +90,9 @@ export const EventModeForm = ({
 
     if (eventMode === "OFFLINE") {
       if (!offlineAddress?.trim()) newErrors.offlineAddress = "Venue address is required for offline events";
+      if (!city?.trim()) newErrors.city = "City is required";
+      if (!state?.trim()) newErrors.state = "State is required";
+      if (!country?.trim()) newErrors.country = "Country is required";
     }
 
     if (eventMode === "ONLINE") {
@@ -172,6 +187,9 @@ export const EventModeForm = ({
               setOfflineAddress("");
               setOfflineMapLink("");
               setOfflineLandmark("");
+              setCity("");
+              setState("");
+              setCountry("");
             }}
             className={cn(
               "flex flex-row items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer",
@@ -361,6 +379,50 @@ export const EventModeForm = ({
                       className="pl-10"
                     />
                   </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-3">
+                  <Label htmlFor="city">City</Label>
+                  <div className="relative flex items-center">
+                    <MapPin className="absolute left-3 size-4 text-muted-foreground" />
+                    <Input
+                      id="city"
+                      placeholder="e.g. Mumbai"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  {errors?.city && <p className="text-xs text-destructive font-medium">{errors.city}</p>}
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="state">State</Label>
+                  <div className="relative flex items-center">
+                    <MapPin className="absolute left-3 size-4 text-muted-foreground" />
+                    <Input
+                      id="state"
+                      placeholder="e.g. Maharashtra"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  {errors?.state && <p className="text-xs text-destructive font-medium">{errors.state}</p>}
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="country">Country</Label>
+                  <div className="relative flex items-center">
+                    <Globe className="absolute left-3 size-4 text-muted-foreground" />
+                    <Input
+                      id="country"
+                      placeholder="e.g. India"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  {errors?.country && <p className="text-xs text-destructive font-medium">{errors.country}</p>}
                 </div>
               </div>
             </div>

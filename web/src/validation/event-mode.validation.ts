@@ -19,6 +19,9 @@ export const eventModeSchema = z.discriminatedUnion("eventMode", [
   z.object({
     eventMode: z.literal("OFFLINE"),
     offlineAddress: z.string().min(1, "Venue address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    country: z.string().min(1, "Country is required"),
     offlineMapLink: z.string().url("Must be a valid URL").min(1, "Google map link is required"),
     capacity: z.string().min(1, "Capacity is required").refine((val) => {
       const num = parseInt(val, 10);

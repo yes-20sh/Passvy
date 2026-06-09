@@ -24,6 +24,9 @@ mutation CreateEvent($input: CreateEventInput!) {
         offlineAddress
         offlineMapLink
         offlineLandmark
+        city
+        state
+        country
         capacity
       }
       descriptionBlocks {

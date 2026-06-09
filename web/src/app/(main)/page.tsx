@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 import { Header } from "@/components/organisms/header/header";
 import { FeaturedEvents } from "@/components/organisms/featured-events/featured-events";
@@ -10,6 +11,7 @@ import { EventsTemplate } from "@/components/template/events-template/events-tem
 import { MOCK_EVENTS, CATEGORIES } from "./data";
 
 const EventsPage = () => {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -86,6 +88,7 @@ const EventsPage = () => {
             mockEvents={MOCK_EVENTS}
             registeredIds={registeredIds}
             setRegisteredIds={setRegisteredIds}
+            isAuthenticated={isAuthenticated}
           />
         ) : undefined
       }

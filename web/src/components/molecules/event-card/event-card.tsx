@@ -21,6 +21,7 @@ export interface EventData {
   tag: string;
   price: string;
   location?: string;
+  passCount?: number;
 }
 
 export interface EventCardProps {
@@ -29,7 +30,7 @@ export interface EventCardProps {
 }
 
 export function EventCard({ event, onRegister }: EventCardProps) {
-  const { id, title, image, date, tag, price, location } = event;
+  const { id, title, image, date, tag, price, location, passCount } = event;
 
   const handleRegisterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -40,7 +41,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
 
   return (
     <Card className="flex flex-col h-full overflow-hidden bg-card/45 backdrop-blur-sm shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group p-2 rounded-xl gap-2">
-      {/* Event Image Container with Zoom effect on hover */}
+      {/* Event Image Container */}
       <Link
         href={`/events/${id}`}
         className="relative aspect-video w-full overflow-hidden bg-muted rounded-xl block"
@@ -50,10 +51,15 @@ export function EventCard({ event, onRegister }: EventCardProps) {
           alt={title}
           fill
           sizes="(max-width: 768px)  100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500"
         />
         {/* Subtle top overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10" />
+
+        {/* Pass Count Badge */}
+        <Badge className="absolute top-2 right-2 z-20 bg-background/80 text-foreground backdrop-blur-md border-0 pointer-events-none px-2 py-0.5 text-xs font-semibold">
+          {passCount || 24} Passes
+        </Badge>
       </Link>
 
       <CardContent className="flex flex-col flex-1 px-0 pb-0 gap-3">

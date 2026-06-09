@@ -56,6 +56,9 @@ export class EventsService {
           offlineAddress,
           offlineMapLink,
           offlineLandmark,
+          city,
+          state,
+          country,
           capacity,
           paymentSetting,
           descriptionBlocks,
@@ -74,6 +77,9 @@ export class EventsService {
                 offlineAddress,
                 offlineMapLink,
                 offlineLandmark,
+                city,
+                state,
+                country,
                 capacity,
               },
             );
@@ -88,6 +94,12 @@ export class EventsService {
               existingEvent.mode.offlineMapLink = offlineMapLink;
             if (offlineLandmark !== undefined)
               existingEvent.mode.offlineLandmark = offlineLandmark;
+            if (city !== undefined)
+              existingEvent.mode.city = city;
+            if (state !== undefined)
+              existingEvent.mode.state = state;
+            if (country !== undefined)
+              existingEvent.mode.country = country;
             if (capacity !== undefined) existingEvent.mode.capacity = capacity;
           }
         }

@@ -68,6 +68,18 @@ export class EventModeSchema {
   @Column({ name: 'offline_landmark', type: 'text', nullable: true })
   offlineLandmark: string | null;
 
+  @Field(() => String, { nullable: true })
+  @Column({ name: 'city', type: 'text', nullable: true })
+  city: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ name: 'state', type: 'text', nullable: true })
+  state: string | null;
+
+  @Field(() => String, { nullable: true })
+  @Column({ name: 'country', type: 'text', nullable: true })
+  country: string | null;
+
   @Field(() => Int, { nullable: true })
   @Column({ type: 'int', nullable: true })
   capacity: number | null;

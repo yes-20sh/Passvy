@@ -28,6 +28,8 @@ input CreateEventCouponInput {
 input CreateEventInput {
   capacity: Int
   category: String
+  city: String
+  country: String
   coupons: [CreateEventCouponInput!]
   descriptionBlocks: [CreateDescriptionBlockInput!]
   endDate: DateTime
@@ -47,6 +49,7 @@ input CreateEventInput {
   paymentSetting: CreateEventPaymentSettingInput
   startDate: DateTime
   startTime: String
+  state: String
   status: EventStatus
   stepper: EventStep
   title: String!
@@ -102,6 +105,8 @@ enum EventMode {
 
 type EventModeSchema {
   capacity: Int
+  city: String
+  country: String
   createdAt: DateTime!
   eventMode: EventMode!
   id: ID!
@@ -113,6 +118,7 @@ type EventModeSchema {
   offlineLandmark: String
   offlineMapLink: String
   onlineLink: String
+  state: String
   updatedAt: DateTime!
 }
 

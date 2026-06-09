@@ -1,28 +1,26 @@
-import React, { useRef } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight, Ticket } from "lucide-react";
-import { Badge } from "@/components/atoms/badge/badge";
-import {
-  EventCard,
-  type EventData,
-} from "@/components/molecules/event-card/event-card";
-import { EventCardHorizontal } from "@/components/molecules/event-card-horizontal/event-card-horizontal";
-import { EventPassCard } from "@/components/molecules/event-pass-card/event-pass-card";
+import React, { useRef } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Ticket } from 'lucide-react';
+import { Badge } from '@/components/atoms/badge/badge';
+import { type EventData } from '@/components/molecules/event-card/event-card';
+import { EventCardHorizontal } from '@/components/molecules/event-card-horizontal/event-card-horizontal';
+import { EventPassCard } from '@/components/molecules/event-pass-card/event-pass-card';
 import {
   TypographyH3,
   TypographyH4,
   TypographyMuted,
   TypographySpan,
-} from "@/components/atoms/typography/typography";
+} from '@/components/atoms/typography/typography';
 
 export interface FeaturedEventsProps {
-  activeFeaturedTab: "feature" | "wishlist" | "pass";
-  setActiveFeaturedTab: (tab: "feature" | "wishlist" | "pass") => void;
+  activeFeaturedTab: 'feature' | 'wishlist' | 'pass';
+  setActiveFeaturedTab: (tab: 'feature' | 'wishlist' | 'pass') => void;
   featuredEvents: EventData[];
   mockEvents: EventData[];
   registeredIds: string[];
   setRegisteredIds: React.Dispatch<React.SetStateAction<string[]>>;
+  isAuthenticated: boolean;
 }
 
 export const FeaturedEvents = ({
@@ -32,86 +30,93 @@ export const FeaturedEvents = ({
   mockEvents,
   registeredIds,
   setRegisteredIds,
+  isAuthenticated,
 }: FeaturedEventsProps) => {
   const featuredScrollRef = useRef<HTMLDivElement>(null);
 
   const wishlistScrollRef = useRef<HTMLDivElement>(null);
   const passScrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollFeatured = (direction: "left" | "right") => {
+  const scrollFeatured = (direction: 'left' | 'right') => {
     if (featuredScrollRef.current) {
       const { scrollLeft, clientWidth } = featuredScrollRef.current;
       const scrollAmount = clientWidth * 0.8;
       featuredScrollRef.current.scrollTo({
         left:
-          direction === "left"
+          direction === 'left'
             ? scrollLeft - scrollAmount
             : scrollLeft + scrollAmount,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   };
 
-  const scrollWishlist = (direction: "left" | "right") => {
+  const scrollWishlist = (direction: 'left' | 'right') => {
     if (wishlistScrollRef.current) {
       const { scrollLeft, clientWidth } = wishlistScrollRef.current;
       const scrollAmount = clientWidth * 0.8;
       wishlistScrollRef.current.scrollTo({
         left:
-          direction === "left"
+          direction === 'left'
             ? scrollLeft - scrollAmount
             : scrollLeft + scrollAmount,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   };
 
-  const scrollPass = (direction: "left" | "right") => {
+  const scrollPass = (direction: 'left' | 'right') => {
     if (passScrollRef.current) {
       const { scrollLeft, clientWidth } = passScrollRef.current;
       const scrollAmount = clientWidth * 0.8;
       passScrollRef.current.scrollTo({
         left:
-          direction === "left"
+          direction === 'left'
             ? scrollLeft - scrollAmount
             : scrollLeft + scrollAmount,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   };
 
+  const tabs = isAuthenticated
+    ? (['pass', 'wishlist', 'feature'] as const)
+    : (['feature'] as const);
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <TypographyH3 className="font-bold text-left border-0">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <TypographyH3 className="border-0 text-left font-bold">
           Featured Events
         </TypographyH3>
 
         {/* Right side: Simple Tabs (Pass, Wishlist, Feature) */}
-        <div className="flex items-center gap-6 self-start sm:self-auto">
-          {(["pass", "wishlist", "feature"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveFeaturedTab(tab)}
-              className={`pb-1 text-sm font-bold transition-all duration-300 capitalize cursor-pointer select-none border-b-2 ${
-                activeFeaturedTab === tab
-                  ? "border-indigo-600 text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab === "feature" ? "Featured" : tab}
-            </button>
-          ))}
-        </div>
+        {isAuthenticated && (
+          <div className="flex items-center gap-6 self-start sm:self-auto">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveFeaturedTab(tab)}
+                className={`cursor-pointer border-b-2 pb-1 text-sm font-bold capitalize transition-all duration-300 select-none ${
+                  activeFeaturedTab === tab
+                    ? 'text-foreground border-indigo-600'
+                    : 'text-muted-foreground hover:text-foreground border-transparent'
+                }`}
+              >
+                {tab === 'feature' ? 'Featured' : tab}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Tab Content 1: Feature Carousel */}
-      {activeFeaturedTab === "feature" && (
-        <div className="relative group/feat-carousel">
+      {activeFeaturedTab === 'feature' && (
+        <div className="group/feat-carousel relative">
           {/* Left Scroll Button */}
           <button
-            onClick={() => scrollFeatured("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/feat-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+            onClick={() => scrollFeatured('left')}
+            className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 left-0 z-30 hidden size-9 -translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/feat-carousel:opacity-100 active:scale-95 md:flex"
             aria-label="Scroll left"
           >
             <ChevronLeft className="size-5" />
@@ -120,13 +125,13 @@ export const FeaturedEvents = ({
           {/* Carousel Track */}
           <div
             ref={featuredScrollRef}
-            className="flex items-center gap-6 overflow-x-auto scrollbar-none py-2 px-1 scroll-smooth"
+            className="flex scrollbar-none items-center gap-6 overflow-x-auto scroll-smooth px-1 py-2"
           >
             {featuredEvents.map((event) => (
               <Link
                 key={`featured-${event.id}`}
                 href={`/events/${event.id}`}
-                className="group/feat relative w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] h-64 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 shrink-0 cursor-pointer block"
+                className="group/feat relative block h-64 w-full shrink-0 cursor-pointer overflow-hidden rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
               >
                 {/* Background Image */}
                 <Image
@@ -136,27 +141,27 @@ export const FeaturedEvents = ({
                   className="object-cover transition-transform duration-500 group-hover/feat:scale-105"
                 />
                 {/* Dark Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent z-10" />
+                <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
 
                 {/* Content overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 z-20 flex flex-col gap-2 text-left">
+                <div className="absolute right-0 bottom-0 left-0 z-20 flex flex-col gap-2 p-5 text-left">
                   {/* Category Tag */}
                   <div>
                     <Badge
                       variant={null}
-                      className="bg-indigo-600/90 text-white border-0 font-semibold text-[10px] px-2 py-0.5 rounded"
+                      className="rounded border-0 bg-indigo-600/90 px-2 py-0.5 text-[10px] font-semibold text-white"
                     >
                       {event.tag}
                     </Badge>
                   </div>
 
                   {/* Event Title */}
-                  <TypographyH4 className="text-white text-base md:text-lg font-bold tracking-tight line-clamp-2 leading-snug border-0">
+                  <TypographyH4 className="line-clamp-2 border-0 text-base leading-snug font-bold tracking-tight text-white md:text-lg">
                     {event.title}
                   </TypographyH4>
 
                   {/* Date & Location */}
-                  <div className="flex items-center gap-3 text-white/70 text-xs font-medium">
+                  <div className="flex items-center gap-3 text-xs font-medium text-white/70">
                     <TypographySpan className="shrink-0">
                       {event.date}
                     </TypographySpan>
@@ -172,8 +177,8 @@ export const FeaturedEvents = ({
 
           {/* Right Scroll Button */}
           <button
-            onClick={() => scrollFeatured("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/feat-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+            onClick={() => scrollFeatured('right')}
+            className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 right-0 z-30 hidden size-9 translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/feat-carousel:opacity-100 active:scale-95 md:flex"
             aria-label="Scroll right"
           >
             <ChevronRight className="size-5" />
@@ -182,12 +187,12 @@ export const FeaturedEvents = ({
       )}
 
       {/* Tab Content 2: Wishlist Carousel */}
-      {activeFeaturedTab === "wishlist" && (
-        <div className="relative group/wishlist-carousel">
+      {activeFeaturedTab === 'wishlist' && (
+        <div className="group/wishlist-carousel relative">
           {/* Left Scroll Button */}
           <button
-            onClick={() => scrollWishlist("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/wishlist-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+            onClick={() => scrollWishlist('left')}
+            className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 left-0 z-30 hidden size-9 -translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/wishlist-carousel:opacity-100 active:scale-95 md:flex"
             aria-label="Scroll left"
           >
             <ChevronLeft className="size-5" />
@@ -196,12 +201,12 @@ export const FeaturedEvents = ({
           {/* Carousel Track */}
           <div
             ref={wishlistScrollRef}
-            className="flex items-center gap-6 overflow-x-auto scrollbar-none py-2 px-1 scroll-smooth"
+            className="flex scrollbar-none items-center gap-6 overflow-x-auto scroll-smooth px-1 py-2"
           >
             {mockEvents.slice(1, 6).map((event) => (
               <div
                 key={`wishlist-${event.id}`}
-                className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0"
+                className="w-full shrink-0 md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
               >
                 <EventCardHorizontal
                   event={event}
@@ -220,8 +225,8 @@ export const FeaturedEvents = ({
 
           {/* Right Scroll Button */}
           <button
-            onClick={() => scrollWishlist("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/wishlist-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+            onClick={() => scrollWishlist('right')}
+            className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 right-0 z-30 hidden size-9 translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/wishlist-carousel:opacity-100 active:scale-95 md:flex"
             aria-label="Scroll right"
           >
             <ChevronRight className="size-5" />
@@ -230,14 +235,14 @@ export const FeaturedEvents = ({
       )}
 
       {/* Tab Content 3: Passes Carousel */}
-      {activeFeaturedTab === "pass" && (
+      {activeFeaturedTab === 'pass' && (
         <div>
           {registeredIds.length > 0 ? (
-            <div className="relative group/pass-carousel">
+            <div className="group/pass-carousel relative">
               {/* Left Scroll Button */}
               <button
-                onClick={() => scrollPass("left")}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/pass-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+                onClick={() => scrollPass('left')}
+                className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 left-0 z-30 hidden size-9 -translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/pass-carousel:opacity-100 active:scale-95 md:flex"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="size-5" />
@@ -246,14 +251,14 @@ export const FeaturedEvents = ({
               {/* Carousel Track */}
               <div
                 ref={passScrollRef}
-                className="flex items-center gap-6 overflow-x-auto scrollbar-none py-2 px-1 scroll-smooth"
+                className="flex scrollbar-none items-center gap-6 overflow-x-auto scroll-smooth px-1 py-2"
               >
                 {mockEvents
                   .filter((event) => registeredIds.includes(event.id))
                   .map((event) => (
                     <div
                       key={`pass-${event.id}`}
-                      className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0"
+                      className="w-full shrink-0 md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
                     >
                       <EventPassCard event={event} />
                     </div>
@@ -262,22 +267,21 @@ export const FeaturedEvents = ({
 
               {/* Right Scroll Button */}
               <button
-                onClick={() => scrollPass("right")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/pass-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+                onClick={() => scrollPass('right')}
+                className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 right-0 z-30 hidden size-9 translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/pass-carousel:opacity-100 active:scale-95 md:flex"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="size-5" />
               </button>
             </div>
           ) : (
-            <div className="py-12 text-center border border-dashed border-border rounded-2xl bg-card/25 backdrop-blur-sm shadow-inner">
-              <Ticket className="size-9 text-muted-foreground/60 mb-2 mx-auto animate-pulse" />
-              <TypographyH4 className="text-sm font-bold text-foreground border-0">
+            <div className="border-border bg-card/25 rounded-2xl border border-dashed py-12 text-center shadow-inner backdrop-blur-sm">
+              <Ticket className="text-muted-foreground/60 mx-auto mb-2 size-9 animate-pulse" />
+              <TypographyH4 className="text-foreground border-0 text-sm font-bold">
                 No active passes
               </TypographyH4>
-              <TypographyMuted className="text-xs max-w-xs mx-auto mt-1">
-                You haven't registered for any events yet. Click "Register Now"
-                on any card to secure your pass!
+              <TypographyMuted className="mx-auto mt-1 max-w-xs text-xs">
+                {"You haven't registered for any events yet. Click \"Register Now\" on any card to secure your pass!"}
               </TypographyMuted>
             </div>
           )}

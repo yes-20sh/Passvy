@@ -32,6 +32,9 @@ export interface CreateEventState {
   offlineAddress: string;
   offlineMapLink: string;
   offlineLandmark: string;
+  city: string;
+  state: string;
+  country: string;
   capacity: string;
   blocks: DescriptionBlock[];
   passes: EventPass[];
@@ -64,6 +67,9 @@ const initialState: CreateEventState = {
   offlineAddress: '',
   offlineMapLink: '',
   offlineLandmark: '',
+  city: '',
+  state: '',
+  country: '',
   capacity: '',
   blocks: [
     {
@@ -157,6 +163,9 @@ export const createEventSlice = createSlice({
         state.offlineAddress = event.mode.offlineAddress || '';
         state.offlineMapLink = event.mode.offlineMapLink || '';
         state.offlineLandmark = event.mode.offlineLandmark || '';
+        state.city = event.mode.city || '';
+        state.state = event.mode.state || '';
+        state.country = event.mode.country || '';
         state.capacity = event.mode.capacity ? String(event.mode.capacity) : '';
       }
 
@@ -193,7 +202,10 @@ export const createEventSlice = createSlice({
       }
 
       if (event.paymentSetting) {
-        state.acceptedMethods = event.paymentSetting.acceptedMethods || ['RAZORPAY', 'CHECKIN'];
+        state.acceptedMethods = event.paymentSetting.acceptedMethods || [
+          'RAZORPAY',
+          'CHECKIN',
+        ];
       }
 
       // Create a copy for lastSavedValues
@@ -217,6 +229,9 @@ export const createEventSlice = createSlice({
         offlineAddress: state.offlineAddress,
         offlineMapLink: state.offlineMapLink,
         offlineLandmark: state.offlineLandmark,
+        city: state.city,
+        state: state.state,
+        country: state.country,
         capacity: state.capacity,
         blocks: state.blocks,
         passes: state.passes,

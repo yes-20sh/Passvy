@@ -244,6 +244,21 @@ export class CreateEventInput {
   @IsOptional()
   offlineLandmark?: string;
 
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  state?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  country?: string;
+
   @Field(() => Int, { nullable: true })
   @IsInt()
   @IsOptional()
