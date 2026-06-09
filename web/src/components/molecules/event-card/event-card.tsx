@@ -30,7 +30,7 @@ export interface EventCardProps {
 }
 
 export function EventCard({ event, onRegister }: EventCardProps) {
-  const { id, title, image, date, tag, price, location, passCount } = event;
+  const { id, title, image, date, time, tag, price, location, passCount } = event;
 
   const handleRegisterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -82,7 +82,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
         <div className="mt-auto text-[13px] text-muted-foreground flex flex-wrap items-center gap-y-1 gap-x-3">
           <div className="flex items-center gap-1.5 font-medium shrink-0">
             <Calendar className="size-3.5 text-indigo-600 dark:text-indigo-400" />
-            <span>{date}</span>
+            <span>{date} • {time}</span>
           </div>
           {location && (
             <div className="flex items-center gap-1.5 truncate">

@@ -5,7 +5,9 @@ import { HealthModule } from './features/health/health.module';
 import { AuthModule } from './features/auth/auth.module';
 import { SettingsModule } from './features/settings/settings.module';
 import { EventsModule } from './features/events/events.module';
+import { EventsListModule } from './features/events-list/events-list.module';
 import { MailModule } from './config/mail/mail.module';
+import { PaginationModule } from './service/pagination/pagination.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
@@ -18,7 +20,9 @@ import { JwtModule } from '@nestjs/jwt';
     AuthModule,
     SettingsModule,
     EventsModule,
+    EventsListModule,
     MailModule,
+    PaginationModule,
     JwtModule.register({ secret: process.env.JWT_SECRET || 'fallback' }),
   ],
   providers: [

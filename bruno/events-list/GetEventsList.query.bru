@@ -1,0 +1,50 @@
+meta {
+  name: GetEventsList
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetEventsList($input: GetEventsListInput) {
+    getEventsList(input: $input) {
+      events {
+        id
+        slug
+        title
+        category
+        headerImage
+        startDate
+        startTime
+        mode {
+          eventMode
+          city
+          state
+          capacity
+        }
+        passes {
+          pricing
+          price
+        }
+      }
+      meta {
+        nextCursor
+        hasNextPage
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "limit": 10,
+      "filter": "upcoming"
+    }
+  }
+}

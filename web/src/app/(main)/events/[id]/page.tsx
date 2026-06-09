@@ -1,7 +1,7 @@
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { notFound } from "next/navigation";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
 import {
   ArrowLeft,
   Calendar,
@@ -10,11 +10,12 @@ import {
   Share2,
   Shield,
   Heart,
-} from "lucide-react";
-import { MOCK_EVENTS } from "../data";
-import { Badge, BadgeVariant } from "@/components/atoms/badge/badge";
-import { Button } from "@/components/atoms/button/button";
-import { Card } from "@/components/atoms/card/card";
+} from 'lucide-react';
+
+import { Badge, BadgeVariant } from '@/components/atoms/badge/badge';
+import { Button } from '@/components/atoms/button/button';
+import { Card } from '@/components/atoms/card/card';
+import { MOCK_EVENTS } from '../../data';
 
 // Dynamic route parameters type for Next.js 16
 export interface EventDetailPageProps {
@@ -39,13 +40,13 @@ export default async function EventDetailPage({
   const mockDescription = `Join us for the highly anticipated ${title}! This premium event brings together industry experts, enthusiasts, and innovators for an unforgettable experience. Over the course of the session, you will gain access to deep-dive workshops, keynotes, live Q&A panel discussions, and unmatched networking opportunities. Whether you are looking to build your professional network, learn new techniques, or simply enjoy a world-class gathering, this is the event for you.`;
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col">
+    <div className="bg-background text-foreground flex min-h-screen flex-col transition-colors duration-200">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="border-border/40 bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link
             href="/events"
-            className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+            className="text-muted-foreground hover:text-foreground group flex items-center gap-2 text-sm font-semibold transition-colors"
           >
             <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
             <span>Back to Events</span>
@@ -53,14 +54,14 @@ export default async function EventDetailPage({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="p-2 rounded-full hover:bg-secondary border border-border/60 transition-all active:scale-95 text-muted-foreground hover:text-foreground cursor-pointer"
+              className="hover:bg-secondary border-border/60 text-muted-foreground hover:text-foreground cursor-pointer rounded-full border p-2 transition-all active:scale-95"
               aria-label="Share event"
             >
               <Share2 className="size-4" />
             </button>
             <button
               type="button"
-              className="p-2 rounded-full hover:bg-secondary border border-border/60 transition-all active:scale-95 text-muted-foreground hover:text-rose-500 cursor-pointer"
+              className="hover:bg-secondary border-border/60 text-muted-foreground cursor-pointer rounded-full border p-2 transition-all hover:text-rose-500 active:scale-95"
               aria-label="Add to favorites"
             >
               <Heart className="size-4" />
@@ -69,12 +70,12 @@ export default async function EventDetailPage({
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 pb-28 lg:pb-8 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <main className="container mx-auto flex-1 px-4 py-8 pb-28 lg:pb-8">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
           {/* Left Column: Details & Media */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8 lg:col-span-2">
             {/* Hero Image Block */}
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted shadow-lg">
+            <div className="border-border bg-muted relative aspect-video w-full overflow-hidden rounded-2xl border shadow-lg">
               <Image
                 src={image}
                 alt={title}
@@ -83,11 +84,11 @@ export default async function EventDetailPage({
                 sizes="(max-width: 1024px) 100vw, 800px"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               <div className="absolute top-4 left-4">
                 <Badge
                   variant={null}
-                  className="bg-indigo-600 text-white border-0 font-bold px-3 py-1 text-xs shadow-md rounded-lg"
+                  className="rounded-lg border-0 bg-indigo-600 px-3 py-1 text-xs font-bold text-white shadow-md"
                 >
                   {tag}
                 </Badge>
@@ -96,23 +97,23 @@ export default async function EventDetailPage({
 
             {/* Title & Headline Info */}
             <div className="space-y-4 text-left">
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
+              <h1 className="text-foreground text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl">
                 {title}
               </h1>
 
               {/* Badges and tags */}
               <div className="flex flex-wrap gap-3 pt-2">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card border border-border/60 text-sm font-medium">
-                  <Calendar className="size-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <div className="bg-card border-border/60 flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium">
+                  <Calendar className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
                   <span>{date}</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card border border-border/60 text-sm font-medium">
-                  <Clock className="size-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <div className="bg-card border-border/60 flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium">
+                  <Clock className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
                   <span>{time}</span>
                 </div>
                 {location && (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card border border-border/60 text-sm font-medium">
-                    <MapPin className="size-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <div className="bg-card border-border/60 flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm font-medium">
+                    <MapPin className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
                     <span>{location}</span>
                   </div>
                 )}
@@ -123,7 +124,7 @@ export default async function EventDetailPage({
 
             {/* Event Description */}
             <div className="space-y-4 text-left">
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 className="text-foreground text-xl font-bold">
                 About the Event
               </h2>
               <p className="text-muted-foreground text-base leading-relaxed whitespace-pre-line">
@@ -133,20 +134,20 @@ export default async function EventDetailPage({
           </div>
 
           {/* Right Column: Dynamic Sticky Booking Widget */}
-          <div className="lg:sticky lg:top-24 space-y-4">
-            <Card className="hidden lg:flex p-4 bg-card/65 backdrop-blur-md border-border/80 shadow-lg rounded-xl flex-col gap-4 text-left">
+          <div className="space-y-4 lg:sticky lg:top-24">
+            <Card className="bg-card/65 border-border/80 hidden flex-col gap-4 rounded-xl p-4 text-left shadow-lg backdrop-blur-md lg:flex">
               <div className="space-y-0.5">
-                <span className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">
+                <span className="text-muted-foreground text-[10px] font-semibold tracking-wider uppercase">
                   TICKET PRICE
                 </span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-extrabold text-foreground">
-                    {price === "Free" || price.toLowerCase() === "free"
-                      ? "Free"
+                  <span className="text-foreground text-2xl font-extrabold">
+                    {price === 'Free' || price.toLowerCase() === 'free'
+                      ? 'Free'
                       : `$${price}`}
                   </span>
-                  {price !== "Free" && (
-                    <span className="text-[11px] font-medium text-muted-foreground">
+                  {price !== 'Free' && (
+                    <span className="text-muted-foreground text-[11px] font-medium">
                       / person
                     </span>
                   )}
@@ -155,40 +156,40 @@ export default async function EventDetailPage({
 
               {/* Enhanced Detailed Information inside Card */}
               <div className="space-y-2.5 text-xs">
-                <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1.5">
                   <span className="text-muted-foreground">Category</span>
                   <Badge
                     variant={BadgeVariant.Secondary}
-                    className="font-bold text-[10px] px-2 py-0.5"
+                    className="px-2 py-0.5 text-[10px] font-bold"
                   >
                     {tag}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1.5">
                   <span className="text-muted-foreground">Location type</span>
-                  <span className="font-semibold text-foreground">
-                    {location ? "In-Person" : "Online"}
+                  <span className="text-foreground font-semibold">
+                    {location ? 'In-Person' : 'Online'}
                   </span>
                 </div>
                 {location && (
-                  <div className="flex items-start justify-between py-1.5 border-b border-border/40 gap-4">
+                  <div className="border-border/40 flex items-start justify-between gap-4 border-b py-1.5">
                     <span className="text-muted-foreground shrink-0">
                       Venue
                     </span>
-                    <span className="font-semibold text-foreground text-right break-words">
+                    <span className="text-foreground text-right font-semibold break-words">
                       {location}
                     </span>
                   </div>
                 )}
-                <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1.5">
                   <span className="text-muted-foreground">Date</span>
-                  <span className="font-semibold text-foreground">{date}</span>
+                  <span className="text-foreground font-semibold">{date}</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1.5">
                   <span className="text-muted-foreground">Time</span>
-                  <span className="font-semibold text-foreground">{time}</span>
+                  <span className="text-foreground font-semibold">{time}</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1.5">
                   <span className="text-muted-foreground">Availability</span>
                   <span className="font-bold text-amber-600 dark:text-amber-400">
                     Limited Spots Left!
@@ -196,7 +197,7 @@ export default async function EventDetailPage({
                 </div>
                 <div className="flex items-center justify-between py-1.5">
                   <span className="text-muted-foreground">Refund Policy</span>
-                  <span className="text-[11px] text-muted-foreground">
+                  <span className="text-muted-foreground text-[11px]">
                     Flexible (24h notice)
                   </span>
                 </div>
@@ -205,24 +206,24 @@ export default async function EventDetailPage({
               <Link href={`/events/${id}/register`} className="w-full">
                 <Button
                   size="sm"
-                  className="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg py-5 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full cursor-pointer rounded-lg bg-indigo-700 py-5 font-bold text-white shadow-sm transition-all hover:bg-indigo-600 active:scale-[0.98]"
                 >
                   Secure Spot Now
                 </Button>
               </Link>
 
-              <span className="text-[10px] text-muted-foreground text-center block">
+              <span className="text-muted-foreground block text-center text-[10px]">
                 Instant checkout & confirmation • No hidden fees
               </span>
             </Card>
 
             {/* Event Guidelines / FAQ section moved under the booking widget for trust validation */}
-            <div className="p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 dark:bg-indigo-500/5 text-left space-y-2">
+            <div className="space-y-2 rounded-xl border border-indigo-500/10 bg-indigo-500/5 p-4 text-left dark:bg-indigo-500/5">
               <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
                 <Shield className="size-4 shrink-0" />
-                <h3 className="font-bold text-xs">Passvy Verified Event</h3>
+                <h3 className="text-xs font-bold">Passvy Verified Event</h3>
               </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground text-[11px] leading-relaxed">
                 This event is verified by Passvy. You will receive an encrypted
                 digital entry pass containing a scanable barcode as soon as
                 registration is complete.
@@ -230,45 +231,45 @@ export default async function EventDetailPage({
             </div>
 
             {/* Mobile Detailed Information Card - Shown only on Mobile, below Passvy Verification box */}
-            <Card className="lg:hidden p-4 bg-card/65 backdrop-blur-md border-border/80 shadow-md rounded-xl flex flex-col gap-3 text-left">
-              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider border-b border-border/40 pb-2">
+            <Card className="bg-card/65 border-border/80 flex flex-col gap-3 rounded-xl p-4 text-left shadow-md backdrop-blur-md lg:hidden">
+              <h4 className="text-foreground border-border/40 border-b pb-2 text-xs font-bold tracking-wider uppercase">
                 Event Information
               </h4>
               <div className="space-y-2.5 text-xs">
-                <div className="flex items-center justify-between py-1 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1">
                   <span className="text-muted-foreground">Category</span>
                   <Badge
                     variant={BadgeVariant.Secondary}
-                    className="font-bold text-[10px] px-2 py-0.5"
+                    className="px-2 py-0.5 text-[10px] font-bold"
                   >
                     {tag}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1">
                   <span className="text-muted-foreground">Location type</span>
-                  <span className="font-semibold text-foreground">
-                    {location ? "In-Person" : "Online"}
+                  <span className="text-foreground font-semibold">
+                    {location ? 'In-Person' : 'Online'}
                   </span>
                 </div>
                 {location && (
-                  <div className="flex items-start justify-between py-1 border-b border-border/40 gap-4">
+                  <div className="border-border/40 flex items-start justify-between gap-4 border-b py-1">
                     <span className="text-muted-foreground shrink-0">
                       Venue
                     </span>
-                    <span className="font-semibold text-foreground text-right break-words">
+                    <span className="text-foreground text-right font-semibold break-words">
                       {location}
                     </span>
                   </div>
                 )}
-                <div className="flex items-center justify-between py-1 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1">
                   <span className="text-muted-foreground">Date</span>
-                  <span className="font-semibold text-foreground">{date}</span>
+                  <span className="text-foreground font-semibold">{date}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1">
                   <span className="text-muted-foreground">Time</span>
-                  <span className="font-semibold text-foreground">{time}</span>
+                  <span className="text-foreground font-semibold">{time}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-border/40">
+                <div className="border-border/40 flex items-center justify-between border-b py-1">
                   <span className="text-muted-foreground">Availability</span>
                   <span className="font-bold text-amber-600 dark:text-amber-400">
                     Limited Spots Left!
@@ -276,7 +277,7 @@ export default async function EventDetailPage({
                 </div>
                 <div className="flex items-center justify-between py-1">
                   <span className="text-muted-foreground">Refund Policy</span>
-                  <span className="text-[11px] text-muted-foreground">
+                  <span className="text-muted-foreground text-[11px]">
                     Flexible (24h notice)
                   </span>
                 </div>
@@ -287,21 +288,21 @@ export default async function EventDetailPage({
       </main>
 
       {/* Mobile Sticky Floating Booking Footer Bar */}
-      <div className="fixed bottom-4 left-4 right-4 z-50 bg-card/95 backdrop-blur-md border border-border/80 p-3.5 shadow-2xl rounded-xl flex items-center justify-between lg:hidden transition-transform duration-300">
+      <div className="bg-card/95 border-border/80 fixed right-4 bottom-4 left-4 z-50 flex items-center justify-between rounded-xl border p-3.5 shadow-2xl backdrop-blur-md transition-transform duration-300 lg:hidden">
         <div className="flex flex-col text-left">
-          <span className="text-[9px] font-semibold text-muted-foreground tracking-wider uppercase">
+          <span className="text-muted-foreground text-[9px] font-semibold tracking-wider uppercase">
             TICKET PRICE
           </span>
-          <span className="text-xl font-extrabold text-foreground leading-none mt-1">
-            {price === "Free" || price.toLowerCase() === "free"
-              ? "Free"
+          <span className="text-foreground mt-1 text-xl leading-none font-extrabold">
+            {price === 'Free' || price.toLowerCase() === 'free'
+              ? 'Free'
               : `$${price}`}
           </span>
         </div>
         <Link href={`/events/${id}/register`}>
           <Button
             size="sm"
-            className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg px-5 py-4.5 shadow-md active:scale-95 transition-all text-xs cursor-pointer"
+            className="cursor-pointer rounded-lg bg-indigo-700 px-5 py-4.5 text-xs font-bold text-white shadow-md transition-all hover:bg-indigo-600 active:scale-95"
           >
             Secure Spot
           </Button>

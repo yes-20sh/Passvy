@@ -1,7 +1,16 @@
-import React, { useRef } from "react";
-import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
-import { type Category } from "@/app/(main)/events/data";
-import { TypographySpan } from "@/components/atoms/typography/typography";
+import React, { useRef } from 'react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
+import { type Category } from '@/app/(main)/data';
+import { TypographySpan } from '@/components/atoms/typography/typography';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+} from '@/components/atoms/dropdown-menu';
 
 export interface CategoryFilterProps {
   categories: Category[];
@@ -16,28 +25,28 @@ export const CategoryFilter = ({
 }: CategoryFilterProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
       const scrollAmount = clientWidth * 0.6;
       scrollRef.current.scrollTo({
         left:
-          direction === "left"
+          direction === 'left'
             ? scrollLeft - scrollAmount
             : scrollLeft + scrollAmount,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   };
 
   return (
-    <div className="flex items-center gap-4 my-6 py-2">
+    <div className="my-6 flex items-center gap-4 py-2">
       {/* Left side: Category Carousel */}
-      <div className="relative flex-1 min-w-0 group/carousel">
+      <div className="group/carousel relative min-w-0 flex-1">
         {/* Left Scroll Button */}
         <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+          onClick={() => scroll('left')}
+          className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 left-0 z-10 hidden size-9 -translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/carousel:opacity-100 active:scale-95 md:flex"
           aria-label="Scroll left"
         >
           <ChevronLeft className="size-5" />
@@ -46,12 +55,12 @@ export const CategoryFilter = ({
         {/* Carousel Track */}
         <div
           ref={scrollRef}
-          className="flex items-center gap-3 overflow-x-auto scrollbar-none py-1 px-1 scroll-smooth"
+          className="flex scrollbar-none items-center gap-3 overflow-x-auto scroll-smooth px-1 py-1"
         >
           {categories.map((cat) => {
             const Icon = cat.icon;
             const isSelected =
-              (cat.name === "All Events" && !selectedCategory) ||
+              (cat.name === 'All Events' && !selectedCategory) ||
               selectedCategory === cat.name;
 
             return (
@@ -59,20 +68,20 @@ export const CategoryFilter = ({
                 key={cat.id}
                 onClick={() =>
                   setSelectedCategory(
-                    cat.name === "All Events" ? null : cat.name,
+                    cat.name === 'All Events' ? null : cat.name,
                   )
                 }
-                className={`flex items-center gap-2.5 p-3 px-4 rounded-xl cursor-pointer select-none shrink-0 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 border ${
+                className={`flex shrink-0 cursor-pointer items-center gap-2.5 rounded-xl border p-3 px-4 transition-all duration-300 select-none hover:-translate-y-0.5 active:scale-95 ${
                   isSelected
-                    ? "bg-indigo-700 border-indigo-700 text-white shadow-sm shadow-indigo-700/20"
-                    : "bg-secondary/15 border-border/80 text-muted-foreground hover:text-foreground hover:bg-secondary/30 hover:border-indigo-500/20"
+                    ? 'border-indigo-700 bg-indigo-700 text-white shadow-sm shadow-indigo-700/20'
+                    : 'bg-secondary/15 border-border/80 text-muted-foreground hover:text-foreground hover:bg-secondary/30 hover:border-indigo-500/20'
                 }`}
               >
                 <Icon
                   className={`size-4.5 ${
                     isSelected
-                      ? "text-white"
-                      : "text-indigo-600 dark:text-indigo-400"
+                      ? 'text-white'
+                      : 'text-indigo-600 dark:text-indigo-400'
                   }`}
                 />
                 <TypographySpan className="text-[13px] font-semibold tracking-wide">
@@ -85,8 +94,8 @@ export const CategoryFilter = ({
 
         {/* Right Scroll Button */}
         <button
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+          onClick={() => scroll('right')}
+          className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 right-0 z-10 hidden size-9 translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/carousel:opacity-100 active:scale-95 md:flex"
           aria-label="Scroll right"
         >
           <ChevronRight className="size-5" />
@@ -94,13 +103,25 @@ export const CategoryFilter = ({
       </div>
 
       {/* Right side: Filter Button */}
-      <button
-        onClick={() => alert("Advanced filtering panel coming soon!")}
-        className="flex items-center gap-2 p-3 px-4 rounded-xl cursor-pointer select-none shrink-0 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 border bg-secondary/15 border-border/80 text-muted-foreground hover:text-foreground hover:bg-secondary/30 hover:border-indigo-500/20 font-semibold text-[13px]"
-      >
-        <SlidersHorizontal className="size-4 text-indigo-600 dark:text-indigo-400" />
-        <TypographySpan>Filters</TypographySpan>
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="bg-secondary/15 border-border/80 text-muted-foreground hover:text-foreground hover:bg-secondary/30 flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border p-3 px-4 text-[13px] font-semibold transition-all duration-300 outline-none select-none hover:-translate-y-0.5 hover:border-indigo-500/20 active:scale-95">
+          <SlidersHorizontal className="size-4 text-indigo-600 dark:text-indigo-400" />
+          <TypographySpan>Filters</TypographySpan>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Event Status</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer">
+              Upcoming
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
+              Ongoing
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">Past</DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

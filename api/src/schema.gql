@@ -68,6 +68,11 @@ input CreateEventPaymentSettingInput {
   acceptedMethods: [String!]!
 }
 
+type CursorPaginationMetaEntity {
+  hasNextPage: Boolean!
+  nextCursor: String
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -96,6 +101,30 @@ type EventDescriptionBlockSchema {
   listStyle: String
   sortOrder: Int!
   textSize: String
+}
+
+type EventListBaseEntity {
+  category: String
+  headerImage: String
+  id: ID!
+  mode: EventListModeEntity
+  passes: [EventListPassEntity!]
+  slug: String
+  startDate: DateTime
+  startTime: String
+  title: String!
+}
+
+type EventListModeEntity {
+  capacity: Int
+  city: String
+  eventMode: EventMode!
+  state: String
+}
+
+type EventListPassEntity {
+  price: Float!
+  pricing: PassPricing!
 }
 
 enum EventMode {
@@ -181,8 +210,21 @@ enum EventStep {
   PAYOUTS
 }
 
+type EventsListResponse {
+  events: [EventListBaseEntity!]!
+  meta: CursorPaginationMetaEntity
+}
+
 input ForgotPasswordInput {
   email: String!
+}
+
+input GetEventsListInput {
+  category: String
+  cursor: String
+  filter: String
+  limit: Int
+  search: String
 }
 
 input GoogleAuthInput {
@@ -225,6 +267,7 @@ enum PassTier {
 
 type Query {
   getEvent(slug: String!): EventResponse!
+  getEventsList(input: GetEventsListInput = {}): EventsListResponse!
   getSettings: SettingsResponse!
   healthCheck: String!
 }

@@ -1,0 +1,27 @@
+query GetEventsList($input: GetEventsListInput) {
+  getEventsList(input: $input) {
+    events {
+      id
+      slug
+      title
+      category
+      headerImage
+      startDate
+      startTime
+      mode {
+        eventMode
+        city
+        state
+        capacity
+      }
+      passes {
+        pricing
+        price
+      }
+    }
+    meta {
+      nextCursor
+      hasNextPage
+    }
+  }
+}
