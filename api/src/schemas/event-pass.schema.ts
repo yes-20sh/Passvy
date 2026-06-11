@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { EventSchema } from './event.schema';
+import type { EventSchema as IEventSchema } from './event.schema';
 import { PassPricing, PassTier } from '@/enum';
 
 @ObjectType()
@@ -24,7 +25,7 @@ export class EventPassSchema {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'event_id' })
-  event: EventSchema;
+  event: IEventSchema;
 
   @Field(() => PassPricing)
   @Column({ type: 'enum', enum: PassPricing, default: PassPricing.FREE })

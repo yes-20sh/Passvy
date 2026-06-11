@@ -1,6 +1,6 @@
 import * as React from "react";
 import Image from "next/image";
-import { Calendar, MapPin, ArrowUpRight } from "lucide-react";
+import { Calendar, MapPin, ArrowUpRight, Globe } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -14,6 +14,7 @@ import { Badge, BadgeVariant } from "@/components/atoms/badge/badge";
 
 export interface EventData {
   id: string;
+  slug?: string | null;
   title: string;
   image: string;
   date: string;
@@ -21,6 +22,7 @@ export interface EventData {
   tag: string;
   price: string;
   location?: string;
+  isOnline?: boolean;
   passCount?: number;
 }
 
@@ -30,7 +32,7 @@ export interface EventCardProps {
 }
 
 export function EventCard({ event, onRegister }: EventCardProps) {
-  const { id, title, image, date, time, tag, price, location, passCount } = event;
+  const { id, slug, title, image, date, time, tag, price, location, passCount, isOnline } = event;
 
   const handleRegisterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
     <Card className="flex flex-col h-full overflow-hidden bg-card/45 backdrop-blur-sm shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-xl group p-2 rounded-xl gap-2">
       {/* Event Image Container */}
       <Link
-        href={`/events/${id}`}
+        href={`/events/${slug || id}`}
         className="relative aspect-video w-full overflow-hidden bg-muted rounded-xl block"
       >
         <Image
@@ -65,7 +67,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
       <CardContent className="flex flex-col flex-1 px-0 pb-0 gap-3">
         {/* Title & Tag */}
         <div className="flex items-start justify-between gap-6">
-          <Link href={`/events/${id}`} className="flex-1 min-w-0">
+          <Link href={`/events/${slug || id}`} className="flex-1 min-w-0">
             <CardTitle className="text-lg font-bold leading-tight tracking-tight text-foreground line-clamp-2 min-h-[2.75rem]">
               {title}
             </CardTitle>
@@ -84,12 +86,17 @@ export function EventCard({ event, onRegister }: EventCardProps) {
             <Calendar className="size-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>{date} • {time}</span>
           </div>
-          {location && (
+          {isOnline ? (
+            <div className="flex items-center gap-1.5 truncate">
+              <Globe className="size-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Online</span>
+            </div>
+          ) : location ? (
             <div className="flex items-center gap-1.5 truncate">
               <MapPin className="size-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span className="truncate">{location}</span>
             </div>
-          )}
+          ) : null}
         </div>
       </CardContent>
 

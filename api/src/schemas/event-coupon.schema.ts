@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { EventSchema } from './event.schema';
+import type { EventSchema as IEventSchema } from './event.schema';
 import { DiscountType } from '@/enum';
 
 @ObjectType()
@@ -24,7 +25,7 @@ export class EventCouponSchema {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'event_id' })
-  event: EventSchema;
+  event: IEventSchema;
 
   @Field()
   @Column({ type: 'varchar', length: 50 })

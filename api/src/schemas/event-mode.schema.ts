@@ -9,6 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { EventSchema } from './event.schema';
+import type { EventSchema as IEventSchema } from './event.schema';
 import { EventMode } from '@/enum';
 
 @ObjectType()
@@ -25,7 +26,7 @@ export class EventModeSchema {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'event_id' })
-  event: EventSchema;
+  event: IEventSchema;
 
   @Field(() => EventMode)
   @Column({

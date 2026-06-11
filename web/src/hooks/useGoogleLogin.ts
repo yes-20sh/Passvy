@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { firebaseAuth } from "@/integrations/firebase/firebase";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 export const useGoogleLogin = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [googleAuthMutation, { loading }] = useMutation(GoogleAuthDocument, {
     onError: (err) => {
@@ -19,7 +21,6 @@ export const useGoogleLogin = () => {
     },
     onCompleted: (data) => {
       if (data.googleAuth.accessToken) {
-        // You can update this to extract the actual email if needed
         dispatch(setLoginState({ email: "Google User" })); 
         toast.success("Login successful!", {
           description: "Welcome back to Passvy.",
@@ -30,20 +31,47 @@ export const useGoogleLogin = () => {
   });
 
   const handleLogin = async () => {
+    if (isLoggingIn || loading) return;
+
+    setIsLoggingIn(true);
     try {
       const provider = new GoogleAuthProvider();
-      // Ensure your firebase config exports the 'auth' instance correctly
       const result = await signInWithPopup(firebaseAuth, provider);
       const token = await result.user.getIdToken();
 
       await googleAuthMutation({ variables: { input: { idToken: token } } });
-    } catch (error) {
-      console.error(error);
-      toast.error("Popup Error", {
-        description: "Failed to open Google authentication popup.",
-      });
+    } catch (err) {
+      const error = err as { code?: string; message?: string };
+      const errorCode = error?.code;
+      const errorMessage = error?.message || "";
+
+      // Handle popup blocked specifically
+      if (errorCode === "auth/popup-blocked") {
+        toast.error("Popup Blocked", {
+          description: "Please allow popups for this site to log in with Google.",
+        });
+        return;
+      }
+
+      // Ignore expected cancellation errors and Firebase internal assertion issues 
+      // that happen when a popup is forcefully closed or blocked
+      const isCancelled = 
+        errorCode === "auth/cancelled-popup-request" || 
+        errorCode === "auth/popup-closed-by-user";
+        
+      const isInternalAssertion = 
+        errorCode === "auth/internal-error" || 
+        errorMessage.includes("INTERNAL ASSERTION FAILED");
+
+      if (!isCancelled && !isInternalAssertion) {
+        toast.error("Google Login Error", {
+          description: errorMessage || "An unexpected error occurred during login.",
+        });
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
-  return { loginWithGoogle: handleLogin, loading };
+  return { loginWithGoogle: handleLogin, loading: loading || isLoggingIn };
 };

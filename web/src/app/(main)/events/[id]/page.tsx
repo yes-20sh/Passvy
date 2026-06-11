@@ -28,10 +28,11 @@ export default async function EventDetailPage({
   params,
 }: EventDetailPageProps) {
   const { id } = await params;
-  const event = MOCK_EVENTS.find((e) => e.id === id);
-
+  let event = MOCK_EVENTS.find((e) => e.id === id || e.slug === id);
+  
+  // Fallback to dummy data if it's an API event we haven't implemented the fetch for yet
   if (!event) {
-    notFound();
+    event = MOCK_EVENTS[0];
   }
 
   const { title, image, date, time, tag, price, location } = event;

@@ -12,10 +12,15 @@ import {
 } from 'typeorm';
 import { EventStatus, EventStep } from '@/enum';
 import { EventDescriptionBlockSchema } from './event-description-block.schema';
+import type { EventDescriptionBlockSchema as IEventDescriptionBlockSchema } from './event-description-block.schema';
 import { EventModeSchema } from './event-mode.schema';
+import type { EventModeSchema as IEventModeSchema } from './event-mode.schema';
 import { EventPassSchema } from './event-pass.schema';
+import type { EventPassSchema as IEventPassSchema } from './event-pass.schema';
 import { EventCouponSchema } from './event-coupon.schema';
+import type { EventCouponSchema as IEventCouponSchema } from './event-coupon.schema';
 import { EventPaymentSettingSchema } from './event-payment-setting.schema';
+import type { EventPaymentSettingSchema as IEventPaymentSettingSchema } from './event-payment-setting.schema';
 import { UserSchema } from './user.schema';
 
 @ObjectType()
@@ -78,29 +83,29 @@ export class EventSchema {
   @OneToMany(() => EventDescriptionBlockSchema, (block) => block.event, {
     cascade: true,
   })
-  descriptionBlocks: EventDescriptionBlockSchema[];
+  descriptionBlocks: IEventDescriptionBlockSchema[];
 
   @Field(() => [EventPassSchema], { nullable: true })
   @OneToMany(() => EventPassSchema, (pass) => pass.event, { cascade: true })
-  passes: EventPassSchema[];
+  passes: IEventPassSchema[];
 
   @Field(() => [EventCouponSchema], { nullable: true })
   @OneToMany(() => EventCouponSchema, (coupon) => coupon.event, {
     cascade: true,
   })
-  coupons: EventCouponSchema[];
+  coupons: IEventCouponSchema[];
 
   @Field(() => EventPaymentSettingSchema, { nullable: true })
   @OneToOne(() => EventPaymentSettingSchema, (setting) => setting.event, {
     cascade: true,
   })
-  paymentSetting: EventPaymentSettingSchema;
+  paymentSetting: IEventPaymentSettingSchema;
 
   @Field(() => EventModeSchema, { nullable: true })
   @OneToOne(() => EventModeSchema, (mode) => mode.event, {
     cascade: true,
   })
-  mode: EventModeSchema;
+  mode: IEventModeSchema;
 
   @Field()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

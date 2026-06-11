@@ -133,11 +133,12 @@ export const FeaturedEvents = ({
                 href={`/events/${event.id}`}
                 className="group/feat relative block h-64 w-full shrink-0 cursor-pointer overflow-hidden rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
               >
-                {/* Background Image */}
                 <Image
                   src={event.image}
                   alt={event.title}
                   fill
+                  priority={true}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover/feat:scale-105"
                 />
                 {/* Dark Gradient Overlay */}
