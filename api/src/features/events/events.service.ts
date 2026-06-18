@@ -7,10 +7,18 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { EventSchema } from '@/schemas/event.schema';
-import { CreateEventInput } from './dto/event.dto';
+import { EventPromotionSchema } from '@/schemas/event-promotion.schema';
+import { SavedEventSchema } from '@/schemas/saved-event.schema';
+import { CreateEventInput, PromoteEventInput } from './dto/event.dto';
 import { GoogleService } from '@/config/google/google.service';
 import { EventResponse } from './entities/event.response.entity';
-import { EventStep, EventMode, EventRelation, BlockType } from '@/enum';
+import {
+  EventStep,
+  EventMode,
+  EventRelation,
+  BlockType,
+  PromotionImageSource,
+} from '@/enum';
 import { generateEventMeetLinkHelper } from '@/helper/generate-meet-link/generate-meet-link.helper';
 import { CloudinaryService } from '@/config/cloudinary/cloudinary.service';
 import { uploadEventImageHelper } from '@/helper/cloudinary/cloudinary.helper';
@@ -23,6 +31,10 @@ export class EventsService {
   constructor(
     @InjectRepository(EventSchema)
     private readonly eventRepository: Repository<EventSchema>,
+    @InjectRepository(EventPromotionSchema)
+    private readonly promotionRepository: Repository<EventPromotionSchema>,
+    @InjectRepository(SavedEventSchema)
+    private readonly savedEventRepository: Repository<SavedEventSchema>,
     private readonly googleService: GoogleService,
     private readonly cloudinaryService: CloudinaryService,
   ) {}
@@ -217,10 +229,14 @@ export class EventsService {
     }
   }
 
-  async getEvent(slug: string, userId?: string): Promise<EventResponse> {
+  async getEvent(
+    slug: string,
+    userId?: string,
+    isCreatorDashboard: boolean = false,
+  ): Promise<EventResponse> {
     try {
       const whereClause: FindOptionsWhere<EventSchema> = { slug };
-      if (userId) {
+      if (userId && isCreatorDashboard) {
         whereClause.creatorId = userId;
       }
 
@@ -248,7 +264,7 @@ export class EventsService {
       }
       if (event.mode) {
         // Hide the meet link for public requests on online events
-        if (!userId && event.mode.eventMode === EventMode.ONLINE) {
+        if (!isCreatorDashboard && event.mode.eventMode === EventMode.ONLINE) {
           event.mode.onlineLink = null;
         }
 
@@ -266,11 +282,20 @@ export class EventsService {
         }
       }
 
+      let isSaved = false;
+      if (userId) {
+        const savedEvent = await this.savedEventRepository.findOne({
+          where: { userId, eventId: event.id },
+        });
+        isSaved = !!savedEvent;
+      }
+
       return {
         message: userId
           ? 'Event fetched successfully'
           : 'Event details fetched successfully',
         event,
+        isSaved,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -278,6 +303,84 @@ export class EventsService {
       }
       this.logger.error('Failed to fetch event', error);
       throw new InternalServerErrorException('Failed to fetch event');
+    }
+  }
+
+  async promoteEvent(
+    userId: string,
+    input: PromoteEventInput,
+  ): Promise<boolean> {
+    try {
+      const event = await this.eventRepository.findOne({
+        where: { slug: input.eventSlug, creatorId: userId },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found or unauthorized');
+      }
+
+      let imageUrl = input.imageUrl || null;
+
+      if (
+        input.imageSource === PromotionImageSource.UPLOAD &&
+        input.imageUrl &&
+        input.imageUrl.startsWith('data:image')
+      ) {
+        imageUrl = await uploadEventImageHelper(
+          this.cloudinaryService,
+          input.imageUrl,
+          'passvy/events/promotions',
+        );
+      } else if (input.imageSource === PromotionImageSource.HEADER) {
+        imageUrl = event.headerImage;
+      }
+
+      const promotion = this.promotionRepository.create({
+        eventId: event.id,
+        duration: input.duration,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        imageSource: input.imageSource,
+        imageUrl,
+      });
+
+      await this.promotionRepository.save(promotion);
+
+      return true;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error('Failed to promote event', error);
+      throw new InternalServerErrorException('Failed to promote event');
+    }
+  }
+
+  async getEventPromotions(
+    userId: string,
+    eventSlug: string,
+  ): Promise<EventPromotionSchema[]> {
+    try {
+      const event = await this.eventRepository.findOne({
+        where: { slug: eventSlug, creatorId: userId },
+      });
+
+      if (!event) {
+        throw new NotFoundException('Event not found or unauthorized');
+      }
+
+      return this.promotionRepository.find({
+        where: { eventId: event.id },
+        order: { createdAt: 'DESC' },
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error('Failed to fetch event promotions', error);
+      throw new InternalServerErrorException(
+        'Failed to fetch event promotions',
+      );
     }
   }
 }

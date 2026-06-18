@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, use } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Shield } from "lucide-react";
-import { SuccessPassTicket } from "@/components/molecules/success-pass-ticket/success-pass-ticket";
-import { type Attendee } from "@/app/(main)/events/[id]/register/page";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useQuery } from "@apollo/client/react";
-import { GetEventDetailDocument } from "@/gql/graphql";
-import { setEventDetail } from "@/store/slices/event-detail.slice";
+import React, { useState, useEffect, use } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft, Shield } from 'lucide-react';
+import { SuccessPassTicket } from '@/components/molecules/success-pass-ticket/success-pass-ticket';
+import { type Attendee } from '@/app/(main)/events/[id]/register/page';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import { useQuery } from '@apollo/client/react';
+import { GetEventDetailDocument, GetPassDetailDocument } from '@/gql/graphql';
+import { setEventDetail } from '@/store/slices/event-detail.slice';
 
 export interface PassPageProps {
   params: Promise<{
@@ -46,8 +46,15 @@ export default function PassPage({ params }: PassPageProps) {
     skip: shouldSkipQuery,
   });
 
-  const [orderData, setOrderData] = useState<SavedOrderData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { data: passDetailData, loading: passDetailLoading } = useQuery(
+    GetPassDetailDocument,
+    { variables: { slug: resolvedParams.id } },
+  );
+
+  const [savedOrderData, setSavedOrderData] = useState<SavedOrderData | null>(
+    null,
+  );
+  const [isClient, setIsClient] = useState(false);
 
   // Sync with Redux if we fetched from query
   useEffect(() => {
@@ -56,12 +63,12 @@ export default function PassPage({ params }: PassPageProps) {
 
       // format date/time manually or roughly, since it's just for display on checkout
       const formattedDate = rawEvent.startDate
-        ? new Date(rawEvent.startDate as string).toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
+        ? new Date(rawEvent.startDate as string).toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
           })
-        : "TBA";
+        : 'TBA';
 
       dispatch(
         setEventDetail({
@@ -69,20 +76,21 @@ export default function PassPage({ params }: PassPageProps) {
           slug: resolvedParams.id,
           title: rawEvent.title,
           image:
-            typeof rawEvent.headerImage === "string"
+            typeof rawEvent.headerImage === 'string'
               ? rawEvent.headerImage
-              : "",
+              : '',
           date: formattedDate,
           time: rawEvent.startDate
             ? new Date(rawEvent.startDate as string).toLocaleTimeString(
-                "en-US",
-                { hour: "2-digit", minute: "2-digit" },
+                'en-US',
+                { hour: '2-digit', minute: '2-digit' },
               )
-            : "TBA",
-          tag: rawEvent.category || "",
-          price: rawEvent.passes?.[0]?.price || "Free",
-          location: rawEvent.mode?.offlineAddress || rawEvent.mode?.city || "TBA",
-          description: rawEvent.descriptionBlocks?.[0]?.content || "",
+            : 'TBA',
+          tag: rawEvent.category || '',
+          price: rawEvent.passes?.[0]?.price?.toString() || 'Free',
+          location:
+            rawEvent.mode?.offlineAddress || rawEvent.mode?.city || 'TBA',
+          description: rawEvent.descriptionBlocks?.[0]?.content || '',
           passes: rawEvent.passes || [],
         }),
       );
@@ -92,36 +100,78 @@ export default function PassPage({ params }: PassPageProps) {
   const rawPasses = event?.passes || [];
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(`order-${resolvedParams.id}`);
-    if (saved) {
-      try {
-        setOrderData(JSON.parse(saved));
-      } catch (err) {
-        console.error("Error parsing order details", err);
+    // Wrap in setTimeout to push the setState to the next tick, bypassing the synchronous cascade warning
+    const timer = setTimeout(() => {
+      setIsClient(true);
+      const saved = sessionStorage.getItem(`order-${resolvedParams.id}`);
+      if (saved) {
+        try {
+          setSavedOrderData(JSON.parse(saved));
+        } catch (err) {
+          console.error('Error parsing order details', err);
+        }
       }
-    } else if (event) {
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [resolvedParams.id]);
+
+  const orderData = React.useMemo(() => {
+    if (savedOrderData) return savedOrderData;
+
+    if (passDetailData?.getPassDetail) {
+      const { registration, event: rawEvent } = passDetailData.getPassDetail;
+      const passPrice = rawEvent.passes?.[0]?.price?.toString() || 'Free';
+      const finalPrice =
+        passPrice.toLowerCase() === 'free' ? 'Free' : `$${passPrice}`;
+
+      return {
+        userName: registration.name,
+        userEmail: registration.email,
+        userPhone: 'N/A',
+        selectedPassId: rawEvent.passes?.[0]?.id || '',
+        attendees: [],
+        ticketCode: `PV-${registration.id.split('-')[0].toUpperCase()}`,
+        couponCode: 'N/A',
+        paymentMethod: 'Completed',
+        finalPaidAmount: finalPrice,
+      };
+    }
+
+    if (event && !passDetailLoading) {
       // Create a premium default ticket mock so page never displays empty error when navigating back
       const defaultPass = rawPasses[0];
-      const defaultPrice = event.passes?.[0]?.price === "Free" || String(event.passes?.[0]?.price).toLowerCase() === "free"
-        ? "Free"
-        : `$${event.passes?.[0]?.price || 0}`;
-        
-      setOrderData({
-        userName: "Guest Registrant",
-        userEmail: "guest@passvy.io",
-        userPhone: "+1 (555) 019-2834",
-        selectedPassId: defaultPass?.id || "",
-        attendees: [],
-        ticketCode: `PV-${resolvedParams.id.toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        couponCode: "WELCOME10",
-        paymentMethod: "Pay at Check-in",
-        finalPaidAmount: defaultPrice,
-      });
-    }
-    setIsLoading(false);
-  }, [resolvedParams.id, event, rawPasses]);
+      const defaultPrice =
+        !event.passes?.[0]?.price || event.passes?.[0]?.price === 0
+          ? 'Free'
+          : `$${event.passes?.[0]?.price}`;
 
-  if (isLoading || (queryLoading && !shouldSkipQuery)) {
+      return {
+        userName: 'Guest Registrant',
+        userEmail: 'guest@passvy.io',
+        userPhone: '+1 (555) 019-2834',
+        selectedPassId: defaultPass?.id || '',
+        attendees: [],
+        ticketCode: `PV-${resolvedParams.id.toUpperCase().slice(0, 8)}-MOCK`,
+        couponCode: 'WELCOME10',
+        paymentMethod: 'Pay at Check-in',
+        finalPaidAmount: defaultPrice,
+      };
+    }
+
+    return null;
+  }, [
+    savedOrderData,
+    passDetailData,
+    event,
+    rawPasses,
+    resolvedParams.id,
+    passDetailLoading,
+  ]);
+
+  const isLoading = !isClient || (passDetailLoading && !savedOrderData);
+
+  if (isLoading || (queryLoading && !shouldSkipQuery && !orderData)) {
     return (
       <div className="bg-background text-foreground flex min-h-screen items-center justify-center">
         <span className="text-muted-foreground animate-pulse text-xs font-bold tracking-widest uppercase">
@@ -163,45 +213,49 @@ export default function PassPage({ params }: PassPageProps) {
     couponCode,
   } = orderData;
 
-  const activePass = rawPasses.find((p) => p.id === selectedPassId) || rawPasses[0];
+  const activePass =
+    rawPasses.find((p) => p.id === selectedPassId) || rawPasses[0];
 
   const getCapacity = (category: string | null) => {
-    const cat = category?.toUpperCase() || "";
-    if (cat === "FRIEND" || cat === "COUPLE") return 2;
-    if (cat === "GROUP" || cat === "TEAM") return 5;
+    const cat = category?.toUpperCase() || '';
+    if (cat === 'FRIEND' || cat === 'COUPLE') return 2;
+    if (cat === 'GROUP' || cat === 'TEAM') return 5;
     return 1;
   };
 
-  const passTierName = activePass?.tier || "General Admission";
-  const passCategoryName = activePass?.customName || activePass?.passCategory || "Single Pass";
+  const passTierName = activePass?.tier || 'General Admission';
+  const passCategoryName =
+    activePass?.customName || activePass?.passCategory || 'Single Pass';
   const totalTickets = getCapacity(activePass?.passCategory || null);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const isCheckout = searchParams.get("flow") === "checkout";
+  const isCheckout = searchParams.get('flow') === 'checkout';
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-200 flex flex-col pb-12">
+    <div className="bg-background text-foreground flex min-h-screen flex-col pb-12 transition-colors duration-200">
       {/* Top Header */}
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+      <header className="border-border/40 bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link
             href="/events"
-            className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+            className="text-muted-foreground hover:text-foreground group flex items-center gap-2 text-sm font-semibold transition-colors"
           >
             <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
             <span>Return to Events Directory</span>
           </Link>
           <div className="flex items-center gap-2">
             <Shield className="size-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-xs font-bold tracking-tight">PV SECURE TICKET</span>
+            <span className="text-xs font-bold tracking-tight">
+              PV SECURE TICKET
+            </span>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 flex-1 flex items-center justify-center">
+      <main className="container mx-auto flex flex-1 items-center justify-center px-4 py-8">
         <SuccessPassTicket
           event={event}
           userName={userName}

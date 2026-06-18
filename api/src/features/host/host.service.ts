@@ -11,6 +11,7 @@ import {
   GetHostEventsInput,
   HostEventFilter,
   GetRegisteredAttendeesInput,
+  ExportRegisteredAttendeesInput,
 } from './dto/host-event.dto';
 import {
   HostEventData,
@@ -154,7 +155,7 @@ export class HostService {
 
       if (input.search) {
         queryBuilder.andWhere(
-          '(reg.name ILIKE :search OR reg.email ILIKE :search)',
+          '(reg.name ILIKE :search OR reg.email ILIKE :search OR reg.mobileNumber ILIKE :search)',
           { search: `%${input.search}%` },
         );
       }
@@ -177,6 +178,7 @@ export class HostService {
           id: reg.id,
           name: reg.name,
           email: reg.email,
+          mobileNumber: reg.mobileNumber,
           passType,
           ticketId,
           registerDate: reg.createdAt,
@@ -208,6 +210,75 @@ export class HostService {
       }
       throw new InternalServerErrorException(
         'Failed to fetch registered attendees',
+      );
+    }
+  }
+
+  async exportRegisteredAttendees(
+    userId: string,
+    input: ExportRegisteredAttendeesInput,
+  ): Promise<string> {
+    try {
+      const event = await this.eventRepository.findOne({
+        where: { slug: input.slug, creatorId: userId },
+      });
+
+      if (!event) {
+        throw new InternalServerErrorException(
+          'Event not found or unauthorized',
+        );
+      }
+
+      const registrations = await this.registrationRepository.find({
+        where: { eventId: event.id },
+        order: { createdAt: 'DESC' },
+      });
+
+      const data = registrations.map((reg) => {
+        const ticketId = `TKT-${reg.id.substring(0, 6).toUpperCase()}`;
+        const passType = 'General Admission';
+        const status = 'Registered';
+
+        return {
+          id: reg.id,
+          name: reg.name,
+          email: reg.email,
+          mobileNumber: reg.mobileNumber || '',
+          passType,
+          ticketId,
+          registerDate: reg.createdAt.toISOString(),
+          status,
+        };
+      });
+
+      if (data.length === 0) {
+        return '';
+      }
+
+      const headers = input.columns;
+      const csvRows: string[] = [];
+      csvRows.push(headers.join(','));
+
+      for (const row of data) {
+        const values = headers.map((header) => {
+          const key = header as keyof typeof row;
+          const value = row[key] || '';
+          const stringValue = String(value).replace(/"/g, '""');
+          return `"${stringValue}"`;
+        });
+        csvRows.push(values.join(','));
+      }
+
+      return csvRows.join('\n');
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Failed to export registered attendees: ${error.message}`,
+          error.stack,
+        );
+      }
+      throw new InternalServerErrorException(
+        'Failed to export registered attendees',
       );
     }
   }

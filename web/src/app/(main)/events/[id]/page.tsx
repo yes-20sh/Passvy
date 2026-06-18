@@ -30,6 +30,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
   });
 
   const rawEvent = data?.getEventDetail?.event;
+  const isSavedInitial = data?.getEventDetail?.isSaved ?? false;
 
   const formatTime12hr = (timeStr?: string | null) => {
     if (!timeStr) return 'TBA';
@@ -109,7 +110,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
           {/* Left Column: Details & Media */}
           <div className="space-y-8 lg:col-span-2">
-            <EventHero image={image} title={rawEvent.title} tag={tag} />
+            <EventHero image={image} title={rawEvent.title} tag={tag} eventSlug={id} initialIsSaved={isSavedInitial} />
 
             <EventHeadlineInfo
               title={rawEvent.title}

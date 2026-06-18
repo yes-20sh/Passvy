@@ -62,7 +62,7 @@ export const ManageEventTabs = () => {
       <div className="w-full mt-6">
 
         {activeTab === 'attendees' && <AttendeesTable />}
-        {activeTab === 'scanner' && <EventScanner />}
+        {activeTab === 'scanner' && <EventScanner eventId={eventId} />}
         {activeTab === 'promote' && <AdvertisementSetup />}
       </div>
     </div>

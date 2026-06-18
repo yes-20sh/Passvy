@@ -50,6 +50,16 @@ export enum DiscountType {
   AMOUNT = 'AMOUNT',
 }
 
+export enum PromotionDuration {
+  ONE_DAY = '1-day',
+  ONE_WEEK = '1-week',
+}
+
+export enum PromotionImageSource {
+  HEADER = 'header',
+  UPLOAD = 'upload',
+}
+
 registerEnumType(EventMode, { name: 'EventMode' });
 registerEnumType(EventStatus, { name: 'EventStatus' });
 registerEnumType(BlockType, { name: 'BlockType' });
@@ -57,3 +67,5 @@ registerEnumType(PassPricing, { name: 'PassPricing' });
 registerEnumType(PassTier, { name: 'PassTier' });
 registerEnumType(DiscountType, { name: 'DiscountType' });
 registerEnumType(EventStep, { name: 'EventStep' });
+registerEnumType(PromotionDuration, { name: 'PromotionDuration' });
+registerEnumType(PromotionImageSource, { name: 'PromotionImageSource' });

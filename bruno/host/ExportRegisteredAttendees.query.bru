@@ -1,0 +1,30 @@
+meta {
+  name: ExportRegisteredAttendees
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query ExportRegisteredAttendees($input: ExportRegisteredAttendeesInput!) {
+    exportRegisteredAttendees(input: $input)
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "slug": "test-event",
+      "columns": ["name", "email", "status"]
+    }
+  }
+}

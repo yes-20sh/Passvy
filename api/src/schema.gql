@@ -115,6 +115,7 @@ type EventListBaseEntity {
   category: String
   headerImage: String
   id: ID!
+  isSaved: Boolean
   mode: EventListModeEntity
   passes: [EventListPassEntity!]
   slug: String
@@ -177,12 +178,37 @@ type EventPaymentSettingSchema {
   updatedAt: DateTime!
 }
 
+type EventPromotionSchema {
+  createdAt: DateTime!
+  duration: PromotionDuration!
+  endDate: DateTime!
+  eventId: String!
+  id: ID!
+  imageSource: PromotionImageSource!
+  imageUrl: String
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
 type EventRegistrationResponse {
   message: String!
 }
 
+type EventRegistrationSchema {
+  createdAt: DateTime!
+  email: String!
+  eventId: String!
+  id: ID!
+  isCheckedIn: Boolean!
+  mobileNumber: String
+  name: String!
+  slug: String!
+  updatedAt: DateTime!
+}
+
 type EventResponse {
   event: EventSchema
+  isSaved: Boolean
   message: String!
 }
 
@@ -199,6 +225,7 @@ type EventSchema {
   mode: EventModeSchema
   passes: [EventPassSchema!]
   paymentSetting: EventPaymentSettingSchema
+  promotions: [EventPromotionSchema!]
   slug: String
   startDate: DateTime
   startTime: String
@@ -226,6 +253,11 @@ type EventsListResponse {
   meta: CursorPaginationMetaEntity
 }
 
+input ExportRegisteredAttendeesInput {
+  columns: [String!]!
+  slug: String!
+}
+
 input ForgotPasswordInput {
   email: String!
 }
@@ -250,6 +282,11 @@ input GetRegisteredAttendeesInput {
   search: String
   slug: String!
   status: String
+}
+
+input GetSavedEventsInput {
+  cursor: String
+  limit: Int
 }
 
 input GoogleAuthInput {
@@ -294,13 +331,16 @@ type LoginResponse {
 }
 
 type Mutation {
+  checkInPass(eventId: String!, ticketCode: String!): EventRegistrationSchema!
   createEvent(input: CreateEventInput!): EventResponse!
   createEventRegistration(input: CreateEventRegistrationInput!): EventRegistrationResponse!
   forgotPassword(input: ForgotPasswordInput!): SuccessResponse!
   googleAuth(input: GoogleAuthInput!): LoginResponse!
   login(input: LoginInput!): LoginResponse!
   logout: SuccessResponse!
+  promoteEvent(input: PromoteEventInput!): Boolean!
   resetPassword(input: ResetPasswordInput!): SuccessResponse!
+  saveEvent(input: SaveEventInput!): Boolean!
   signup(input: SignupInput!): SuccessResponse!
   updateSettings(input: UpdateSettingsInput!): SettingsResponse!
   verifyOtp(input: VerifyOtpInput!): SuccessResponse!
@@ -321,6 +361,11 @@ enum PassPricing {
   PAID
 }
 
+type PassResponseEntity {
+  event: EventSchema!
+  registration: EventRegistrationSchema!
+}
+
 enum PassTier {
   CUSTOM
   GA
@@ -328,12 +373,36 @@ enum PassTier {
   VVIP
 }
 
+input PromoteEventInput {
+  duration: PromotionDuration!
+  endDate: DateTime!
+  eventSlug: String!
+  imageSource: PromotionImageSource!
+  imageUrl: String
+  startDate: DateTime!
+}
+
+enum PromotionDuration {
+  ONE_DAY
+  ONE_WEEK
+}
+
+enum PromotionImageSource {
+  HEADER
+  UPLOAD
+}
+
 type Query {
+  exportRegisteredAttendees(input: ExportRegisteredAttendeesInput!): String!
   getEvent(slug: String!): EventResponse!
   getEventDetail(slug: String!): EventResponse!
+  getEventPromotions(eventSlug: String!): [EventPromotionSchema!]!
   getEventsList(input: GetEventsListInput = {}): EventsListResponse!
   getHostEvents(input: GetHostEventsInput!): HostEventsResponse!
+  getPassDetail(slug: String!): PassResponseEntity!
+  getPasses: [PassResponseEntity!]!
   getRegisteredAttendees(input: GetRegisteredAttendeesInput!): RegisteredAttendeesResponse!
+  getSavedEvents(input: GetSavedEventsInput = {}): EventsListResponse!
   getSettings: SettingsResponse!
   healthCheck: String!
 }
@@ -341,6 +410,7 @@ type Query {
 type RegisteredAttendeeData {
   email: String!
   id: ID!
+  mobileNumber: String
   name: String!
   passType: String!
   registerDate: DateTime!
@@ -358,6 +428,10 @@ input ResetPasswordInput {
   email: String!
   newPassword: String!
   otp: String!
+}
+
+input SaveEventInput {
+  eventSlug: String!
 }
 
 type Settings {

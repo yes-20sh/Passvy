@@ -17,6 +17,8 @@ import {
   PassTier,
   DiscountType,
   EventStep,
+  PromotionDuration,
+  PromotionImageSource,
 } from '@/enum';
 
 @InputType()
@@ -295,4 +297,30 @@ export class CreateEventInput {
   @Type(() => CreateEventPaymentSettingInput)
   @IsOptional()
   paymentSetting?: CreateEventPaymentSettingInput;
+}
+
+@InputType()
+export class PromoteEventInput {
+  @Field(() => String)
+  @IsString()
+  eventSlug: string;
+
+  @Field(() => PromotionDuration)
+  @IsEnum(PromotionDuration)
+  duration: PromotionDuration;
+
+  @Field(() => Date)
+  startDate: Date;
+
+  @Field(() => Date)
+  endDate: Date;
+
+  @Field(() => PromotionImageSource)
+  @IsEnum(PromotionImageSource)
+  imageSource: PromotionImageSource;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
 }

@@ -4,6 +4,7 @@ query GetRegisteredAttendees($input: GetRegisteredAttendeesInput!) {
       id
       name
       email
+      mobileNumber
       passType
       ticketId
       registerDate

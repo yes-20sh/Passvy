@@ -1,0 +1,11 @@
+query GetEventPromotions($eventSlug: String!) {
+  getEventPromotions(eventSlug: $eventSlug) {
+    id
+    duration
+    startDate
+    endDate
+    imageSource
+    imageUrl
+    createdAt
+  }
+}

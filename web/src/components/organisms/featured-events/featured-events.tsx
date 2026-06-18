@@ -12,6 +12,8 @@ import {
   TypographyMuted,
   TypographySpan,
 } from '@/components/atoms/typography/typography';
+import { useQuery } from '@apollo/client/react';
+import { GetSavedEventsDocument, GetPassesDocument } from '@/gql/graphql';
 
 export interface FeaturedEventsProps {
   activeFeaturedTab: 'feature' | 'wishlist' | 'pass';
@@ -36,6 +38,102 @@ export const FeaturedEvents = ({
 
   const wishlistScrollRef = useRef<HTMLDivElement>(null);
   const passScrollRef = useRef<HTMLDivElement>(null);
+
+  const { data: savedEventsData, loading: savedEventsLoading } = useQuery(
+    GetSavedEventsDocument,
+    {
+      skip: !isAuthenticated || activeFeaturedTab !== 'wishlist',
+      variables: { input: { limit: 10 } },
+    },
+  );
+
+  const { data: passData, loading: passLoading } = useQuery(
+    GetPassesDocument,
+    {
+      skip: !isAuthenticated || activeFeaturedTab !== 'pass',
+    },
+  );
+
+  const wishlistEvents = React.useMemo(() => {
+    const formatTime12hr = (timeStr?: string | null) => {
+      if (!timeStr) return 'TBA';
+      const parts = timeStr.split(':');
+      if (parts.length >= 2) {
+        const h = parseInt(parts[0], 10);
+        const m = parts[1];
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return `${h12}:${m} ${ampm}`;
+      }
+      return timeStr;
+    };
+
+    return (
+      savedEventsData?.getSavedEvents?.events?.map((event) => ({
+        id: event.id,
+        slug: event.slug,
+        title: event.title,
+        image:
+          event.headerImage ||
+          'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
+        date: event.startDate
+          ? new Date(event.startDate as string).toLocaleDateString('en-US', {
+              month: 'short',
+              day: '2-digit',
+              year: 'numeric',
+            })
+          : 'TBA',
+        time: formatTime12hr(event.startTime),
+        tag: event.category || 'General',
+        price: event.passes?.[0]?.price?.toString() || 'Free',
+        location: event.mode?.city
+          ? `${event.mode.city}${event.mode.state ? `, ${event.mode.state}` : ''}`
+          : 'TBD',
+        isOnline: event.mode?.eventMode === 'ONLINE',
+        isSaved: event.isSaved,
+      })) || []
+    );
+  }, [savedEventsData]);
+
+  const passEvents = React.useMemo(() => {
+    const formatTime12hr = (timeStr?: string | null) => {
+      if (!timeStr) return 'TBA';
+      const parts = timeStr.split(':');
+      if (parts.length >= 2) {
+        const h = parseInt(parts[0], 10);
+        const m = parts[1];
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h % 12 || 12;
+        return `${h12}:${m} ${ampm}`;
+      }
+      return timeStr;
+    };
+
+    return (
+      passData?.getPasses?.map((pass) => ({
+        id: pass.event.id,
+        slug: pass.event.slug,
+        title: pass.event.title,
+        image:
+          pass.event.headerImage ||
+          'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
+        date: pass.event.startDate
+          ? new Date(pass.event.startDate as string).toLocaleDateString('en-US', {
+              month: 'short',
+              day: '2-digit',
+              year: 'numeric',
+            })
+          : 'TBA',
+        time: formatTime12hr(pass.event.startTime),
+        tag: pass.event.category || 'General',
+        price: pass.event.passes?.[0]?.price?.toString() || 'Free',
+        location: pass.event.mode?.city
+          ? `${pass.event.mode.city}${pass.event.mode.state ? `, ${pass.event.mode.state}` : ''}`
+          : 'TBD',
+        isOnline: pass.event.mode?.eventMode === 'ONLINE',
+      })) || []
+    );
+  }, [passData]);
 
   const scrollFeatured = (direction: 'left' | 'right') => {
     if (featuredScrollRef.current) {
@@ -204,24 +302,41 @@ export const FeaturedEvents = ({
             ref={wishlistScrollRef}
             className="flex scrollbar-none items-center gap-6 overflow-x-auto scroll-smooth px-1 py-2"
           >
-            {mockEvents.slice(1, 6).map((event) => (
-              <div
-                key={`wishlist-${event.id}`}
-                className="w-full shrink-0 md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
-              >
-                <EventCardHorizontal
-                  event={event}
-                  onRegister={(id) => {
-                    setRegisteredIds((prev) =>
-                      prev.includes(id) ? prev : [...prev, id],
-                    );
-                    alert(
-                      `Successfully registered for event: ${event.title} (ID: ${id})!`,
-                    );
-                  }}
-                />
+            {savedEventsLoading && wishlistEvents.length === 0 ? (
+              <div className="flex h-64 w-full items-center justify-center">
+                <span className="text-muted-foreground">
+                  Loading wishlist...
+                </span>
               </div>
-            ))}
+            ) : wishlistEvents.length > 0 ? (
+              wishlistEvents.map((event) => (
+                <div
+                  key={`wishlist-${event.id}`}
+                  className="w-full shrink-0 md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+                >
+                  <EventCardHorizontal
+                    event={event}
+                    onRegister={(id) => {
+                      setRegisteredIds((prev) =>
+                        prev.includes(id) ? prev : [...prev, id],
+                      );
+                      alert(
+                        `Successfully registered for event: ${event.title} (ID: ${id})!`,
+                      );
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="border-border bg-card/25 w-full rounded-2xl border border-dashed py-12 text-center shadow-inner backdrop-blur-sm">
+                <TypographyH4 className="text-foreground border-0 text-sm font-bold">
+                  No saved events
+                </TypographyH4>
+                <TypographyMuted className="mx-auto mt-1 max-w-xs text-xs">
+                  Save some events to see them here!
+                </TypographyMuted>
+              </div>
+            )}
           </div>
 
           {/* Right Scroll Button */}
@@ -237,57 +352,57 @@ export const FeaturedEvents = ({
 
       {/* Tab Content 3: Passes Carousel */}
       {activeFeaturedTab === 'pass' && (
-        <div>
-          {registeredIds.length > 0 ? (
-            <div className="group/pass-carousel relative">
-              {/* Left Scroll Button */}
-              <button
-                onClick={() => scrollPass('left')}
-                className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 left-0 z-30 hidden size-9 -translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/pass-carousel:opacity-100 active:scale-95 md:flex"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="size-5" />
-              </button>
+        <div className="group/pass-carousel relative">
+          {/* Left Scroll Button */}
+          <button
+            onClick={() => scrollPass('left')}
+            className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 left-0 z-30 hidden size-9 -translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/pass-carousel:opacity-100 active:scale-95 md:flex"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="size-5" />
+          </button>
 
-              {/* Carousel Track */}
-              <div
-                ref={passScrollRef}
-                className="flex scrollbar-none items-center gap-6 overflow-x-auto scroll-smooth px-1 py-2"
-              >
-                {mockEvents
-                  .filter((event) => registeredIds.includes(event.id))
-                  .map((event) => (
-                    <div
-                      key={`pass-${event.id}`}
-                      className="w-full shrink-0 md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
-                    >
-                      <EventPassCard event={event} />
-                    </div>
-                  ))}
+          {/* Carousel Track */}
+          <div
+            ref={passScrollRef}
+            className="flex scrollbar-none items-center gap-6 overflow-x-auto scroll-smooth px-1 py-2"
+          >
+            {passLoading && passEvents.length === 0 ? (
+              <div className="flex h-64 w-full items-center justify-center">
+                <span className="text-muted-foreground">Loading passes...</span>
               </div>
+            ) : passEvents.length > 0 ? (
+              passEvents.map((event) => (
+                <div
+                  key={`pass-${event.id}`}
+                  className="w-full shrink-0 md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+                >
+                  <EventPassCard event={event} />
+                </div>
+              ))
+            ) : (
+              <div className="border-border bg-card/25 w-full rounded-2xl border border-dashed py-12 text-center shadow-inner backdrop-blur-sm">
+                <Ticket className="text-muted-foreground/60 mx-auto mb-2 size-9 animate-pulse" />
+                <TypographyH4 className="text-foreground border-0 text-sm font-bold">
+                  No active passes
+                </TypographyH4>
+                <TypographyMuted className="mx-auto mt-1 max-w-xs text-xs">
+                  {
+                    'You haven\'t registered for any events yet. Click "Register Now" on any card to secure your pass!'
+                  }
+                </TypographyMuted>
+              </div>
+            )}
+          </div>
 
-              {/* Right Scroll Button */}
-              <button
-                onClick={() => scrollPass('right')}
-                className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 right-0 z-30 hidden size-9 translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/pass-carousel:opacity-100 active:scale-95 md:flex"
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="size-5" />
-              </button>
-            </div>
-          ) : (
-            <div className="border-border bg-card/25 rounded-2xl border border-dashed py-12 text-center shadow-inner backdrop-blur-sm">
-              <Ticket className="text-muted-foreground/60 mx-auto mb-2 size-9 animate-pulse" />
-              <TypographyH4 className="text-foreground border-0 text-sm font-bold">
-                No active passes
-              </TypographyH4>
-              <TypographyMuted className="mx-auto mt-1 max-w-xs text-xs">
-                {
-                  'You haven\'t registered for any events yet. Click "Register Now" on any card to secure your pass!'
-                }
-              </TypographyMuted>
-            </div>
-          )}
+          {/* Right Scroll Button */}
+          <button
+            onClick={() => scrollPass('right')}
+            className="border-border bg-background/95 text-foreground hover:bg-secondary absolute top-1/2 right-0 z-30 hidden size-9 translate-x-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover/pass-carousel:opacity-100 active:scale-95 md:flex"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="size-5" />
+          </button>
         </div>
       )}
     </div>

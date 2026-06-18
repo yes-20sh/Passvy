@@ -21,6 +21,8 @@ import { EventCouponSchema } from './event-coupon.schema';
 import type { EventCouponSchema as IEventCouponSchema } from './event-coupon.schema';
 import { EventPaymentSettingSchema } from './event-payment-setting.schema';
 import type { EventPaymentSettingSchema as IEventPaymentSettingSchema } from './event-payment-setting.schema';
+import { EventPromotionSchema } from './event-promotion.schema';
+import type { EventPromotionSchema as IEventPromotionSchema } from './event-promotion.schema';
 import { UserSchema } from './user.schema';
 
 @ObjectType()
@@ -106,6 +108,12 @@ export class EventSchema {
     cascade: true,
   })
   mode: IEventModeSchema;
+
+  @Field(() => [EventPromotionSchema], { nullable: true })
+  @OneToMany(() => EventPromotionSchema, (promotion) => promotion.event, {
+    cascade: true,
+  })
+  promotions: IEventPromotionSchema[];
 
   @Field()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

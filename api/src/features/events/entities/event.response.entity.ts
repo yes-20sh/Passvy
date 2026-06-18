@@ -8,4 +8,7 @@ export class EventResponse {
 
   @Field(() => EventSchema, { nullable: true })
   event?: EventSchema;
+
+  @Field(() => Boolean, { nullable: true })
+  isSaved?: boolean;
 }

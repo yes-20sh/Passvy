@@ -34,6 +34,10 @@ export class EventRegistrationSchema {
   @Column({ type: 'varchar', nullable: true })
   mobileNumber: string | null;
 
+  @Field(() => Boolean)
+  @Column({ type: 'boolean', default: false })
+  isCheckedIn: boolean;
+
   @Field()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

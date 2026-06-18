@@ -84,6 +84,9 @@ export class RegisteredAttendeeData {
   @Field(() => String)
   email: string;
 
+  @Field(() => String, { nullable: true })
+  mobileNumber?: string | null;
+
   @Field(() => String)
   passType: string;
 

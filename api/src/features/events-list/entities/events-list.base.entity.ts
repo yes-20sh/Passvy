@@ -32,4 +32,7 @@ export class EventListBaseEntity extends PickType(EventSchema, [
 
   @Field(() => [EventListPassEntity], { nullable: true })
   passes?: EventListPassEntity[];
+
+  @Field(() => Boolean, { nullable: true })
+  isSaved?: boolean;
 }

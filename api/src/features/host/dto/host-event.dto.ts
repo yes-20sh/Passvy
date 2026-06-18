@@ -40,3 +40,12 @@ export class GetRegisteredAttendeesInput {
   @Field(() => Int, { defaultValue: 10 })
   limit: number;
 }
+
+@InputType()
+export class ExportRegisteredAttendeesInput {
+  @Field(() => String)
+  slug: string;
+
+  @Field(() => [String])
+  columns: string[];
+}

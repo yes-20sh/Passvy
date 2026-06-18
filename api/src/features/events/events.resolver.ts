@@ -2,7 +2,8 @@ import { Resolver, Mutation, Query, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { EventSchema } from '@/schemas/event.schema';
-import { CreateEventInput } from './dto/event.dto';
+import { EventPromotionSchema } from '@/schemas/event-promotion.schema';
+import { CreateEventInput, PromoteEventInput } from './dto/event.dto';
 import { EventResponse } from './entities/event.response.entity';
 import { CurrentUser } from '@/decorator/current-user.decorator';
 import { RolesGuard } from '@/guards/roles.guard';
@@ -32,12 +33,35 @@ export class EventsResolver {
     @CurrentUser() user: JwtUser,
     @Args('slug') slug: string,
   ): Promise<EventResponse> {
-    return this.eventsService.getEvent(slug, user.sub);
+    return this.eventsService.getEvent(slug, user.sub, true);
   }
 
   @Query(() => EventResponse)
   @Public()
-  async getEventDetail(@Args('slug') slug: string): Promise<EventResponse> {
-    return this.eventsService.getEvent(slug);
+  async getEventDetail(
+    @Args('slug') slug: string,
+    @CurrentUser() user?: JwtUser,
+  ): Promise<EventResponse> {
+    return this.eventsService.getEvent(slug, user?.sub);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(RolesGuard)
+  @Roles(Role.USER)
+  async promoteEvent(
+    @CurrentUser() user: JwtUser,
+    @Args('input') input: PromoteEventInput,
+  ): Promise<boolean> {
+    return this.eventsService.promoteEvent(user.sub, input);
+  }
+
+  @Query(() => [EventPromotionSchema])
+  @UseGuards(RolesGuard)
+  @Roles(Role.USER)
+  async getEventPromotions(
+    @CurrentUser() user: JwtUser,
+    @Args('eventSlug') eventSlug: string,
+  ): Promise<EventPromotionSchema[]> {
+    return this.eventsService.getEventPromotions(user.sub, eventSlug);
   }
 }

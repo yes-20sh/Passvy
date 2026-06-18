@@ -8,6 +8,7 @@ import { EventsModule } from './features/events/events.module';
 import { EventsListModule } from './features/events-list/events-list.module';
 import { EventRegistrationModule } from './features/event-registration/event-registration.module';
 import { HostModule } from './features/host/host.module';
+import { PassModule } from './features/pass/pass.module';
 import { MailModule } from './config/mail/mail.module';
 import { PaginationModule } from './service/pagination/pagination.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
@@ -25,6 +26,7 @@ import { JwtModule } from '@nestjs/jwt';
     EventsListModule,
     EventRegistrationModule,
     HostModule,
+    PassModule,
     MailModule,
     PaginationModule,
     JwtModule.register({ secret: process.env.JWT_SECRET || 'fallback' }),

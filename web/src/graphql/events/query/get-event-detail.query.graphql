@@ -1,6 +1,7 @@
 query GetEventDetail($slug: String!) {
   getEventDetail(slug: $slug) {
     message
+    isSaved
     event {
       id
       title

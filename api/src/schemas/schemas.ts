@@ -5,6 +5,8 @@ import { EventPassSchema } from './event-pass.schema';
 import { EventCouponSchema } from './event-coupon.schema';
 import { EventPaymentSettingSchema } from './event-payment-setting.schema';
 import { EventModeSchema } from './event-mode.schema';
+import { EventPromotionSchema } from './event-promotion.schema';
+import { SavedEventSchema } from './saved-event.schema';
 
 const SCHEMAS = [
   UserSchema,
@@ -14,6 +16,8 @@ const SCHEMAS = [
   EventCouponSchema,
   EventPaymentSettingSchema,
   EventModeSchema,
+  EventPromotionSchema,
+  SavedEventSchema,
 ];
 
 export default SCHEMAS;
