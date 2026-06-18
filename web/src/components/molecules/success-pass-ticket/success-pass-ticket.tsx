@@ -4,18 +4,14 @@ import Image from "next/image";
 import { Calendar, QrCode } from "lucide-react";
 import { Badge } from "@/components/atoms/badge/badge";
 import { Button } from "@/components/atoms/button/button";
-import { type EventData } from "@/components/molecules/event-card/event-card";
-import {
-  type Attendee,
-  PassType,
-  PassCategory,
-} from "@/app/(main)/events/[id]/register/page";
+import { type EventDetailState } from "@/store/slices/event-detail.slice";
+import { type Attendee } from "@/app/(main)/events/[id]/register/page";
 
 export interface SuccessPassTicketProps {
-  event: EventData;
+  event: EventDetailState;
   userName: string;
-  selectedPass: PassType;
-  selectedCategory: PassCategory;
+  passTierName: string;
+  passCategoryName: string;
   totalTickets: number;
   ticketCode: string;
   calculatedTotal: string;
@@ -65,8 +61,8 @@ const BARCODE_PATTERN: BarcodeBar[] = [
 export function SuccessPassTicket({
   event,
   userName,
-  selectedPass,
-  selectedCategory,
+  passTierName,
+  passCategoryName,
   totalTickets,
   ticketCode,
   calculatedTotal,
@@ -79,6 +75,9 @@ export function SuccessPassTicket({
   isCheckout = false,
 }: SuccessPassTicketProps) {
   const { title, image, date, tag } = event;
+
+  const isVip = passTierName.toLowerCase().includes('vip');
+  const isVvip = passTierName.toLowerCase().includes('vvip') || passTierName.toLowerCase().includes('premium');
 
   return (
     <div className="flex flex-col items-center w-full max-w-md gap-6 text-center">
@@ -100,8 +99,8 @@ export function SuccessPassTicket({
         <div className="flex gap-4">
           <div className="relative w-24 h-24 aspect-square rounded-xl overflow-hidden bg-muted shrink-0 shadow-inner">
             <Image
-              src={image}
-              alt={title}
+              src={image || "/placeholder.svg"}
+              alt={title || "Event Image"}
               fill
               sizes="96px"
               className="object-cover"
@@ -116,19 +115,19 @@ export function SuccessPassTicket({
                   variant={null}
                   className="bg-indigo-600/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border-0 font-bold text-[10px] px-2 py-0.5 rounded"
                 >
-                  {tag}
+                  {tag || "EVENT"}
                 </Badge>
                 <Badge
                   variant={null}
                   className="bg-amber-500/20 text-amber-700 dark:text-amber-300 border-0 font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded"
                 >
-                  {selectedPass} PASS
+                  {passTierName}
                 </Badge>
                 <Badge
                   variant={null}
                   className="bg-indigo-500/20 text-indigo-700 dark:bg-indigo-500/30 border-0 font-extrabold text-[10px] uppercase tracking-wide px-2 py-0.5 rounded"
                 >
-                  {selectedCategory}
+                  {passCategoryName}
                 </Badge>
               </div>
               <h3 className="text-base font-bold leading-snug text-foreground line-clamp-2">
@@ -169,7 +168,7 @@ export function SuccessPassTicket({
             FREE GIFTS INCLUDED
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1 text-foreground">
-            {selectedPass === PassType.GA && (
+            {!isVip && !isVvip && (
               <>
                 <div className="p-2.5 bg-secondary/35 border border-border/80 rounded-lg flex items-center gap-2 text-xs font-bold text-foreground">
                   <span className="text-base shrink-0 select-none">🎨</span>
@@ -181,7 +180,7 @@ export function SuccessPassTicket({
                 </div>
               </>
             )}
-            {selectedPass === PassType.VIP && (
+            {isVip && !isVvip && (
               <>
                 <div className="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-300">
                   <span className="text-base shrink-0 select-none">🎫</span>
@@ -197,7 +196,7 @@ export function SuccessPassTicket({
                 </div>
               </>
             )}
-            {selectedPass === PassType.VVIP && (
+            {isVvip && (
               <>
                 <div className="p-2.5 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center gap-2 text-xs font-bold text-purple-700 dark:text-purple-300">
                   <span className="text-base shrink-0 select-none">🤝</span>
@@ -240,21 +239,28 @@ export function SuccessPassTicket({
                 },
                 0,
               );
-              let currentX = (100 - barcodeContentWidth) / 2;
-              return BARCODE_PATTERN.map((bar, index) => {
-                const x = currentX;
-                currentX += bar.width + bar.gap;
-                return (
-                  <rect
-                    key={index}
-                    x={x}
-                    y="0"
-                    width={bar.width}
-                    height="20"
-                    fill="currentColor"
-                  />
-                );
-              });
+              
+              const startX = (100 - barcodeContentWidth) / 2;
+              
+              const { elements } = BARCODE_PATTERN.reduce(
+                (acc, bar, index) => {
+                  acc.elements.push(
+                    <rect
+                      key={index}
+                      x={acc.currentX}
+                      y="0"
+                      width={bar.width}
+                      height="20"
+                      fill="currentColor"
+                    />
+                  );
+                  acc.currentX += bar.width + bar.gap;
+                  return acc;
+                },
+                { currentX: startX, elements: [] as React.ReactNode[] }
+              );
+              
+              return elements;
             })()}
           </svg>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground tracking-widest font-semibold uppercase">
@@ -291,10 +297,10 @@ export function SuccessPassTicket({
                 Ticket Info
               </span>
               <span className="font-bold text-foreground text-sm block">
-                {selectedPass} Pass
+                {passTierName} Pass
               </span>
               <span className="text-muted-foreground block">
-                {selectedCategory} Category
+                {passCategoryName} Category
               </span>
               <span className="text-muted-foreground block">
                 {totalTickets} Ticket(s)
@@ -368,7 +374,7 @@ export function SuccessPassTicket({
           </div>
           <div className="flex flex-col gap-0.5 border-l border-border/40 pl-3 min-w-0">
             <span className="text-muted-foreground/60 uppercase tracking-wider text-[9px] font-semibold">Pass</span>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px] sm:text-xs truncate">{selectedPass} Pass</span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400 text-[11px] sm:text-xs truncate">{passTierName} Pass</span>
           </div>
           <div className="flex flex-col gap-0.5 border-l border-border/40 pl-3 min-w-0">
             <span className="text-muted-foreground/60 uppercase tracking-wider text-[9px] font-semibold">Register ID</span>
@@ -396,4 +402,3 @@ export function SuccessPassTicket({
     </div>
   );
 }
-

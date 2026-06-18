@@ -1,0 +1,22 @@
+query GetRegisteredAttendees($input: GetRegisteredAttendeesInput!) {
+  getRegisteredAttendees(input: $input) {
+    data {
+      id
+      name
+      email
+      passType
+      ticketId
+      registerDate
+      status
+    }
+    meta {
+      totalItems
+      itemCount
+      itemsPerPage
+      totalPages
+      currentPage
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}

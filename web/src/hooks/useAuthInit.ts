@@ -27,6 +27,8 @@ export const useAuthInit = () => {
           dispatch(
             login({
               email: data.getSettings.data.email ?? '',
+              fullName: data.getSettings.data.fullName ?? '',
+              mobileNumber: data.getSettings.data.mobileNumber ?? '',
             }),
           );
         } else {

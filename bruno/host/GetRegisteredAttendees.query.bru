@@ -1,0 +1,50 @@
+meta {
+  name: GetRegisteredAttendees
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query GetRegisteredAttendees($input: GetRegisteredAttendeesInput!) {
+    getRegisteredAttendees(input: $input) {
+      data {
+        id
+        name
+        email
+        passType
+        ticketId
+        registerDate
+        status
+      }
+      meta {
+        totalItems
+        itemCount
+        itemsPerPage
+        totalPages
+        currentPage
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "slug": "test-event",
+      "page": 1,
+      "limit": 10
+    }
+  }
+}

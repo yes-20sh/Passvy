@@ -1,0 +1,42 @@
+meta {
+  name: GetHostEvents
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query GetHostEvents($input: GetHostEventsInput!) {
+    getHostEvents(input: $input) {
+      events {
+        id
+        slug
+        headerImage
+        title
+        registeredCount
+        startDate
+        startTime
+        endDate
+        endTime
+        status
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "filter": "UPCOMING"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+mutation CreateEventRegistration($input: CreateEventRegistrationInput!) {
+  createEventRegistration(input: $input) {
+    message
+  }
+}

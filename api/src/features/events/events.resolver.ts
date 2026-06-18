@@ -9,6 +9,7 @@ import { RolesGuard } from '@/guards/roles.guard';
 import { Roles } from '@/decorator/roles.decorator';
 import { Role } from '@/enum';
 import type { JwtUser } from '@/interface';
+import { Public } from '@/decorator/public.decorator';
 
 @Resolver(() => EventSchema)
 export class EventsResolver {
@@ -31,6 +32,12 @@ export class EventsResolver {
     @CurrentUser() user: JwtUser,
     @Args('slug') slug: string,
   ): Promise<EventResponse> {
-    return this.eventsService.getEvent(user.sub, slug);
+    return this.eventsService.getEvent(slug, user.sub);
+  }
+
+  @Query(() => EventResponse)
+  @Public()
+  async getEventDetail(@Args('slug') slug: string): Promise<EventResponse> {
+    return this.eventsService.getEvent(slug);
   }
 }

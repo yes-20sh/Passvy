@@ -282,7 +282,9 @@ export const FeaturedEvents = ({
                 No active passes
               </TypographyH4>
               <TypographyMuted className="mx-auto mt-1 max-w-xs text-xs">
-                {"You haven't registered for any events yet. Click \"Register Now\" on any card to secure your pass!"}
+                {
+                  'You haven\'t registered for any events yet. Click "Register Now" on any card to secure your pass!'
+                }
               </TypographyMuted>
             </div>
           )}

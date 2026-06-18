@@ -1,32 +1,41 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { Badge } from "@/components/atoms/badge/badge";
-import { Button } from "@/components/atoms/button/button";
-import { Input } from "@/components/atoms/input/input";
-import { Label } from "@/components/atoms/label/label";
-import { CreditCard, Wallet, Coins, Percent, ArrowLeft, ShieldCheck } from "lucide-react";
-import { PassType, PassCategory } from "@/app/(main)/events/[id]/register/page";
+import React, { useState } from 'react';
+import { Badge } from '@/components/atoms/badge/badge';
+import { Button } from '@/components/atoms/button/button';
+import { Input } from '@/components/atoms/input/input';
+import { Label } from '@/components/atoms/label/label';
+import {
+  CreditCard,
+  Wallet,
+  Coins,
+  Percent,
+  ArrowLeft,
+  ShieldCheck,
+  Hash,
+  Banknote,
+} from 'lucide-react';
 
 export interface PaymentFormProps {
   userName: string;
   userEmail: string;
-  selectedPass: PassType;
-  selectedCategory: PassCategory;
   passTierName: string;
   passCategoryName: string;
   totalTickets: number;
   rawAmount: number;
   onBack: () => void;
-  onPaymentSuccess: (couponCode: string, paymentMethod: string, finalPaid: number) => void;
+  onPaymentSuccess: (
+    couponCode: string,
+    paymentMethod: string,
+    finalPaid: number,
+  ) => void;
   onCouponApply?: (discountPercentage: number) => void;
   onCouponRemove?: () => void;
 }
 
 export enum PaymentMethod {
-  CARD = "CARD",
-  WALLET = "WALLET",
-  CRYPTO = "CRYPTO"
+  RAZORPAY = 'RAZORPAY',
+  CHECKIN = 'CHECKIN',
 }
 
 export interface CouponDetails {
@@ -36,15 +45,21 @@ export interface CouponDetails {
 }
 
 const MOCK_COUPONS: CouponDetails[] = [
-  { code: "PASSVY20", discountPercentage: 20, description: "20% off your entire order!" },
-  { code: "WELCOME10", discountPercentage: 10, description: "10% off for new attendees!" }
+  {
+    code: 'PASSVY20',
+    discountPercentage: 20,
+    description: '20% off your entire order!',
+  },
+  {
+    code: 'WELCOME10',
+    discountPercentage: 10,
+    description: '10% off for new attendees!',
+  },
 ];
 
 export function PaymentForm({
   userName,
   userEmail,
-  selectedPass,
-  selectedCategory,
   passTierName,
   passCategoryName,
   totalTickets,
@@ -54,29 +69,28 @@ export function PaymentForm({
   onCouponApply,
   onCouponRemove,
 }: PaymentFormProps) {
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(PaymentMethod.CARD);
-  const [couponInput, setCouponInput] = useState<string>("");
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(
+    PaymentMethod.CHECKIN,
+  );
+  const [couponInput, setCouponInput] = useState<string>('');
   const [activeCoupon, setActiveCoupon] = useState<CouponDetails | null>(null);
-  const [couponError, setCouponError] = useState<string>("");
+  const [couponError, setCouponError] = useState<string>('');
 
-  // Card details state
-  const [cardNumber, setCardNumber] = useState<string>("");
-  const [expiry, setExpiry] = useState<string>("");
-  const [cvv, setCvv] = useState<string>("");
-
-  const couponDiscount = activeCoupon ? Math.round(rawAmount * (activeCoupon.discountPercentage / 100)) : 0;
+  const couponDiscount = activeCoupon
+    ? Math.round(rawAmount * (activeCoupon.discountPercentage / 100))
+    : 0;
   const finalPaid = Math.max(0, rawAmount - couponDiscount);
 
   const handleApplyCoupon = () => {
-    setCouponError("");
+    setCouponError('');
     const codeUpper = couponInput.trim().toUpperCase();
     const found = MOCK_COUPONS.find((c) => c.code === codeUpper);
     if (found) {
       setActiveCoupon(found);
-      setCouponInput("");
+      setCouponInput('');
       onCouponApply?.(found.discountPercentage);
     } else {
-      setCouponError("Invalid coupon code. Try PASSVY20 or WELCOME10");
+      setCouponError('Invalid coupon code. Try PASSVY20 or WELCOME10');
     }
   };
 
@@ -87,22 +101,16 @@ export function PaymentForm({
 
   const handlePay = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (selectedMethod === PaymentMethod.CARD) {
-      if (!cardNumber || !expiry || !cvv) {
-        alert("Please fill in your card details.");
-        return;
-      }
-    }
-    onPaymentSuccess(activeCoupon?.code || "", selectedMethod, finalPaid);
+    onPaymentSuccess(activeCoupon?.code || '', selectedMethod, finalPaid);
   };
 
   return (
-    <div className="lg:col-span-3 flex flex-col gap-6 text-left w-full">
+    <div className="flex w-full flex-col gap-6 text-left lg:col-span-3">
       {/* Back button */}
       <div>
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
+          className="text-muted-foreground hover:text-foreground group flex cursor-pointer items-center gap-2 text-xs font-bold transition-colors"
         >
           <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
           <span>Edit Registration Info</span>
@@ -110,210 +118,124 @@ export function PaymentForm({
       </div>
 
       <div className="space-y-1">
-        <h2 className="text-2xl font-black tracking-tight text-foreground">Secure Payment</h2>
-        <p className="text-xs text-muted-foreground">Select your payment method and apply coupons to complete checkout.</p>
+        <h2 className="text-foreground text-2xl font-black tracking-tight">
+          Secure Payment
+        </h2>
+        <p className="text-muted-foreground text-xs">
+          Select your payment method and apply coupons to complete checkout.
+        </p>
       </div>
 
       {/* User details and tier summary review */}
-      <div className="p-4 border border-border/60 rounded-xl bg-secondary/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="border-border/60 bg-secondary/15 flex flex-col justify-between gap-4 rounded-xl border p-4 sm:flex-row sm:items-center">
         <div className="space-y-1">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Registration Review</span>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-extrabold text-sm text-foreground">{userName}</span>
-            <span className="text-xs text-muted-foreground">({userEmail})</span>
+          <span className="text-muted-foreground text-[10px] font-bold tracking-wider uppercase">
+            Registration Review
+          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-foreground text-sm font-extrabold">
+              {userName}
+            </span>
+            <span className="text-muted-foreground text-xs">({userEmail})</span>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             {passTierName} • {passCategoryName} • {totalTickets} Ticket(s)
           </p>
-        </div>
-        <div className="flex gap-2">
-          <Badge variant={null} className="bg-indigo-600/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 font-extrabold text-[9px] uppercase px-2 py-0.5 rounded border-0">
-            {selectedPass}
-          </Badge>
-          <Badge variant={null} className="bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/25 dark:text-indigo-300 font-extrabold text-[9px] uppercase px-2 py-0.5 rounded border-0">
-            {selectedCategory}
-          </Badge>
         </div>
       </div>
 
       <hr className="border-border/40" />
 
       {/* Coupon code section */}
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <Label className="text-xs font-extrabold uppercase tracking-wider block">Promo Codes / Coupons</Label>
-        {!activeCoupon ? (
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                type="text"
-                placeholder="Enter promo code (e.g., PASSVY20)"
-                value={couponInput}
-                onChange={(e) => {
-                  setCouponInput(e.target.value);
-                  setCouponError("");
-                }}
-                className="pr-10 h-10 text-xs"
-              />
-              <Percent className="size-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            </div>
-            <Button
-              type="button"
-              onClick={handleApplyCoupon}
-              className="bg-indigo-600 text-white font-bold h-10 px-4 rounded-lg text-xs animate-none transition-all active:scale-[0.98]"
-            >
-              Apply
-            </Button>
+        <div className="flex gap-2 relative opacity-70 cursor-not-allowed group">
+          <div className="relative flex-1">
+            <Input
+              type="text"
+              placeholder="Promo codes coming soon"
+              disabled
+              className="pr-10 h-10 text-xs cursor-not-allowed bg-secondary/20 pointer-events-none"
+            />
+            <Percent className="size-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           </div>
-        ) : (
-          <div className="p-3 border border-emerald-500/20 bg-emerald-500/5 rounded-xl flex items-center justify-between gap-4 animate-none">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <Badge variant={null} className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-0 font-black text-[10px] px-1.5 py-0.5 rounded uppercase">
-                  {activeCoupon.code}
-                </Badge>
-                <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
-                  {activeCoupon.discountPercentage}% Off Applied!
-                </span>
-              </div>
-              <p className="text-[10px] text-muted-foreground">{activeCoupon.description}</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleRemoveCoupon}
-              className="text-[10px] font-bold text-rose-500 hover:underline cursor-pointer"
-            >
-              Remove
-            </button>
+          <Button
+            type="button"
+            disabled
+            className="bg-indigo-600/50 text-white font-bold h-10 px-4 rounded-lg text-xs animate-none transition-all cursor-not-allowed pointer-events-none"
+          >
+            Apply
+          </Button>
+          <div className="absolute -top-2.5 -right-1 bg-secondary text-[9px] font-bold py-0.5 px-2 rounded-full border border-border shadow-sm text-foreground uppercase tracking-wider">
+            Coming Soon
           </div>
-        )}
-        {couponError && <p className="text-[10px] font-semibold text-rose-500">{couponError}</p>}
-      </div>
+        </div>
+      </div> */}
 
       <hr className="border-border/40" />
 
       {/* Payment methods section */}
       <div className="space-y-3">
-        <Label className="text-xs font-extrabold uppercase tracking-wider block">Select Payment Mode</Label>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* Card Method */}
+        <Label className="block text-xs font-extrabold tracking-wider uppercase">
+          Select Payment Mode
+        </Label>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+          {/* CHECK-IN */}
           <div
-            onClick={() => setSelectedMethod(PaymentMethod.CARD)}
-            className={`p-4 border rounded-xl cursor-pointer select-none transition-all flex flex-col items-center justify-center gap-2 text-center ${
-              selectedMethod === PaymentMethod.CARD
-                ? "ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5"
-                : "border-border hover:border-indigo-600 bg-secondary/10"
+            onClick={() => setSelectedMethod(PaymentMethod.CHECKIN)}
+            className={`relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-4 text-center transition-all select-none ${
+              selectedMethod === PaymentMethod.CHECKIN
+                ? 'border-indigo-600 bg-indigo-600/5 ring-2 ring-indigo-600'
+                : 'border-border bg-secondary/10 hover:border-indigo-600'
             }`}
           >
-            <CreditCard className="size-5 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-extrabold text-xs text-foreground">Credit Card</span>
+            <Hash className="size-5 text-indigo-600 dark:text-indigo-400" />
+            <span className="text-foreground text-xs leading-tight font-extrabold">
+              Pay at
+              <br />
+              Check-in
+            </span>
           </div>
 
-          {/* Wallet Method */}
-          <div
-            onClick={() => setSelectedMethod(PaymentMethod.WALLET)}
-            className={`p-4 border rounded-xl cursor-pointer select-none transition-all flex flex-col items-center justify-center gap-2 text-center ${
-              selectedMethod === PaymentMethod.WALLET
-                ? "ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5"
-                : "border-border hover:border-indigo-600 bg-secondary/10"
-            }`}
+          {/* RAZORPAY */}
+          <button
+            type="button"
+            disabled
+            className="border-border/60 bg-secondary/20 text-muted-foreground relative flex cursor-not-allowed flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border p-4 text-center opacity-70"
           >
-            <Wallet className="size-5 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-extrabold text-xs text-foreground">Passvy Wallet</span>
-          </div>
-
-          {/* Crypto Method */}
-          <div
-            onClick={() => setSelectedMethod(PaymentMethod.CRYPTO)}
-            className={`p-4 border rounded-xl cursor-pointer select-none transition-all flex flex-col items-center justify-center gap-2 text-center ${
-              selectedMethod === PaymentMethod.CRYPTO
-                ? "ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5"
-                : "border-border hover:border-indigo-600 bg-secondary/10"
-            }`}
-          >
-            <Coins className="size-5 text-indigo-600 dark:text-indigo-400" />
-            <span className="font-extrabold text-xs text-foreground">Cryptocurrency</span>
-          </div>
+            <Banknote className="size-5" />
+            <span className="text-xs font-extrabold">Razorpay</span>
+            <div className="bg-secondary absolute inset-x-0 top-0 py-0.5 text-center text-[9px] font-bold">
+              Coming Soon
+            </div>
+          </button>
         </div>
       </div>
 
       {/* Dynamic Payment fields based on selected payment mode */}
       <form onSubmit={handlePay} className="space-y-4">
-        {selectedMethod === PaymentMethod.CARD && (
-          <div className="p-4 border border-border/40 rounded-xl bg-secondary/5 space-y-3.5">
-            <div className="space-y-1.5 text-left">
-              <Label htmlFor="cardNumber">Card Number</Label>
-              <div className="relative">
-                <Input
-                  id="cardNumber"
-                  type="text"
-                  placeholder="4111 2222 3333 4444"
-                  maxLength={19}
-                  required
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  className="pr-10"
-                />
-                <CreditCard className="size-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5 text-left">
-                <Label htmlFor="expiry">Expiry Date</Label>
-                <Input
-                  id="expiry"
-                  type="text"
-                  placeholder="MM/YY"
-                  maxLength={5}
-                  required
-                  value={expiry}
-                  onChange={(e) => setExpiry(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5 text-left">
-                <Label htmlFor="cvv">CVV</Label>
-                <Input
-                  id="cvv"
-                  type="password"
-                  placeholder="123"
-                  maxLength={4}
-                  required
-                  value={cvv}
-                  onChange={(e) => setCvv(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {selectedMethod === PaymentMethod.WALLET && (
-          <div className="p-4 border border-indigo-500/20 rounded-xl bg-indigo-500/5 space-y-2 text-center">
-            <ShieldCheck className="size-8 text-indigo-600 dark:text-indigo-400 mx-auto" />
-            <span className="font-extrabold text-xs text-foreground block">Passvy One-Click Pay</span>
-            <p className="text-[10px] text-muted-foreground max-w-xs mx-auto">
-              Pay instantly using your encrypted Passvy Balance. Wallet discount applied.
+        {selectedMethod === PaymentMethod.CHECKIN && (
+          <div className="space-y-2 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 text-center">
+            <Hash className="mx-auto size-8 text-indigo-600 dark:text-indigo-400" />
+            <span className="text-foreground block text-xs font-extrabold">
+              Pay at Venue
+            </span>
+            <p className="text-muted-foreground mx-auto max-w-xs text-[10px]">
+              You have chosen to pay later. Please prepare your payment for when
+              you check in at the event location.
             </p>
           </div>
         )}
 
-        {selectedMethod === PaymentMethod.CRYPTO && (
-          <div className="p-4 border border-amber-500/20 rounded-xl bg-amber-500/5 space-y-2 text-center">
-            <Coins className="size-8 text-amber-500 mx-auto" />
-            <span className="font-extrabold text-xs text-foreground block">Web3 Cryptographic Pay</span>
-            <p className="text-[10px] text-muted-foreground max-w-xs mx-auto">
-              Scan dynamic QR Code in next step to secure your seats via USDC / BTC / ETH.
-            </p>
-          </div>
-        )}
-
-        <Button
-          type="submit"
-          className="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg py-2.5 shadow-sm transition-all active:scale-[0.98] mt-4 cursor-pointer text-xs uppercase tracking-wider"
-        >
-          Pay & Confirm • {finalPaid === 0 ? "Free" : `$${finalPaid}`}
-        </Button>
+        <div className="border-border/50 flex justify-end border-t pt-4">
+          <Button
+            type="submit"
+            className="h-9 cursor-pointer rounded-lg bg-indigo-700 px-8 text-xs font-bold tracking-wider text-white uppercase shadow-sm transition-all hover:bg-indigo-600 active:scale-[0.98]"
+          >
+            Pay & Confirm • {finalPaid === 0 ? 'Free' : `$${finalPaid}`}
+          </Button>
+        </div>
       </form>
     </div>
   );
 }
-

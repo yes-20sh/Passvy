@@ -1,0 +1,19 @@
+query GetHostEvents($input: GetHostEventsInput!) {
+  getHostEvents(input: $input) {
+    events {
+      id
+      slug
+      headerImage
+      title
+      category
+      registeredCount
+      startDate
+      startTime
+      endDate
+      endTime
+      location
+      isOnline
+      status
+    }
+  }
+}

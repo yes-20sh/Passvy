@@ -1,7 +1,6 @@
 query GetEvent($slug: String!) {
   getEvent(slug: $slug) {
     message
-    statusCode
     event {
       id
       title

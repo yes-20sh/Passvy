@@ -4,8 +4,8 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "builder": "swc",
     "typeCheck": true,
-    "assets": ["**/*.json"]
+    "assets": ["**/*.json"],
+    "builder": "swc"
   }
 }

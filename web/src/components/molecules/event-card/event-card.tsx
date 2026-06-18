@@ -29,9 +29,12 @@ export interface EventData {
 export interface EventCardProps {
   event: EventData;
   onRegister?: (eventId: string) => void;
+  priority?: boolean;
+  buttonText?: string;
+  passLabel?: string;
 }
 
-export function EventCard({ event, onRegister }: EventCardProps) {
+export function EventCard({ event, onRegister, priority = false, buttonText = "Register Now", passLabel = "Passes" }: EventCardProps) {
   const { id, slug, title, image, date, time, tag, price, location, passCount, isOnline } = event;
 
   const handleRegisterClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -52,6 +55,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
           src={image}
           alt={title}
           fill
+          priority={priority}
           sizes="(max-width: 768px)  100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-500"
         />
@@ -60,7 +64,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
 
         {/* Pass Count Badge */}
         <Badge className="absolute top-2 right-2 z-20 bg-background/80 text-foreground backdrop-blur-md border-0 pointer-events-none px-2 py-0.5 text-xs font-semibold">
-          {passCount || 24} Passes
+          {passCount ?? 0} {passLabel}
         </Badge>
       </Link>
 
@@ -116,7 +120,7 @@ export function EventCard({ event, onRegister }: EventCardProps) {
           size="sm"
           className="group/btn gap-1.5 bg-indigo-700 text-white hover:bg-indigo-600 active:translate-y-px transition-all rounded-full text-[13px] px-4 font-semibold shadow-sm"
         >
-          <span>Register Now</span>
+          <span>{buttonText}</span>
           <ArrowUpRight className="size-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
         </Button>
       </CardFooter>

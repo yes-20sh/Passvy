@@ -5,13 +5,11 @@ import { Input } from "@/components/atoms/input/input";
 import { Label } from "@/components/atoms/label/label";
 import { Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  PassType,
-  PassCategory,
   type Attendee,
   type Friend,
-  type CategoryDetails,
-  type PassDetails,
 } from "@/app/(main)/events/[id]/register/page";
+import { type EventPass } from "@/store/slices/event-detail.slice";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 export interface RegisterFormProps {
   userName: string;
@@ -20,10 +18,8 @@ export interface RegisterFormProps {
   setUserEmail: (val: string) => void;
   userPhone: string;
   setUserPhone: (val: string) => void;
-  selectedPass: PassType;
-  setSelectedPass: (val: PassType) => void;
-  selectedCategory: PassCategory;
-  setSelectedCategory: (val: PassCategory) => void;
+  selectedPassId: string;
+  setSelectedPassId: (val: string) => void;
   attendees: Attendee[];
   setAttendees: React.Dispatch<React.SetStateAction<Attendee[]>>;
   searchQuery: string;
@@ -36,8 +32,7 @@ export interface RegisterFormProps {
   setInviteEmail: (val: string) => void;
   buddyShortage: number;
   calculatedTotal: string;
-  categoryOptions: CategoryDetails[];
-  passOptions: PassDetails[];
+  passes: EventPass[];
   mockFriends: Friend[];
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
@@ -49,10 +44,8 @@ export function RegisterForm({
   setUserEmail,
   userPhone,
   setUserPhone,
-  selectedPass,
-  setSelectedPass,
-  selectedCategory,
-  setSelectedCategory,
+  selectedPassId,
+  setSelectedPassId,
   attendees,
   setAttendees,
   searchQuery,
@@ -65,27 +58,20 @@ export function RegisterForm({
   setInviteEmail,
   buddyShortage,
   calculatedTotal,
-  categoryOptions,
-  passOptions,
+  passes,
   mockFriends,
   onSubmit,
 }: RegisterFormProps) {
   const passScrollRef = useRef<HTMLDivElement>(null);
-  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const user = useAppSelector((state) => state.auth.user);
 
-  const scrollCategory = (direction: "left" | "right") => {
-    if (categoryScrollRef.current) {
-      const { scrollLeft, clientWidth } = categoryScrollRef.current;
-      const scrollAmount = clientWidth * 0.8;
-      categoryScrollRef.current.scrollTo({
-        left:
-          direction === "left"
-            ? scrollLeft - scrollAmount
-            : scrollLeft + scrollAmount,
-        behavior: "smooth",
-      });
+  React.useEffect(() => {
+    if (user) {
+      if (!userName && user.fullName) setUserName(user.fullName as string);
+      if (!userEmail && user.email) setUserEmail(user.email as string);
+      if (!userPhone && user.mobileNumber) setUserPhone(user.mobileNumber as string);
     }
-  };
+  }, [user, userName, userEmail, userPhone, setUserName, setUserEmail, setUserPhone]);
 
   const scrollPass = (direction: "left" | "right") => {
     if (passScrollRef.current) {
@@ -117,14 +103,13 @@ export function RegisterForm({
     }
   };
 
-  // Add search-filled friend as an attendee
   const addFriendAttendee = (friend: Friend) => {
     if (attendees.some((a) => a.email === friend.email)) {
       alert(`${friend.name} is already added!`);
       return;
     }
     const newAttendee: Attendee = {
-      id: Math.random().toString(),
+      id: friend.email,
       name: friend.name,
       email: friend.email,
       isInvite: false,
@@ -134,14 +119,17 @@ export function RegisterForm({
     setFriendSuggestions([]);
   };
 
-  // Add custom manual invite friend
   const handleAddManualInvite = () => {
     if (!inviteName || !inviteEmail) {
       alert("Please fill in both name and email to invite a friend.");
       return;
     }
+    if (attendees.some((a) => a.email === inviteEmail)) {
+      alert(`${inviteName} is already added!`);
+      return;
+    }
     const newAttendee: Attendee = {
-      id: Math.random().toString(),
+      id: inviteEmail,
       name: inviteName,
       email: inviteEmail,
       isInvite: true,
@@ -151,18 +139,16 @@ export function RegisterForm({
     setInviteEmail("");
   };
 
-  // Remove attendee
   const removeAttendee = (id: string) => {
     setAttendees((prev) => prev.filter((a) => a.id !== id));
   };
 
-  const activeCategory =
-    categoryOptions.find((c) => c.id === selectedCategory) ||
-    categoryOptions[0];
+  const activePass = passes.find((p) => p.id === selectedPassId) || passes[0];
+  const requiresBuddies = activePass && activePass.passCategory !== 'SINGLE';
 
   return (
     <div className="md:col-span-3 flex flex-col gap-8 text-left">
-      {/* SECTION 1: PASS CATEGORY SELECTOR */}
+      {/* SECTION 1: PASS SELECTOR */}
       <div className="space-y-4">
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
@@ -171,100 +157,19 @@ export function RegisterForm({
             </span>
           </div>
           <h2 className="text-xl font-black tracking-tight text-foreground">
-            Select Pass Category
+            Select Pass
           </h2>
           <p className="text-xs text-muted-foreground">
-            Choose a pass category option suited for you or a group of buddies.
+            Choose a pass option for you or your group.
           </p>
         </div>
 
-        <div className="relative group/category-carousel">
-          {/* Left Scroll Button */}
-          <button
-            type="button"
-            onClick={() => scrollCategory("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/category-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="size-5" />
-          </button>
-
-          {/* Right Scroll Button */}
-          <button
-            type="button"
-            onClick={() => scrollCategory("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/category-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="size-5" />
-          </button>
-
-          {/* Carousel Track */}
-          <div
-            ref={categoryScrollRef}
-            className="flex items-center gap-4 overflow-x-auto scrollbar-none py-2 px-1 scroll-smooth w-full"
-          >
-            {categoryOptions.map((cat) => (
-              <div
-                key={cat.id}
-                onClick={() => {
-                  setSelectedCategory(cat.id);
-                  setAttendees([]);
-                }}
-                className={`p-3.5 border rounded-xl cursor-pointer select-none transition-all flex flex-col justify-between text-left gap-3 shrink-0 w-[240px] sm:w-[260px] snap-center min-h-[140px] ${
-                  selectedCategory === cat.id
-                    ? "ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5 scale-[1.01]"
-                    : "border-border hover:border-indigo-600 bg-secondary/10"
-                }`}
-              >
-                <div className="space-y-1">
-                  <span className="font-extrabold text-xs text-foreground block">
-                    {cat.name}
-                  </span>
-                  <p className="text-[10px] text-muted-foreground leading-normal">
-                    {cat.description}
-                  </p>
-                </div>
-                {cat.discount > 0 && (
-                  <div>
-                    <Badge
-                      variant={null}
-                      className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-extrabold text-[8px] uppercase tracking-wide border-0 px-1.5 py-0.5 rounded"
-                    >
-                      {cat.discount}% Off
-                    </Badge>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <hr className="border-border/40" />
-
-      {/* SECTION 2: PASS TYPE SELECTOR */}
-      <div className="space-y-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
-            <span className="text-xs font-bold uppercase tracking-wider">
-              Step 2
-            </span>
-          </div>
-          <h2 className="text-xl font-black tracking-tight text-foreground">
-            Select Pass Type
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Select the tier of event access you would like to secure.
-          </p>
-        </div>
-
-        <div className="relative group/pass-carousel">
+        <div className="relative group/pass-carousel py-4">
           {/* Left Scroll Button */}
           <button
             type="button"
             onClick={() => scrollPass("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/pass-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-30 p-2.5 rounded-full border border-white/10 bg-background/60 backdrop-blur-md text-foreground hover:bg-secondary/80 shadow-[0_0_15px_rgba(0,0,0,0.1)] opacity-0 group-hover/pass-carousel:opacity-100 transition-all duration-300 hidden md:flex items-center justify-center cursor-pointer size-10 active:scale-95"
             aria-label="Scroll left"
           >
             <ChevronLeft className="size-5" />
@@ -274,7 +179,7 @@ export function RegisterForm({
           <button
             type="button"
             onClick={() => scrollPass("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-2 rounded-full border border-border bg-background/95 text-foreground hover:bg-secondary shadow-md opacity-0 group-hover/pass-carousel:opacity-100 transition-opacity duration-300 hidden md:flex items-center justify-center cursor-pointer size-9 active:scale-95"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-30 p-2.5 rounded-full border border-white/10 bg-background/60 backdrop-blur-md text-foreground hover:bg-secondary/80 shadow-[0_0_15px_rgba(0,0,0,0.1)] opacity-0 group-hover/pass-carousel:opacity-100 transition-all duration-300 hidden md:flex items-center justify-center cursor-pointer size-10 active:scale-95"
             aria-label="Scroll right"
           >
             <ChevronRight className="size-5" />
@@ -283,64 +188,89 @@ export function RegisterForm({
           {/* Carousel Track */}
           <div
             ref={passScrollRef}
-            className="flex items-center gap-4 overflow-x-auto scrollbar-none py-2 px-1 scroll-smooth w-full"
+            className="flex items-stretch gap-5 overflow-x-auto scrollbar-none py-4 px-2 scroll-smooth w-full snap-x snap-mandatory"
           >
-            {passOptions.map((option) => (
-              <div
-                key={option.type}
-                onClick={() => setSelectedPass(option.type)}
-                className={`p-4 border rounded-xl cursor-pointer select-none transition-all flex flex-col justify-between gap-4 shrink-0 w-[280px] sm:w-[300px] snap-center min-h-[160px] ${
-                  selectedPass === option.type
-                    ? "ring-2 ring-indigo-600 border-indigo-600 bg-indigo-600/5 scale-[1.01]"
-                    : option.color
-                }`}
-              >
-                <div className="space-y-2 text-left">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-extrabold text-sm text-foreground">
-                      {option.name}
-                    </span>
-                    {option.type !== PassType.GA && (
-                      <Badge
-                        variant={null}
-                        className="bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[9px] px-1.5 py-0.5 rounded border-0"
-                      >
-                        Premium
-                      </Badge>
-                    )}
+            {passes.map((option) => {
+              const isSelected = selectedPassId === option.id;
+              return (
+                <div
+                  key={option.id}
+                  onClick={() => {
+                    setSelectedPassId(option.id);
+                    setAttendees([]); // Reset attendees on pass change
+                  }}
+                  className={`relative overflow-hidden p-5 rounded-2xl cursor-pointer select-none transition-all duration-500 flex flex-col justify-between gap-5 shrink-0 w-[290px] sm:w-[320px] snap-center min-h-[180px] group ${
+                    isSelected
+                      ? "border-transparent shadow-[0_8px_30px_rgb(79,70,229,0.2)] scale-[1.02] translate-y-[-4px]"
+                      : "border-border/50 hover:border-indigo-500/50 hover:shadow-[0_8px_25px_rgb(0,0,0,0.05)] hover:-translate-y-1 bg-secondary/5 dark:bg-white/[0.02]"
+                  }`}
+                >
+                  {/* Active Gradient Background & Border */}
+                  {isSelected && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/5 to-transparent z-0" />
+                      <div className="absolute inset-0 border-2 border-indigo-600 rounded-2xl z-10 pointer-events-none" />
+                      <div className="absolute -top-10 -right-10 w-24 h-24 bg-indigo-500/30 blur-[40px] rounded-full z-0 pointer-events-none" />
+                    </>
+                  )}
+
+                  <div className="relative z-10 space-y-3 text-left">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className={`font-black text-lg tracking-tight ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-foreground'}`}>
+                        {option.customName || option.passCategory}
+                      </span>
+                      {option.tier && option.tier !== "GA" && (
+                        <Badge
+                          variant={null}
+                          className={`font-bold text-[10px] px-2 py-0.5 rounded-full border-0 uppercase tracking-wider ${
+                            isSelected
+                              ? 'bg-indigo-600 text-white shadow-[0_0_10px_rgba(79,70,229,0.5)]'
+                              : 'bg-amber-500/20 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          {option.tier}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="flex flex-col gap-1.5 text-xs">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-indigo-500' : 'bg-border'}`} />
+                        <span className="font-medium">Category: <span className="text-foreground/80">{option.passCategory}</span></span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-purple-500' : 'bg-border'}`} />
+                        <span className="font-medium">Tier: <span className="text-foreground/80">{option.tier}</span></span>
+                      </div>
+                    </div>
                   </div>
-                  <ul className="list-disc list-inside text-[11px] text-muted-foreground space-y-0.5">
-                    {option.perks.slice(0, 3).map((perk, i) => (
-                      <li key={i} className="truncate">
-                        {perk}
-                      </li>
-                    ))}
-                  </ul>
+
+                  <div className="relative z-10 flex items-end justify-between pt-4 mt-auto border-t border-border/30">
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                      Price
+                    </span>
+                    <span className={`text-2xl font-black tracking-tighter ${isSelected ? 'text-indigo-600 dark:text-indigo-400 drop-shadow-sm' : 'text-foreground'}`}>
+                      {option.price === 0 || option.pricing === 'FREE' ? "Free" : `$${option.price}`}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-baseline justify-between border-t border-border/40 pt-2.5 mt-auto">
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    {option.extraPrice === 0
-                      ? "Included"
-                      : `+$${option.extraPrice}`}
-                  </span>
-                  <span className="text-base font-black text-foreground">
-                    {option.extraPrice === 0 ? "Free" : `$${option.extraPrice}`}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
+            {passes.length === 0 && (
+               <div className="text-sm text-muted-foreground p-4">No passes available for this event.</div>
+            )}
           </div>
         </div>
       </div>
 
       <hr className="border-border/40" />
 
-      {/* SECTION 3: ATTENDEE INFORMATION FORM */}
+      {/* SECTION 2: ATTENDEE INFORMATION FORM */}
       <div className="space-y-4">
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
             <span className="text-xs font-bold uppercase tracking-wider">
-              Step 3
+              Step 2
             </span>
           </div>
           <h2 className="text-xl font-black tracking-tight text-foreground">
@@ -389,17 +319,17 @@ export function RegisterForm({
             />
           </div>
 
-          {selectedCategory !== PassCategory.SINGLE && (
+          {requiresBuddies && (
             <>
               <hr className="border-border/40 my-6" />
 
-              {/* SECTION 4: REGISTER FRIEND / INVITES */}
+              {/* SECTION 3: REGISTER FRIEND / INVITES */}
               <div className="space-y-4">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400">
                       <span className="text-xs font-bold uppercase tracking-wider">
-                        Step 4
+                        Step 3
                       </span>
                     </div>
                     {/* Helpful validation helper badge */}
@@ -434,7 +364,7 @@ export function RegisterForm({
                   </h2>
                   <p className="text-xs text-muted-foreground">
                     Search and register buddies instantly or invite them via
-                    email to complete your {activeCategory.name}.
+                    email to complete your {activePass?.customName || activePass?.passCategory || 'pass'}.
                   </p>
                 </div>
 
@@ -559,15 +489,17 @@ export function RegisterForm({
             </>
           )}
 
-          <Button
-            type="submit"
-            className="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg py-2.5 shadow-sm transition-all active:scale-[0.98] mt-6 cursor-pointer text-xs uppercase tracking-wider"
-          >
-            Complete Checkout • {calculatedTotal}
-          </Button>
+          <div className="flex justify-end mt-6">
+            <Button
+              type="submit"
+              size="sm"
+              className="bg-indigo-700 hover:bg-indigo-600 text-white font-bold rounded-lg px-6 py-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer text-[11px] uppercase tracking-wider"
+            >
+              Complete Checkout • {calculatedTotal}
+            </Button>
+          </div>
         </form>
       </div>
     </div>
   );
 }
-

@@ -1,0 +1,47 @@
+meta {
+  name: GetEventDetail
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  query GetEventDetail($slug: String!) {
+    getEventDetail(slug: $slug) {
+      message
+ 
+      event {
+        id
+        title
+        headerImage
+        startDate
+        startTime
+        endDate
+        endTime
+        category
+        status
+     
+        mode {
+          id
+          eventMode
+          onlineLink
+          offlineAddress
+          offlineMapLink
+          offlineLandmark
+          capacity
+        }
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "slug": "REPLACE_WITH_EVENT_SLUG"
+  }
+}

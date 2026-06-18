@@ -68,6 +68,14 @@ input CreateEventPaymentSettingInput {
   acceptedMethods: [String!]!
 }
 
+input CreateEventRegistrationInput {
+  email: String!
+  eventId: String!
+  mobileNumber: String
+  name: String!
+  slug: String!
+}
+
 type CursorPaginationMetaEntity {
   hasNextPage: Boolean!
   nextCursor: String
@@ -169,10 +177,13 @@ type EventPaymentSettingSchema {
   updatedAt: DateTime!
 }
 
+type EventRegistrationResponse {
+  message: String!
+}
+
 type EventResponse {
   event: EventSchema
   message: String!
-  statusCode: Int!
 }
 
 type EventSchema {
@@ -227,8 +238,49 @@ input GetEventsListInput {
   search: String
 }
 
+input GetHostEventsInput {
+  filter: HostEventFilter!
+  search: String
+}
+
+input GetRegisteredAttendeesInput {
+  limit: Int! = 10
+  page: Int! = 1
+  passType: String
+  search: String
+  slug: String!
+  status: String
+}
+
 input GoogleAuthInput {
   idToken: String!
+}
+
+type HostEventData {
+  category: String!
+  endDate: DateTime
+  endTime: String
+  headerImage: String
+  id: ID!
+  isOnline: Boolean
+  location: String
+  registeredCount: Int!
+  slug: String
+  startDate: DateTime
+  startTime: String
+  status: HostEventFilter!
+  title: String!
+}
+
+"""Filter for host events based on start/end dates"""
+enum HostEventFilter {
+  ONGOING
+  PAST
+  UPCOMING
+}
+
+type HostEventsResponse {
+  events: [HostEventData!]!
 }
 
 input LoginInput {
@@ -243,6 +295,7 @@ type LoginResponse {
 
 type Mutation {
   createEvent(input: CreateEventInput!): EventResponse!
+  createEventRegistration(input: CreateEventRegistrationInput!): EventRegistrationResponse!
   forgotPassword(input: ForgotPasswordInput!): SuccessResponse!
   googleAuth(input: GoogleAuthInput!): LoginResponse!
   login(input: LoginInput!): LoginResponse!
@@ -251,6 +304,16 @@ type Mutation {
   signup(input: SignupInput!): SuccessResponse!
   updateSettings(input: UpdateSettingsInput!): SettingsResponse!
   verifyOtp(input: VerifyOtpInput!): SuccessResponse!
+}
+
+type PaginationMetaEntity {
+  currentPage: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  itemCount: Int!
+  itemsPerPage: Int!
+  totalItems: Int!
+  totalPages: Int!
 }
 
 enum PassPricing {
@@ -267,9 +330,27 @@ enum PassTier {
 
 type Query {
   getEvent(slug: String!): EventResponse!
+  getEventDetail(slug: String!): EventResponse!
   getEventsList(input: GetEventsListInput = {}): EventsListResponse!
+  getHostEvents(input: GetHostEventsInput!): HostEventsResponse!
+  getRegisteredAttendees(input: GetRegisteredAttendeesInput!): RegisteredAttendeesResponse!
   getSettings: SettingsResponse!
   healthCheck: String!
+}
+
+type RegisteredAttendeeData {
+  email: String!
+  id: ID!
+  name: String!
+  passType: String!
+  registerDate: DateTime!
+  status: String!
+  ticketId: String!
+}
+
+type RegisteredAttendeesResponse {
+  data: [RegisteredAttendeeData!]!
+  meta: PaginationMetaEntity!
 }
 
 input ResetPasswordInput {

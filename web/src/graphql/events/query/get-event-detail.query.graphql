@@ -1,0 +1,56 @@
+query GetEventDetail($slug: String!) {
+  getEventDetail(slug: $slug) {
+    message
+    event {
+      id
+      title
+      slug
+      headerImage
+      startDate
+      startTime
+      endDate
+      endTime
+      category
+      status
+      mode {
+        eventMode
+        offlineAddress
+        offlineMapLink
+        offlineLandmark
+        city
+        state
+        country
+        capacity
+      }
+      descriptionBlocks {
+        id
+        blockType
+        content
+        headingLevel
+        textSize
+        listStyle
+        sortOrder
+      }
+      passes {
+        id
+        pricing
+        tier
+        customName
+        passCategory
+        quantity
+        price
+      }
+      coupons {
+        id
+        code
+        discountType
+        discountValue
+        usageLimit
+      }
+      paymentSetting {
+        id
+        acceptedMethods
+      }
+    }
+  }
+}

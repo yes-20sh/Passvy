@@ -26,10 +26,11 @@ export const EventsGrid = ({
     <>
       {filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filteredEvents.map((event) => (
+          {filteredEvents.map((event, index) => (
             <EventCard
               key={event.id}
               event={event}
+              priority={index < 4}
               onRegister={(id) => {
                 setRegisteredIds((prev) =>
                   prev.includes(id) ? prev : [...prev, id],

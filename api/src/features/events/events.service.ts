@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { EventSchema } from '@/schemas/event.schema';
 import { CreateEventInput } from './dto/event.dto';
 import { GoogleService } from '@/config/google/google.service';
@@ -94,12 +94,9 @@ export class EventsService {
               existingEvent.mode.offlineMapLink = offlineMapLink;
             if (offlineLandmark !== undefined)
               existingEvent.mode.offlineLandmark = offlineLandmark;
-            if (city !== undefined)
-              existingEvent.mode.city = city;
-            if (state !== undefined)
-              existingEvent.mode.state = state;
-            if (country !== undefined)
-              existingEvent.mode.country = country;
+            if (city !== undefined) existingEvent.mode.city = city;
+            if (state !== undefined) existingEvent.mode.state = state;
+            if (country !== undefined) existingEvent.mode.country = country;
             if (capacity !== undefined) existingEvent.mode.capacity = capacity;
           }
         }
@@ -212,7 +209,6 @@ export class EventsService {
         message: input.eventId
           ? 'Event updated successfully'
           : 'Event created successfully',
-        statusCode: input.eventId ? 200 : 201,
         event: savedEvent,
       };
     } catch (error) {
@@ -221,10 +217,15 @@ export class EventsService {
     }
   }
 
-  async getEvent(userId: string, slug: string): Promise<EventResponse> {
+  async getEvent(slug: string, userId?: string): Promise<EventResponse> {
     try {
+      const whereClause: FindOptionsWhere<EventSchema> = { slug };
+      if (userId) {
+        whereClause.creatorId = userId;
+      }
+
       const event = await this.eventRepository.findOne({
-        where: { slug, creatorId: userId },
+        where: whereClause,
         relations: {
           [EventRelation.MODE]: true,
           [EventRelation.DESCRIPTION_BLOCKS]: true,
@@ -246,6 +247,11 @@ export class EventsService {
         event.endDate = new Date(event.endDate);
       }
       if (event.mode) {
+        // Hide the meet link for public requests on online events
+        if (!userId && event.mode.eventMode === EventMode.ONLINE) {
+          event.mode.onlineLink = null;
+        }
+
         if (
           event.mode.meetingStartDate &&
           typeof event.mode.meetingStartDate === 'string'
@@ -261,8 +267,9 @@ export class EventsService {
       }
 
       return {
-        message: 'Event fetched successfully',
-        statusCode: 200,
+        message: userId
+          ? 'Event fetched successfully'
+          : 'Event details fetched successfully',
         event,
       };
     } catch (error) {

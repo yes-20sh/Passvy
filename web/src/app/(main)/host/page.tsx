@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/organisms/header/header';
 import { HostEventsList } from '@/components/organisms/host-events-list/host-events-list';
-import { MOCK_EVENTS } from '../../data'; // Reusing mock events for now
 
 const HostEventsPage = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -63,7 +62,7 @@ const HostEventsPage = () => {
             </p>
           </div>
 
-          <HostEventsList events={MOCK_EVENTS} searchQuery={searchQuery} />
+          <HostEventsList searchQuery={searchQuery} />
         </div>
       </main>
     </div>
