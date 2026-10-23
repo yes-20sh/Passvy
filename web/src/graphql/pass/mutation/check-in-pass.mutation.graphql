@@ -1,0 +1,9 @@
+mutation CheckInPass($eventId: String!, $ticketCode: String!) {
+  checkInPass(eventId: $eventId, ticketCode: $ticketCode) {
+    id
+    eventId
+    name
+    email
+    isCheckedIn
+  }
+}

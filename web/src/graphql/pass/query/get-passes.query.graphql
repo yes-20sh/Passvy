@@ -1,0 +1,34 @@
+query GetPasses {
+  getPasses {
+    registration {
+      id
+      name
+      email
+      eventId
+      slug
+    }
+    event {
+      id
+      slug
+      title
+      headerImage
+      category
+      startDate
+      endDate
+      startTime
+      endTime
+      mode {
+        id
+        eventMode
+        city
+        state
+        capacity
+      }
+      passes {
+        id
+        pricing
+        price
+      }
+    }
+  }
+}

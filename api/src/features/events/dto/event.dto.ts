@@ -1,0 +1,326 @@
+import { InputType, Field, Int, Float } from '@nestjs/graphql';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  EventMode,
+  EventStatus,
+  BlockType,
+  PassPricing,
+  PassTier,
+  DiscountType,
+  EventStep,
+  PromotionDuration,
+  PromotionImageSource,
+} from '@/enum';
+
+@InputType()
+export class CreateDescriptionBlockInput {
+  @Field(() => BlockType)
+  @IsEnum(BlockType)
+  blockType: BlockType;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  content?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  headingLevel?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  textSize?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  listStyle?: string;
+
+  @Field(() => Int)
+  @IsInt()
+  sortOrder: number;
+}
+
+@InputType()
+export class CreateEventPassInput {
+  @Field(() => PassPricing)
+  @IsEnum(PassPricing)
+  pricing: PassPricing;
+
+  @Field(() => PassTier)
+  @IsEnum(PassTier)
+  tier: PassTier;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  customName?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  passCategory?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  quantity?: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  price: number;
+}
+
+@InputType()
+export class CreateEventCouponInput {
+  @Field()
+  @IsString()
+  code: string;
+
+  @Field(() => DiscountType)
+  @IsEnum(DiscountType)
+  discountType: DiscountType;
+
+  @Field(() => Float)
+  @IsNumber()
+  discountValue: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  usageLimit?: number;
+}
+
+@InputType()
+export class CreateEventPaymentSettingInput {
+  @Field(() => [String])
+  @IsArray()
+  @IsString({ each: true })
+  acceptedMethods: string[];
+}
+
+@InputType()
+export class CreateEventModeInput {
+  @Field(() => EventMode)
+  @IsEnum(EventMode)
+  eventMode: EventMode;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  onlineLink?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingStartDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingStartTime?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingEndDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingEndTime?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineAddress?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineMapLink?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineLandmark?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  capacity?: number;
+}
+
+@InputType()
+export class CreateEventInput {
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  eventId?: string;
+
+  @Field(() => EventStep, { nullable: true })
+  @IsEnum(EventStep)
+  @IsOptional()
+  stepper?: EventStep;
+
+  @Field()
+  @IsString()
+  title: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  headerImage?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  startDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  startTime?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  endDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  endTime?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @Field(() => EventMode)
+  @IsEnum(EventMode)
+  eventMode: EventMode;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  onlineLink?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingStartDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingStartTime?: string;
+
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  meetingEndDate?: Date;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  meetingEndTime?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineAddress?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineMapLink?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  offlineLandmark?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  state?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  country?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  capacity?: number;
+
+  @Field(() => EventStatus, { nullable: true })
+  @IsEnum(EventStatus)
+  @IsOptional()
+  status?: EventStatus;
+
+  @Field(() => [CreateDescriptionBlockInput], { nullable: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateDescriptionBlockInput)
+  @IsOptional()
+  descriptionBlocks?: CreateDescriptionBlockInput[];
+
+  @Field(() => [CreateEventPassInput], { nullable: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEventPassInput)
+  @IsOptional()
+  passes?: CreateEventPassInput[];
+
+  @Field(() => [CreateEventCouponInput], { nullable: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEventCouponInput)
+  @IsOptional()
+  coupons?: CreateEventCouponInput[];
+
+  @Field(() => CreateEventPaymentSettingInput, { nullable: true })
+  @ValidateNested()
+  @Type(() => CreateEventPaymentSettingInput)
+  @IsOptional()
+  paymentSetting?: CreateEventPaymentSettingInput;
+}
+
+@InputType()
+export class PromoteEventInput {
+  @Field(() => String)
+  @IsString()
+  eventSlug: string;
+
+  @Field(() => PromotionDuration)
+  @IsEnum(PromotionDuration)
+  duration: PromotionDuration;
+
+  @Field(() => Date)
+  startDate: Date;
+
+  @Field(() => Date)
+  endDate: Date;
+
+  @Field(() => PromotionImageSource)
+  @IsEnum(PromotionImageSource)
+  imageSource: PromotionImageSource;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+}

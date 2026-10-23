@@ -1,0 +1,50 @@
+meta {
+  name: GetPassDetail
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetPassDetail($slug: String!) {
+    getPassDetail(slug: $slug) {
+      registration {
+        id
+        name
+        email
+        eventId
+        slug
+      }
+      event {
+        id
+        title
+        headerImage
+        category
+        startDate
+        endDate
+        startTime
+        endTime
+        mode {
+          eventMode
+          city
+          state
+        }
+        passes {
+          pricing
+          price
+        }
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "slug": "master-the-data-structure-6e01bd"
+  }
+}

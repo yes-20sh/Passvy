@@ -1,0 +1,33 @@
+meta {
+  name: PromoteEvent
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  mutation PromoteEvent($input: PromoteEventInput!) {
+    promoteEvent(input: $input)
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "eventSlug": "YOUR_EVENT_SLUG_HERE",
+      "duration": "1-week",
+      "startDate": "2026-06-20",
+      "endDate": "2026-06-27",
+      "imageSource": "header"
+    }
+  }
+}

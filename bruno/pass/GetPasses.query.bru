@@ -1,0 +1,49 @@
+meta {
+  name: GetPasses
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query GetPasses {
+    getPasses {
+      registration {
+        id
+        name
+        email
+        eventId
+        slug
+      }
+      event {
+        id
+        title
+        headerImage
+        category
+        startDate
+        endDate
+        startTime
+        endTime
+        mode {
+          eventMode
+          city
+          state
+          capacity
+        }
+        passes {
+          pricing
+          price
+        }
+      }
+    }
+  }
+}
+
+body:graphql:vars {
+  {}
+}

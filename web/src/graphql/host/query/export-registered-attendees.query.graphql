@@ -1,0 +1,3 @@
+query ExportRegisteredAttendees($input: ExportRegisteredAttendeesInput!) {
+  exportRegisteredAttendees(input: $input)
+}

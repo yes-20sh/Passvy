@@ -1,0 +1,6 @@
+mutation GoogleAuth($input: GoogleAuthInput!) {
+  googleAuth(input: $input) {
+    accessToken
+    statusCode
+  }
+}

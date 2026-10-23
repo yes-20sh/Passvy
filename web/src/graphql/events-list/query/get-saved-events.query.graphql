@@ -1,0 +1,28 @@
+query GetSavedEvents($input: GetSavedEventsInput) {
+  getSavedEvents(input: $input) {
+    events {
+      id
+      isSaved
+      slug
+      title
+      category
+      headerImage
+      startDate
+      startTime
+      mode {
+        eventMode
+        city
+        state
+        capacity
+      }
+      passes {
+        pricing
+        price
+      }
+    }
+    meta {
+      nextCursor
+      hasNextPage
+    }
+  }
+}

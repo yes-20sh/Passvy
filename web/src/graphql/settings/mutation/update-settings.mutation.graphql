@@ -1,0 +1,15 @@
+mutation UpdateSettings($input: UpdateSettingsInput!) {
+  updateSettings(input: $input) {
+    success
+    message
+    data {
+      id
+      fullName
+      email
+      mobileNumber
+      avatar
+      theme
+      eventPreferences
+    }
+  }
+}

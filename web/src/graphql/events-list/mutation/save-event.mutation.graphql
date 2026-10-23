@@ -1,0 +1,3 @@
+mutation SaveEvent($input: SaveEventInput!) {
+  saveEvent(input: $input)
+}

@@ -1,0 +1,482 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+enum BlockType {
+  HEADING
+  IMAGE
+  LIST
+  PARAGRAPH
+}
+
+input CreateDescriptionBlockInput {
+  blockType: BlockType!
+  content: String
+  headingLevel: String
+  listStyle: String
+  sortOrder: Int!
+  textSize: String
+}
+
+input CreateEventCouponInput {
+  code: String!
+  discountType: DiscountType!
+  discountValue: Float!
+  usageLimit: Int
+}
+
+input CreateEventInput {
+  capacity: Int
+  category: String
+  city: String
+  country: String
+  coupons: [CreateEventCouponInput!]
+  descriptionBlocks: [CreateDescriptionBlockInput!]
+  endDate: DateTime
+  endTime: String
+  eventId: String
+  eventMode: EventMode!
+  headerImage: String
+  meetingEndDate: DateTime
+  meetingEndTime: String
+  meetingStartDate: DateTime
+  meetingStartTime: String
+  offlineAddress: String
+  offlineLandmark: String
+  offlineMapLink: String
+  onlineLink: String
+  passes: [CreateEventPassInput!]
+  paymentSetting: CreateEventPaymentSettingInput
+  startDate: DateTime
+  startTime: String
+  state: String
+  status: EventStatus
+  stepper: EventStep
+  title: String!
+}
+
+input CreateEventPassInput {
+  customName: String
+  passCategory: String
+  price: Float!
+  pricing: PassPricing!
+  quantity: Int
+  tier: PassTier!
+}
+
+input CreateEventPaymentSettingInput {
+  acceptedMethods: [String!]!
+}
+
+input CreateEventRegistrationInput {
+  email: String!
+  eventId: String!
+  mobileNumber: String
+  name: String!
+  slug: String!
+}
+
+type CursorPaginationMetaEntity {
+  hasNextPage: Boolean!
+  nextCursor: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum DiscountType {
+  AMOUNT
+  PERCENTAGE
+}
+
+type EventCouponSchema {
+  code: String!
+  createdAt: DateTime!
+  discountType: DiscountType!
+  discountValue: Float!
+  id: ID!
+  usageLimit: Int
+}
+
+type EventDescriptionBlockSchema {
+  blockType: BlockType!
+  content: String
+  createdAt: DateTime!
+  headingLevel: String
+  id: ID!
+  listStyle: String
+  sortOrder: Int!
+  textSize: String
+}
+
+type EventListBaseEntity {
+  category: String
+  headerImage: String
+  id: ID!
+  isSaved: Boolean
+  mode: EventListModeEntity
+  passes: [EventListPassEntity!]
+  slug: String
+  startDate: DateTime
+  startTime: String
+  title: String!
+}
+
+type EventListModeEntity {
+  capacity: Int
+  city: String
+  eventMode: EventMode!
+  state: String
+}
+
+type EventListPassEntity {
+  price: Float!
+  pricing: PassPricing!
+}
+
+enum EventMode {
+  OFFLINE
+  ONLINE
+}
+
+type EventModeSchema {
+  capacity: Int
+  city: String
+  country: String
+  createdAt: DateTime!
+  eventMode: EventMode!
+  id: ID!
+  meetingEndDate: DateTime
+  meetingEndTime: String
+  meetingStartDate: DateTime
+  meetingStartTime: String
+  offlineAddress: String
+  offlineLandmark: String
+  offlineMapLink: String
+  onlineLink: String
+  state: String
+  updatedAt: DateTime!
+}
+
+type EventPassSchema {
+  createdAt: DateTime!
+  customName: String
+  id: ID!
+  passCategory: String
+  price: Float!
+  pricing: PassPricing!
+  quantity: Int
+  tier: PassTier!
+}
+
+type EventPaymentSettingSchema {
+  acceptedMethods: [String!]!
+  createdAt: DateTime!
+  id: ID!
+  updatedAt: DateTime!
+}
+
+type EventPromotionSchema {
+  createdAt: DateTime!
+  duration: PromotionDuration!
+  endDate: DateTime!
+  eventId: String!
+  id: ID!
+  imageSource: PromotionImageSource!
+  imageUrl: String
+  startDate: DateTime!
+  updatedAt: DateTime!
+}
+
+type EventRegistrationResponse {
+  message: String!
+}
+
+type EventRegistrationSchema {
+  createdAt: DateTime!
+  email: String!
+  eventId: String!
+  id: ID!
+  isCheckedIn: Boolean!
+  mobileNumber: String
+  name: String!
+  slug: String!
+  updatedAt: DateTime!
+}
+
+type EventResponse {
+  event: EventSchema
+  isSaved: Boolean
+  message: String!
+}
+
+type EventSchema {
+  category: String
+  coupons: [EventCouponSchema!]
+  createdAt: DateTime!
+  creatorId: String!
+  descriptionBlocks: [EventDescriptionBlockSchema!]
+  endDate: DateTime
+  endTime: String
+  headerImage: String
+  id: ID!
+  mode: EventModeSchema
+  passes: [EventPassSchema!]
+  paymentSetting: EventPaymentSettingSchema
+  promotions: [EventPromotionSchema!]
+  slug: String
+  startDate: DateTime
+  startTime: String
+  status: EventStatus!
+  stepper: EventStep
+  title: String!
+  updatedAt: DateTime!
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum EventStep {
+  DESCRIPTION
+  ESSENTIALS
+  MODE
+  PASSES
+  PAYOUTS
+}
+
+type EventsListResponse {
+  events: [EventListBaseEntity!]!
+  meta: CursorPaginationMetaEntity
+}
+
+input ExportRegisteredAttendeesInput {
+  columns: [String!]!
+  slug: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+input GetEventsListInput {
+  category: String
+  cursor: String
+  filter: String
+  limit: Int
+  search: String
+}
+
+input GetHostEventsInput {
+  filter: HostEventFilter!
+  search: String
+}
+
+input GetRegisteredAttendeesInput {
+  limit: Int! = 10
+  page: Int! = 1
+  passType: String
+  search: String
+  slug: String!
+  status: String
+}
+
+input GetSavedEventsInput {
+  cursor: String
+  limit: Int
+}
+
+input GoogleAuthInput {
+  idToken: String!
+}
+
+type HostEventData {
+  category: String!
+  endDate: DateTime
+  endTime: String
+  headerImage: String
+  id: ID!
+  isOnline: Boolean
+  location: String
+  registeredCount: Int!
+  slug: String
+  startDate: DateTime
+  startTime: String
+  status: HostEventFilter!
+  title: String!
+}
+
+"""Filter for host events based on start/end dates"""
+enum HostEventFilter {
+  ONGOING
+  PAST
+  UPCOMING
+}
+
+type HostEventsResponse {
+  events: [HostEventData!]!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type LoginResponse {
+  accessToken: String!
+  statusCode: Int!
+}
+
+type Mutation {
+  checkInPass(eventId: String!, ticketCode: String!): EventRegistrationSchema!
+  createEvent(input: CreateEventInput!): EventResponse!
+  createEventRegistration(input: CreateEventRegistrationInput!): EventRegistrationResponse!
+  forgotPassword(input: ForgotPasswordInput!): SuccessResponse!
+  googleAuth(input: GoogleAuthInput!): LoginResponse!
+  login(input: LoginInput!): LoginResponse!
+  logout: SuccessResponse!
+  promoteEvent(input: PromoteEventInput!): Boolean!
+  resetPassword(input: ResetPasswordInput!): SuccessResponse!
+  saveEvent(input: SaveEventInput!): Boolean!
+  signup(input: SignupInput!): SuccessResponse!
+  updateSettings(input: UpdateSettingsInput!): SettingsResponse!
+  verifyOtp(input: VerifyOtpInput!): SuccessResponse!
+}
+
+type PaginationMetaEntity {
+  currentPage: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  itemCount: Int!
+  itemsPerPage: Int!
+  totalItems: Int!
+  totalPages: Int!
+}
+
+enum PassPricing {
+  FREE
+  PAID
+}
+
+type PassResponseEntity {
+  event: EventSchema!
+  registration: EventRegistrationSchema!
+}
+
+enum PassTier {
+  CUSTOM
+  GA
+  VIP
+  VVIP
+}
+
+input PromoteEventInput {
+  duration: PromotionDuration!
+  endDate: DateTime!
+  eventSlug: String!
+  imageSource: PromotionImageSource!
+  imageUrl: String
+  startDate: DateTime!
+}
+
+enum PromotionDuration {
+  ONE_DAY
+  ONE_WEEK
+}
+
+enum PromotionImageSource {
+  HEADER
+  UPLOAD
+}
+
+type Query {
+  exportRegisteredAttendees(input: ExportRegisteredAttendeesInput!): String!
+  getEvent(slug: String!): EventResponse!
+  getEventDetail(slug: String!): EventResponse!
+  getEventPromotions(eventSlug: String!): [EventPromotionSchema!]!
+  getEventsList(input: GetEventsListInput = {}): EventsListResponse!
+  getHostEvents(input: GetHostEventsInput!): HostEventsResponse!
+  getPassDetail(slug: String!): PassResponseEntity!
+  getPasses: [PassResponseEntity!]!
+  getRegisteredAttendees(input: GetRegisteredAttendeesInput!): RegisteredAttendeesResponse!
+  getSavedEvents(input: GetSavedEventsInput = {}): EventsListResponse!
+  getSettings: SettingsResponse!
+  healthCheck: String!
+}
+
+type RegisteredAttendeeData {
+  email: String!
+  id: ID!
+  mobileNumber: String
+  name: String!
+  passType: String!
+  registerDate: DateTime!
+  status: String!
+  ticketId: String!
+}
+
+type RegisteredAttendeesResponse {
+  data: [RegisteredAttendeeData!]!
+  meta: PaginationMetaEntity!
+}
+
+input ResetPasswordInput {
+  confirmPassword: String!
+  email: String!
+  newPassword: String!
+  otp: String!
+}
+
+input SaveEventInput {
+  eventSlug: String!
+}
+
+type Settings {
+  avatar: String
+  email: String!
+  eventPreferences: [String!]
+  fullName: String!
+  id: ID!
+  mobileNumber: String
+  theme: Theme
+}
+
+type SettingsResponse {
+  data: Settings
+  message: String!
+  success: Boolean!
+}
+
+input SignupInput {
+  confirmPassword: String!
+  email: String!
+  fullName: String!
+  mobileNumber: String!
+  password: String!
+}
+
+type SuccessResponse {
+  message: String!
+  statusCode: Int!
+}
+
+enum Theme {
+  DARK
+  LIGHT
+}
+
+input UpdateSettingsInput {
+  avatar: String
+  eventPreferences: [String!]
+  fullName: String
+  mobileNumber: String
+  theme: Theme
+}
+
+input VerifyOtpInput {
+  email: String!
+  otp: String!
+}

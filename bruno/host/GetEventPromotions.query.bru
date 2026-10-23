@@ -1,0 +1,35 @@
+meta {
+  name: GetEventPromotions
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query GetEventPromotions($eventSlug: String!) {
+    getEventPromotions(eventSlug: $eventSlug) {
+      id
+      duration
+      startDate
+      endDate
+      imageSource
+      imageUrl
+      createdAt
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "eventSlug": "YOUR_EVENT_SLUG_HERE"
+  }
+}

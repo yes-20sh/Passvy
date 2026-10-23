@@ -1,0 +1,3 @@
+mutation PromoteEvent($input: PromoteEventInput!) {
+  promoteEvent(input: $input)
+}

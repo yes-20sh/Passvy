@@ -1,0 +1,27 @@
+meta {
+  name: GoogleAuth
+  type: graphql
+  seq: 6
+}
+
+post {
+  url: {{graphqlUrl}}
+  body: graphql
+  auth: none
+}
+
+body:graphql {
+  mutation GoogleAuth($input: GoogleAuthInput!) {
+    googleAuth(input: $input) {
+      accessToken
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "input": {
+      "idToken": "insert-your-firebase-id-token-here"
+    }
+  }
+}
